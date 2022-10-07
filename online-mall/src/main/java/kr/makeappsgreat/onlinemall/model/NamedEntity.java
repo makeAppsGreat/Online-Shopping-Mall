@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,8 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-@Getter @Setter
 @RequiredArgsConstructor @SuperBuilder
+@Getter @Setter
+@EqualsAndHashCode(of = "id")
 public class NamedEntity {
 
     @Id @GeneratedValue

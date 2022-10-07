@@ -1,13 +1,16 @@
 package kr.makeappsgreat.onlinemall.product;
 
 import kr.makeappsgreat.onlinemall.model.NamedEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -16,17 +19,26 @@ import java.util.Set;
 public class Product extends NamedEntity {
 
     private int price;
+    @Builder.Default
+    private LocalDateTime registeredDate = LocalDateTime.now();
 
-    // private Manufacturer manufacturer;
-    // private Category category;
+    @ManyToOne
+    private Manufacturer manufacturer;
+    @ManyToOne
+    private Category category;
     @OneToMany
-    @JoinColumn(name = "product_id")
-    private Set<Product> options;
+    @Builder.Default
+    private Set<Product> options =  new HashSet<>();
+    @OneToMany
+    @Builder.Default
+    private Set<Product> relatedProducts = new HashSet<>();
 
     private String imageLink;
     private String simpleDetail;
     private String detail;
 
-    // 상품 등록일
-    // 관련상품
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

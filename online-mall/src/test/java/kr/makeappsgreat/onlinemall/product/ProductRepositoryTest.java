@@ -10,6 +10,10 @@ import java.util.List;
 @DataJpaTest
 class ProductRepositoryTest {
 
+    /**
+     * @TODO : Do test removing option of product and check query.
+     */
+
     @Autowired
     ManufacturerRepository manufacturerRepository;
 

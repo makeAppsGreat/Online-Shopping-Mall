@@ -29,9 +29,10 @@ public class Product extends NamedEntity {
     @OneToMany
     @Builder.Default
     private Set<Product> options =  new HashSet<>();
-    @OneToMany
+    // 관련상품
+    /* @OneToMany
     @Builder.Default
-    private Set<Product> relatedProducts = new HashSet<>();
+    private Set<Product> relatedProducts = new HashSet<>(); */
 
     private String imageLink;
     private String simpleDetail;

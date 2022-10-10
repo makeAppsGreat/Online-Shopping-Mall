@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+<div>
+    <div th:each="product : ${products}">
+        <a th:href="@{/product/detail/{id}(id=${product.id})}">
+            <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
+            <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:120px">
+            <p><b th:text="${product.name}">(상품이름)</b> | <span th:text="${product.price}">(상품가격)</span> 원</p>
+        </a>
+        <hr>
+    </div>
+</div>
+</body>
+</html>

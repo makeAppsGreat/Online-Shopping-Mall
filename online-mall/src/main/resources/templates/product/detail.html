@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+</head>
+<body>
+<img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
+<img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:400px">
+<h2 th:text="${product.name}">Product Name</h2>
+<p th:text="${product.simpleDetail}">Simple Detail</p>
+<h3><b><span th:text="${product.price}">(상품 가격)</span> 원</b></h3>
+<p><label>제조사 : </label><span th:text="${product.manufacturer.name}">(상품 제조사)</span></p>
+<p><label>상품분류 : </label><span th:text="${product.category.name}">(상품 분류)</span></p>
+</body>
+</html>

@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.product;
 import kr.makeappsgreat.onlinemall.model.NamedEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -14,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@SuperBuilder
+@RequiredArgsConstructor @SuperBuilder
 @Getter @Setter
 public class Product extends NamedEntity {
 

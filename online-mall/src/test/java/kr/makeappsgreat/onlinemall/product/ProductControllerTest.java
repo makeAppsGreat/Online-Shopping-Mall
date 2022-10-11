@@ -61,4 +61,53 @@ class ProductControllerTest {
         }
     }
 
+    @Nested
+    class ListProduct {
+
+        @Test
+        @DisplayName("정상요청")
+        public void list() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("정상요청 with Page")
+        public void list_withPage() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("page", "1"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        /** @TODO : Check that page is default value(1), when wrong case. */
+        @Test
+        @DisplayName("정상요청 with 잘못된 Page(Type mismatch)")
+        public void list_withWrongPage() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("page", "notANumber"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("정상요청 with 잘못된 Page(Not exist)")
+        public void list_withWrongPage2() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("page", "-1"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(get("/product/list")
+                            .param("page", String.valueOf(Integer.MAX_VALUE)))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+    }
+
 }

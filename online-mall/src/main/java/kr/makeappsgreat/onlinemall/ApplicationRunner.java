@@ -176,7 +176,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
         p3.getOptions().add(p4);
         p5.getOptions().add(p6);
 
-        log.info("Products saved... Manufacturer : {}, Category : {}, Product : {}",
+        log.info("Products saved... (Manufacturer : {}, Category : {}, Product : {})",
                 manufacturerRepository.count(),
                 categoryRepository.count(),
                 productRepository.count());

@@ -1,9 +1,9 @@
 package kr.makeappsgreat.onlinemall.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,8 +32,12 @@ public class ProductController {
 
     private final ProductRepository productRepository;
 
+    @Value("${product.list.page_request.size}")
+    private int SIZE;
+
     @GetMapping("/detail/{id}")
     public String detail(@PathVariable Long id, Model model) {
+
         Optional<Product> productOptional = productRepository.findById(id);
         model.addAttribute("product",
                 productOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
@@ -42,22 +46,26 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public String list(@ModelAttribute @Valid MyPageRequest myPageRequest, BindingResult bindingResult,
+    public String list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
                        Model model) {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(e -> {
                 if (e instanceof FieldError) {
                     FieldError fieldError = (FieldError) e;
+
                     switch (fieldError.getField()) {
                         case "page":
-                            myPageRequest.setPage(1);
+                            productPageRequest.setPage(ProductPageRequest.DEFAULT_PAGE_VALUE);
+                            break;
+                        case "sort":
+                            productPageRequest.setSortMethod(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE);
                             break;
                     }
                 }
             });
         }
 
-        PageRequest pageRequest = PageRequest.of(myPageRequest.getPage() - 1, 10, Sort.by("name").ascending());
+        PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
 
         Page<Product> all = productRepository.findAll(pageRequest);
         model.addAttribute("products", all);

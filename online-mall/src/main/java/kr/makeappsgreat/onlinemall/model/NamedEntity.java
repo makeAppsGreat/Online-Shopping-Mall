@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotBlank;
 
 @MappedSuperclass
 @RequiredArgsConstructor @SuperBuilder
@@ -18,5 +19,6 @@ public class NamedEntity {
 
     @Id @GeneratedValue
     private Long id;
+    @NotBlank
     private String name;
 }

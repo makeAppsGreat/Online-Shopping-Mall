@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.data.domain.Sort;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 @Getter @Setter
 public class ProductPageRequest {
@@ -12,9 +13,10 @@ public class ProductPageRequest {
     public static int DEFAULT_SORT_METHOD_VALUE = 0;
     public static int DEFAULT_PAGE_VALUE = 1;
 
+    @Size(min = 2)
     private String keyword;
-    private String manufacturer;
-    private String category;
+    private Long manufacturer = -1L;
+    private Long category = -1L;
     @Min(0)
     private int sortMethod = this.DEFAULT_SORT_METHOD_VALUE;
     @Min(1)

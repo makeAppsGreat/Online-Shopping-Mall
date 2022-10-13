@@ -54,6 +54,9 @@ public class ProductController {
                     FieldError fieldError = (FieldError) e;
 
                     switch (fieldError.getField()) {
+                        case "keyword":
+                            /** @TODO : Handle case -> Keyword is too short. */
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                         case "page":
                             productPageRequest.setPage(ProductPageRequest.DEFAULT_PAGE_VALUE);
                             break;
@@ -64,11 +67,33 @@ public class ProductController {
                 }
             });
         }
+        System.out.println(productPageRequest.getKeyword());
 
         PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
+        Page<Product> result;
 
-        Page<Product> all = productRepository.findAll(pageRequest);
-        model.addAttribute("products", all);
+        if (productPageRequest.getKeyword() != null && !productPageRequest.getKeyword().isBlank())
+            result = productRepository.findByNameContainingOrSimpleDetailContaining(
+                    productPageRequest.getKeyword(),
+                    productPageRequest.getKeyword(),
+                    pageRequest);
+        else if (productPageRequest.getManufacturer() >= 0 && productPageRequest.getCategory() >= 0) {
+            Manufacturer manufacturer = new Manufacturer();
+            manufacturer.setId(productPageRequest.getManufacturer());
+            Category category = new Category();
+            category.setId(productPageRequest.getCategory());
+            result = productRepository.findByManufacturerAndCategory(manufacturer, category, pageRequest);
+        } else if (productPageRequest.getManufacturer() >= 0) {
+            Manufacturer manufacturer = new Manufacturer();
+            manufacturer.setId(productPageRequest.getManufacturer());
+            result = productRepository.findByManufacturer(manufacturer, pageRequest);
+        } else if (productPageRequest.getCategory() >= 0) {
+            Category category = new Category();
+            category.setId(productPageRequest.getCategory());
+            result = productRepository.findByCategory(category, pageRequest);
+        } else result = productRepository.findAll(pageRequest);
+
+        model.addAttribute("products", result);
 
         return "/product/list";
     }

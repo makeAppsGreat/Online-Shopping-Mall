@@ -1,17 +1,17 @@
 package kr.makeappsgreat.onlinemall.product;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -22,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProductControllerTest {
 
     @Autowired
-    // ProductRepository productRepository;
-    ProductRepositoryForTest productRepository;
+    ProductRepository productRepository;
 
     @Autowired
     MockMvc mockMvc;
@@ -36,14 +35,15 @@ class ProductControllerTest {
         public void detail() throws Exception {
             /** @TODO : Do save test data first, if run the application with NOT in-memory DB(Test DB). */
             // Given
-            Optional<Product> one = productRepository.findTopByOrderById();
+            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
 
             // When & Then
-            mockMvc.perform(get("/product/detail/{id}",
-                            one.orElseThrow().getId()))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeExists("product"));
+            for (Product p : one) {
+                mockMvc.perform(get("/product/detail/{id}", p.getId()))
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(model().attributeExists("product"));
+            }
         }
 
         @Test
@@ -177,13 +177,71 @@ class ProductControllerTest {
                     ));
 
             mockMvc.perform(get("/product/list")
-                            .param("sort_methodr", String.valueOf(1_000_000_000)))
+                            .param("sort_method", String.valueOf(1_000_000_000)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
                             hasProperty("sort", is(productPageRequest.getSort()))
                     ));
+        }
+
+        @Test
+        public void list_keyword_200() throws Exception {
+            // Given
+            String keyword = "샴푸";
+
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("keyword", keyword))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty(
+                                    "content",
+                                    hasItem(anyOf(
+                                            Matchers.<Product>hasProperty("name", containsString(keyword)),
+                                            Matchers.<Product>hasProperty("simpleDetail", containsString(keyword))))
+                                    )
+
+                    ));
+        }
+
+        @Test
+        public void list_shortKeyword_200WithNoResult() throws Exception {
+            // Given
+            String keyword = "마";
+
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("keyword", keyword))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        public void list_manufacturer_200() throws Exception {
+            // Given
+            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
+
+            // When & Then
+            for (Product product : one) {
+                Manufacturer target = product.getManufacturer();
+
+                mockMvc.perform(get("/product/list")
+                                .param("manufacturer", String.valueOf(target.getId())))
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(model().attribute(
+                                "products",
+                                hasProperty(
+                                        "content",
+                                        hasItem(Matchers.<Product>hasProperty(
+                                                "manufacturer"
+                                                , is(target))))
+                        ));
+            }
         }
     }
 

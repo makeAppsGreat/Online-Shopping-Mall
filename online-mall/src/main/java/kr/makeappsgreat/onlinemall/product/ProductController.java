@@ -67,7 +67,6 @@ public class ProductController {
                 }
             });
         }
-        System.out.println(productPageRequest.getKeyword());
 
         PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
         Page<Product> result;

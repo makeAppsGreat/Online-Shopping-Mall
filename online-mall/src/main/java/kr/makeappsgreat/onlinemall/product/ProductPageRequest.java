@@ -15,8 +15,8 @@ public class ProductPageRequest {
 
     @Size(min = 2)
     private String keyword;
-    private Long manufacturer = -1L;
-    private Long category = -1L;
+    private Long manufacturer;
+    private Long category;
     @Min(0)
     private int sortMethod = this.DEFAULT_SORT_METHOD_VALUE;
     @Min(1)

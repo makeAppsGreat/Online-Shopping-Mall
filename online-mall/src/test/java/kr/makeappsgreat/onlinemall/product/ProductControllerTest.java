@@ -90,7 +90,7 @@ class ProductControllerTest {
         @DisplayName("정상요청 with Page")
         public void list_properPage_200() throws Exception {
             // Given
-            int page = 1;
+            int page = 2;
 
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -98,6 +98,20 @@ class ProductControllerTest {
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute("productPageRequest", hasProperty("page", is(page))));
+        }
+
+        @Test
+        @DisplayName("정상요청 with Blank Page")
+        public void list_blankPage_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("page", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "productPageRequest",
+                            hasProperty("page", is(ProductPageRequest.DEFAULT_PAGE_VALUE)))
+                    );
         }
 
         @Test
@@ -110,8 +124,8 @@ class ProductControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("page", is(ProductPageRequest.DEFAULT_PAGE_VALUE))
-                    ));
+                            hasProperty("page", is(ProductPageRequest.DEFAULT_PAGE_VALUE)))
+                    );
         }
 
         @Test
@@ -148,6 +162,20 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("정상요청 with Blank Sort Method")
+        public void list_blankSortMethod_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("sort_method", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "productPageRequest",
+                            hasProperty("sortMethod", is(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE)))
+                    );
+        }
+
+        @Test
         @DisplayName("잘못된 Sort Method 요청(Type mismatch)")
         public void list_typeMismatchedSortMethod_200WithDefaultSortMethod() throws Exception {
             // When & Then
@@ -157,8 +185,8 @@ class ProductControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("sortMethod", is(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE))
-                    ));
+                            hasProperty("sortMethod", is(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE)))
+                    );
         }
 
         @Test
@@ -209,6 +237,16 @@ class ProductControllerTest {
         }
 
         @Test
+        public void list_blankKeyword_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("keyword", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeExists("products"));
+        }
+
+        @Test
         public void list_shortKeyword_200WithNoResult() throws Exception {
             // Given
             String keyword = "마";
@@ -217,7 +255,8 @@ class ProductControllerTest {
             mockMvc.perform(get("/product/list")
                             .param("keyword", keyword))
                     .andDo(print())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeDoesNotExist("products"));
         }
 
         @Test
@@ -242,6 +281,42 @@ class ProductControllerTest {
                                                 , is(target))))
                         ));
             }
+        }
+
+        @Test
+        public void list_blankManufacturer_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("manufacturer", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty("content", hasSize(greaterThan(0))))
+                    );
+        }
+
+        @Test
+        public void list_typeMismatchedManufacturer_200WithNoResult() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("manufacturer", "notANumber"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeDoesNotExist("products"));
+        }
+
+        @Test
+        public void list_notExistManufacturer_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("manufacturer", "-1"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty("content", hasSize(0)))
+                    );
         }
     }
 

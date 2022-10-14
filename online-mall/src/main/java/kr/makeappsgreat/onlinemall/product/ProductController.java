@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,14 +50,19 @@ public class ProductController {
     public String list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
                        Model model) {
         if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(e -> {
+            for (ObjectError e : bindingResult.getAllErrors()) {
                 if (e instanceof FieldError) {
                     FieldError fieldError = (FieldError) e;
 
                     switch (fieldError.getField()) {
                         case "keyword":
-                            /** @TODO : Handle case -> Keyword is too short. */
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                            if (!productPageRequest.getKeyword().isBlank())
+                                return "/product/list"; // Case : Keyword is too short.
+                            break;
+                        case "manufacturer":
+                            if (fieldError.isBindingFailure() && !((String) fieldError.getRejectedValue()).isBlank())
+                                return "/product/list";
+                            break;
                         case "page":
                             productPageRequest.setPage(ProductPageRequest.DEFAULT_PAGE_VALUE);
                             break;
@@ -65,28 +71,28 @@ public class ProductController {
                             break;
                     }
                 }
-            });
+            }
         }
 
-        PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
         Page<Product> result;
+        PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
 
         if (productPageRequest.getKeyword() != null && !productPageRequest.getKeyword().isBlank())
             result = productRepository.findByNameContainingOrSimpleDetailContaining(
                     productPageRequest.getKeyword(),
                     productPageRequest.getKeyword(),
                     pageRequest);
-        else if (productPageRequest.getManufacturer() >= 0 && productPageRequest.getCategory() >= 0) {
+        else if (productPageRequest.getManufacturer() != null && productPageRequest.getCategory() != null) {
             Manufacturer manufacturer = new Manufacturer();
             manufacturer.setId(productPageRequest.getManufacturer());
             Category category = new Category();
             category.setId(productPageRequest.getCategory());
             result = productRepository.findByManufacturerAndCategory(manufacturer, category, pageRequest);
-        } else if (productPageRequest.getManufacturer() >= 0) {
+        } else if (productPageRequest.getManufacturer() != null) {
             Manufacturer manufacturer = new Manufacturer();
             manufacturer.setId(productPageRequest.getManufacturer());
             result = productRepository.findByManufacturer(manufacturer, pageRequest);
-        } else if (productPageRequest.getCategory() >= 0) {
+        } else if (productPageRequest.getCategory() != null) {
             Category category = new Category();
             category.setId(productPageRequest.getCategory());
             result = productRepository.findByCategory(category, pageRequest);

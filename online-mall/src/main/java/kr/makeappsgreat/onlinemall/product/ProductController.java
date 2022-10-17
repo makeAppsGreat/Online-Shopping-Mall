@@ -60,6 +60,7 @@ public class ProductController {
                                 return "/product/list"; // Case : Keyword is too short.
                             break;
                         case "manufacturer":
+                        case "category":
                             if (fieldError.isBindingFailure() && !((String) fieldError.getRejectedValue()).isBlank())
                                 return "/product/list";
                             break;

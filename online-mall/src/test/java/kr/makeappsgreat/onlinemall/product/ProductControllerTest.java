@@ -1,9 +1,7 @@
 package kr.makeappsgreat.onlinemall.product;
 
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,10 +26,11 @@ class ProductControllerTest {
     MockMvc mockMvc;
 
     @Nested
+    @TestMethodOrder(MethodOrderer.DisplayName.class)
     class Detail {
 
         @Test
-        @DisplayName("정상요청")
+        @DisplayName("Proper request [200]")
         public void detail() throws Exception {
             /** @TODO : Do save test data first, if run the application with NOT in-memory DB(Test DB). */
             // Given
@@ -47,7 +46,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Product Id 없이 요청")
+        @DisplayName("No Product Id [404]")
         public void detail_withNoProductId_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/detail/"))
@@ -56,7 +55,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Product Id 요청(Type mismatch)")
+        @DisplayName("Wrong Product Id with type mismatched [404]")
         public void detail_typeMismatchedProductId_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/detail/{id}", "notANumber"))
@@ -65,7 +64,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Product Id 요청(Not exist)")
+        @DisplayName("Wrong Product Id with not exist [404]")
         public void detail_notExistedProductId_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/detail/{id}", -1))
@@ -75,10 +74,11 @@ class ProductControllerTest {
     }
 
     @Nested
+    @TestMethodOrder(MethodOrderer.DisplayName.class)
     class ListProduct {
 
         @Test
-        @DisplayName("정상요청")
+        @DisplayName("No condition [200]")
         public void list() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list"))
@@ -87,7 +87,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("정상요청 with Page")
+        @DisplayName("Page [200]")
         public void list_properPage_200() throws Exception {
             // Given
             int page = 2;
@@ -101,7 +101,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("정상요청 with Blank Page")
+        @DisplayName("Page with blank [200, Same as no conditional request]")
         public void list_blankPage_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -115,7 +115,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Page 요청(Type mismatch)")
+        @DisplayName("Page with type mismatched [200, Same as default]")
         public void list_typeMismatchedPage_200WithDefaultPage() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -129,7 +129,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Page 요청(Not exist)")
+        @DisplayName("Page with not exist [200]")
         public void list_notExistedPage_200WithDefaultPage() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -148,7 +148,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("정상요청 with Sort Method")
+        @DisplayName("Sort Method [200]")
         public void list_properSortMethod() throws Exception {
             // Given
             int sort_method = 2;
@@ -162,7 +162,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("정상요청 with Blank Sort Method")
+        @DisplayName("Sort Method with blank [200, Same with default]")
         public void list_blankSortMethod_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -176,7 +176,7 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Sort Method 요청(Type mismatch)")
+        @DisplayName("Sort Method with type mismatch [200, Same with default]")
         public void list_typeMismatchedSortMethod_200WithDefaultSortMethod() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -190,9 +190,9 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("잘못된 Sort Method 요청(Not exist)")
+        @DisplayName("Sort Method with mot exist [200, Same with default]")
         public void list_notExistedSortMethod_200WithDefaultSortMethod() throws Exception {
-            ProductPageRequest productPageRequest = new ProductPageRequest();
+            ProductPageRequest defaultProductPageRequest = new ProductPageRequest();
 
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -201,7 +201,7 @@ class ProductControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("sort", is(productPageRequest.getSort()))
+                            hasProperty("sort", is(defaultProductPageRequest.getSort()))
                     ));
 
             mockMvc.perform(get("/product/list")
@@ -210,11 +210,12 @@ class ProductControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("sort", is(productPageRequest.getSort()))
+                            hasProperty("sort", is(defaultProductPageRequest.getSort()))
                     ));
         }
 
         @Test
+        @DisplayName("Keyword [200]")
         public void list_keyword_200() throws Exception {
             // Given
             String keyword = "샴푸";
@@ -237,6 +238,7 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("Keyword with blank [200, Same as no conditional request]")
         public void list_blankKeyword_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -247,19 +249,23 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("Keyword with too short [200, No result with errors])")
         public void list_shortKeyword_200WithNoResult() throws Exception {
             // Given
             String keyword = "마";
 
             // When & Then
+            /** @TODO : Check "#fields.errors"(thymeleaf) */
             mockMvc.perform(get("/product/list")
                             .param("keyword", keyword))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(model().attributeDoesNotExist("products"));
+                    .andExpect(model().attributeDoesNotExist("products"))
+                    .andExpect(model().attributeExists("fields"));
         }
 
         @Test
+        @DisplayName("Manufacturer [200]")
         public void list_manufacturer_200() throws Exception {
             // Given
             Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
@@ -284,6 +290,7 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("Manufacturer with blank [200, Same as no conditional request]")
         public void list_blankManufacturer_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -297,6 +304,7 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("Manufacturer with type mismatched [200, No result]")
         public void list_typeMismatchedManufacturer_200WithNoResult() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -307,10 +315,76 @@ class ProductControllerTest {
         }
 
         @Test
+        @DisplayName("Manufacturer with not exist [200, No result]")
         public void list_notExistManufacturer_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("manufacturer", "-1"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty("content", hasSize(0)))
+                    );
+        }
+
+
+        @Test
+        @DisplayName("Category [200]")
+        public void list_category_200() throws Exception {
+            // Given
+            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
+
+            // When & Then
+            for (Product product : one) {
+                Category target = product.getCategory();
+
+                mockMvc.perform(get("/product/list")
+                                .param("category", String.valueOf(target.getId())))
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(model().attribute(
+                                "products",
+                                hasProperty(
+                                        "content",
+                                        hasItem(Matchers.<Product>hasProperty(
+                                                "category"
+                                                , is(target))))
+                        ));
+            }
+        }
+
+        @Test
+        @DisplayName("Category with blank [200, Same as no conditional request]")
+        public void list_blankCategory_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("category", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty("content", hasSize(greaterThan(0))))
+                    );
+        }
+
+        @Test
+        @DisplayName("Category with type mismatched [200, No result]")
+        public void list_typeMismatchedCategory_200WithNoResult() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("category", "notANumber"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeDoesNotExist("products"));
+        }
+
+        @Test
+        @DisplayName("Category with not exist [200, No result]")
+        public void list_notExistCategory_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/list")
+                            .param("category", "-1"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(

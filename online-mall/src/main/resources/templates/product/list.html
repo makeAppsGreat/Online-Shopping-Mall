@@ -5,14 +5,43 @@
     <title>List</title>
 </head>
 <body>
-<div>
+<div class="product_top">
+    <labe>제조사</labe>
+    <ul>
+        <li><a th:href="@{/product/list}">전체</a></li>
+        <li th:each="ma : ${manufacturers}">
+            <a th:href="@{/product/list(manufacturer=${ma.id})}"
+               th:text="${ma.name}">(제조사 이름)</a>
+        </li>
+    </ul>
+
+    <labe>분류</labe>
+    <ul>
+        <li><a th:href="@{/product/list(manufacturer=${param.manufacturer})}">전체</a></li>
+        <li th:each="ca : ${categories}">
+            <a th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${ca.id})}"
+               th:text="${ca.name}">(분류 이름)</a>
+        </li>
+    </ul>
+    <p>
+        <a th:href="@{/}">홈 </a>
+        <a th:href="@{/product/list(manufacturer=${param.manufacturer})}">
+            > <span th:text="(${manufacturer} ? ${manufacturer.get().name} : '전체')">(제조사)</span>
+        </a>
+        <a th:if="${category} != null"
+           th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${param.category})}">
+            > <span th:text="${category.get().name}">(분류)</span>
+        </a>
+    </p>
+</div>
+<div class="product_body">
     <div th:each="product : ${products}">
+        <hr>
         <a th:href="@{/product/detail/{id}(id=${product.id})}">
             <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
             <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:120px">
             <p><b th:text="${product.name}">(상품이름)</b> | <span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품가격)</span> 원</p>
         </a>
-        <hr>
     </div>
 </div>
 </body>

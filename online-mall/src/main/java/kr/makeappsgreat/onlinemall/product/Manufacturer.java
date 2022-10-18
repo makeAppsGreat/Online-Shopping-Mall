@@ -6,4 +6,11 @@ import javax.persistence.Entity;
 
 @Entity
 public class Manufacturer extends NamedEntity {
+
+    public static Manufacturer of(Long id) {
+        Manufacturer manufacturer = new Manufacturer();
+        manufacturer.setId(id);
+
+        return manufacturer;
+    }
 }

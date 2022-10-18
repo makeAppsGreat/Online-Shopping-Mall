@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +33,8 @@ public class ProductController {
      */
 
     private final ProductRepository productRepository;
+    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryRepository categoryRepository;
 
     @Value("${product.list.page_request.size}")
     private int SIZE;
@@ -49,6 +52,9 @@ public class ProductController {
     @GetMapping("/list")
     public String list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
                        Model model) {
+        model.addAttribute("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
+        model.addAttribute("categories", categoryRepository.findAll(Sort.by("name")));
+
         if (bindingResult.hasErrors()) {
             for (ObjectError e : bindingResult.getAllErrors()) {
                 if (e instanceof FieldError) {
@@ -75,6 +81,7 @@ public class ProductController {
             }
         }
 
+
         Page<Product> result;
         PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, SIZE, productPageRequest.getSort());
 
@@ -84,22 +91,43 @@ public class ProductController {
                     productPageRequest.getKeyword(),
                     pageRequest);
         else if (productPageRequest.getManufacturer() != null && productPageRequest.getCategory() != null) {
-            Manufacturer manufacturer = new Manufacturer();
-            manufacturer.setId(productPageRequest.getManufacturer());
-            Category category = new Category();
-            category.setId(productPageRequest.getCategory());
-            result = productRepository.findByManufacturerAndCategory(manufacturer, category, pageRequest);
-        } else if (productPageRequest.getManufacturer() != null) {
-            Manufacturer manufacturer = new Manufacturer();
-            manufacturer.setId(productPageRequest.getManufacturer());
-            result = productRepository.findByManufacturer(manufacturer, pageRequest);
-        } else if (productPageRequest.getCategory() != null) {
-            Category category = new Category();
-            category.setId(productPageRequest.getCategory());
-            result = productRepository.findByCategory(category, pageRequest);
-        } else result = productRepository.findAll(pageRequest);
+            result = productRepository.findByManufacturerAndCategory(
+                    Manufacturer.of(productPageRequest.getManufacturer()),
+                    Category.of(productPageRequest.getCategory()),
+                    pageRequest);
 
+            Product product = result.stream().findFirst().orElse(null);
+            if (product != null) {
+                model.addAttribute("manufacturer", product.getManufacturer().getName());
+                model.addAttribute("category", product.getCategory().getName());
+            } else {
+                /** @TODO : Handle case -> if MA or CA is not found. */
+                model.addAttribute("manufacturer", manufacturerRepository.findById(productPageRequest.getManufacturer()));
+                model.addAttribute("category", categoryRepository.findById(productPageRequest.getCategory()));
+            }
+        } else if (productPageRequest.getManufacturer() != null) {
+            result = productRepository.findByManufacturer(
+                    Manufacturer.of(productPageRequest.getManufacturer()),
+                    pageRequest);
+
+            Product product = result.stream().findFirst().orElse(null);
+            if (product != null)
+                model.addAttribute("manufacturer", product.getManufacturer());
+            else
+                model.addAttribute("manufacturer", manufacturerRepository.findById(productPageRequest.getManufacturer()));
+        } else if (productPageRequest.getCategory() != null) {
+            result = productRepository.findByCategory(
+                    Category.of(productPageRequest.getCategory()),
+                    pageRequest);
+
+            Product product = result.stream().findFirst().orElse(null);
+            if (product != null)
+                model.addAttribute("category", product.getCategory());
+            else
+                model.addAttribute("category", categoryRepository.findById(productPageRequest.getCategory()));
+        } else result = productRepository.findAll(pageRequest);
         model.addAttribute("products", result);
+
 
         return "/product/list";
     }

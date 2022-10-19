@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,15 +33,13 @@ class ProductControllerTest {
         public void detail() throws Exception {
             /** @TODO : Do save test data first, if run the application with NOT in-memory DB(Test DB). */
             // Given
-            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
+            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
 
             // When & Then
-            for (Product p : one) {
-                mockMvc.perform(get("/product/detail/{id}", p.getId()))
-                        .andDo(print())
-                        .andExpect(status().isOk())
-                        .andExpect(model().attributeExists("product"));
-            }
+            mockMvc.perform(get("/product/detail/{id}", product.getId()))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeExists("product"));
         }
 
         @Test
@@ -55,12 +52,12 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Wrong Product Id with type mismatched [404]")
-        public void detail_typeMismatchedProductId_404() throws Exception {
+        @DisplayName("Wrong Product Id with type mismatched [400]")
+        public void detail_typeMismatchedProductId_400() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/detail/{id}", "notANumber"))
                     .andDo(print())
-                    .andExpect(status().isNotFound()); // @TODO : Do handle with ExceptionHandler
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
@@ -249,8 +246,8 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Keyword with too short [200, No result with errors])")
-        public void list_shortKeyword_200WithNoResult() throws Exception {
+        @DisplayName("Keyword with too short [400])")
+        public void list_shortKeyword_400() throws Exception {
             // Given
             String keyword = "마";
 
@@ -259,34 +256,29 @@ class ProductControllerTest {
             mockMvc.perform(get("/product/list")
                             .param("keyword", keyword))
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeDoesNotExist("products"))
-                    .andExpect(model().attributeExists("fields"));
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
         @DisplayName("Manufacturer [200]")
         public void list_manufacturer_200() throws Exception {
             // Given
-            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
+            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
+            Manufacturer target = product.getManufacturer();
 
             // When & Then
-            for (Product product : one) {
-                Manufacturer target = product.getManufacturer();
-
-                mockMvc.perform(get("/product/list")
-                                .param("manufacturer", String.valueOf(target.getId())))
-                        .andDo(print())
-                        .andExpect(status().isOk())
-                        .andExpect(model().attribute(
-                                "products",
-                                hasProperty(
-                                        "content",
-                                        hasItem(Matchers.<Product>hasProperty(
-                                                "manufacturer"
-                                                , is(target))))
-                        ));
-            }
+            mockMvc.perform(get("/product/list")
+                            .param("manufacturer", String.valueOf(target.getId())))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty(
+                                    "content",
+                                    hasItem(Matchers.<Product>hasProperty(
+                                            "manufacturer"
+                                            , is(target))))
+                    ));
         }
 
         @Test
@@ -304,28 +296,23 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Manufacturer with type mismatched [200, No result]")
-        public void list_typeMismatchedManufacturer_200WithNoResult() throws Exception {
+        @DisplayName("Manufacturer with type mismatched [400]")
+        public void list_typeMismatchedManufacturer_400() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("manufacturer", "notANumber"))
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeDoesNotExist("products"));
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
-        @DisplayName("Manufacturer with not exist [200, No result]")
-        public void list_notExistManufacturer_200() throws Exception {
+        @DisplayName("Manufacturer with not exist [400]")
+        public void list_notExistManufacturer_400() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("manufacturer", "-1"))
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attribute(
-                            "products",
-                            hasProperty("content", hasSize(0)))
-                    );
+                    .andExpect(status().isBadRequest());
         }
 
 
@@ -333,25 +320,22 @@ class ProductControllerTest {
         @DisplayName("Category [200]")
         public void list_category_200() throws Exception {
             // Given
-            Page<Product> one = productRepository.findAll(Pageable.ofSize(1));
+            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
+            Category target = product.getCategory();
 
             // When & Then
-            for (Product product : one) {
-                Category target = product.getCategory();
-
-                mockMvc.perform(get("/product/list")
-                                .param("category", String.valueOf(target.getId())))
-                        .andDo(print())
-                        .andExpect(status().isOk())
-                        .andExpect(model().attribute(
-                                "products",
-                                hasProperty(
-                                        "content",
-                                        hasItem(Matchers.<Product>hasProperty(
-                                                "category"
-                                                , is(target))))
-                        ));
-            }
+            mockMvc.perform(get("/product/list")
+                            .param("category", String.valueOf(target.getId())))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty(
+                                    "content",
+                                    hasItem(Matchers.<Product>hasProperty(
+                                            "category"
+                                            , is(target))))
+                    ));
         }
 
         @Test
@@ -369,28 +353,23 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Category with type mismatched [200, No result]")
-        public void list_typeMismatchedCategory_200WithNoResult() throws Exception {
+        @DisplayName("Category with type mismatched [400]")
+        public void list_typeMismatchedCategory_400() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("category", "notANumber"))
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeDoesNotExist("products"));
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
-        @DisplayName("Category with not exist [200, No result]")
-        public void list_notExistCategory_200() throws Exception {
+        @DisplayName("Category with not exist [400]")
+        public void list_notExistCategory_400() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("category", "-1"))
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attribute(
-                            "products",
-                            hasProperty("content", hasSize(0)))
-                    );
+                    .andExpect(status().isBadRequest());
         }
     }
 

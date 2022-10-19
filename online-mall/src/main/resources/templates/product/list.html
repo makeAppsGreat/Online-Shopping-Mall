@@ -26,11 +26,11 @@
     <p>
         <a th:href="@{/}">홈 </a>
         <a th:href="@{/product/list(manufacturer=${param.manufacturer})}">
-            > <span th:text="(${manufacturer} ? ${manufacturer.get().name} : '전체')">(제조사)</span>
+            > <span th:text="(${manufacturer} ? ${manufacturer} : '전체')">(제조사)</span>
         </a>
         <a th:if="${category} != null"
            th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${param.category})}">
-            > <span th:text="${category.get().name}">(분류)</span>
+            > <span th:text="${category}">(분류)</span>
         </a>
     </p>
 </div>

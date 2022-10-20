@@ -372,5 +372,4 @@ class ProductControllerTest {
                     .andExpect(status().isBadRequest());
         }
     }
-
 }

@@ -13,4 +13,11 @@ public class Manufacturer extends NamedEntity {
 
         return manufacturer;
     }
+
+    public static Manufacturer of(String name) {
+        Manufacturer manufacturer = new Manufacturer();
+        manufacturer.setName(name);
+
+        return manufacturer;
+    }
 }

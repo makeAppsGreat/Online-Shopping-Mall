@@ -15,4 +15,11 @@ public class Category extends NamedEntity {
 
         return category;
     }
+
+    public static Category of(String name) {
+        Category category = new Category();
+        category.setName(name);
+
+        return category;
+    }
 }

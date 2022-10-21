@@ -5,24 +5,14 @@
     <title>List</title>
 </head>
 <body>
-<div class="product_top">
-    <labe>제조사</labe>
-    <ul>
-        <li><a th:href="@{/product/list}">전체</a></li>
-        <li th:each="ma : ${manufacturers}">
-            <a th:href="@{/product/list(manufacturer=${ma.id})}"
-               th:text="${ma.name}">(제조사 이름)</a>
-        </li>
-    </ul>
-
-    <labe>분류</labe>
-    <ul>
-        <li><a th:href="@{/product/list(manufacturer=${param.manufacturer})}">전체</a></li>
-        <li th:each="ca : ${categories}">
-            <a th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${ca.id})}"
-               th:text="${ca.name}">(분류 이름)</a>
-        </li>
-    </ul>
+<header>
+    <form>
+        <label>상품 찾기 : </label>
+        <input type="text">
+    </form>
+</header>
+<div class="product_list_top">
+    <hr>
     <p>
         <a th:href="@{/}">홈 </a>
         <a th:href="@{/product/list(manufacturer=${param.manufacturer})}">
@@ -33,8 +23,25 @@
             > <span th:text="${category}">(분류)</span>
         </a>
     </p>
+
+    <labe>제조사</labe>
+    <ul>
+        <li><a th:href="@{/product/list}">전체</a></li>
+        <li th:each="ma : ${manufacturers}">
+            <a th:href="@{/product/list(manufacturer=${ma.id})}"
+               th:text="${ma.name}">(제조사 이름)</a>
+        </li>
+    </ul>
+    <labe>분류</labe>
+    <ul>
+        <li><a th:href="@{/product/list(manufacturer=${param.manufacturer})}">전체</a></li>
+        <li th:each="ca : ${categories}">
+            <a th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${ca.id})}"
+               th:text="${ca.name}">(분류 이름)</a>
+        </li>
+    </ul>
 </div>
-<div class="product_body">
+<div class="product_list_body">
     <div th:each="product : ${products}">
         <hr>
         <a th:href="@{/product/detail/{id}(id=${product.id})}">
@@ -43,6 +50,13 @@
             <p><b th:text="${product.name}">(상품이름)</b> | <span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품가격)</span> 원</p>
         </a>
     </div>
+</div>
+<div class="product_list_bottom">
+    <a th:href="${pagination.first.link}" th:text="${pagination.first.text}">First</a>
+    <a th:href="${pagination.previous.link}" th:text="${pagination.previous.text}">Previous</a>
+    <span th:each="page : ${pagination.page}"><a th:href="${page.link}" th:text="${page.text}">(Page Number)</a>  </span>
+    <a th:href="${pagination.next.link}" th:text="${pagination.next.text}">Next</a>
+    <a th:href="${pagination.last.link}" th:text="${pagination.last.text}">Last</a>
 </div>
 </body>
 </html>

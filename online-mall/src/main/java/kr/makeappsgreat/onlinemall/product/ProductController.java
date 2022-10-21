@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 
@@ -34,7 +35,7 @@ public class ProductController {
 
     @GetMapping("/detail/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getProductById(id));
+        model.addAttribute("product", productService.getProduct(id));
         return "/product/detail";
     }
 
@@ -99,7 +100,9 @@ public class ProductController {
         model.addAttribute("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
         model.addAttribute("categories", categoryRepository.findAll(Sort.by("name")));
         model.addAttribute("products", result);
-        model.addAttribute("pagination", new Pagination(result));
+        model.addAttribute(
+                "pagination",
+                new Pagination(ServletUriComponentsBuilder.fromCurrentRequest(), result));
 
 
         return "/product/list";

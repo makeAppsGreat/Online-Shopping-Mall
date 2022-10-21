@@ -26,7 +26,7 @@ public class ProductService {
         PageRequest pageRequest = PageRequest.of(productPageRequest.getPage() - 1, PAGE_SIZE, productPageRequest.getSort());
 
         if (productPageRequest.getKeyword() != null && !productPageRequest.getKeyword().isBlank()) {
-            result = productRepository.findByNameContainingOrSimpleDetailContaining(
+            result = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
                     productPageRequest.getKeyword(),
                     productPageRequest.getKeyword(),
                     pageRequest);

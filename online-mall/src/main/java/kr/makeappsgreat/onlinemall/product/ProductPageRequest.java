@@ -22,6 +22,7 @@ public class ProductPageRequest {
     @Min(1)
     private int page = this.DEFAULT_PAGE_VALUE;
 
+    public int getSort_method() { return this.sortMethod; }
     public void setSort_method(int sortMethod) {
         this.sortMethod = sortMethod;
     }

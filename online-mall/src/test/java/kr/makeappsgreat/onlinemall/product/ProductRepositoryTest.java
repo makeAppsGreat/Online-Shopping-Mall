@@ -176,7 +176,7 @@ class ProductRepositoryTest {
         String keyword = "라보코스메티카";
 
         // When
-        Page<Product> product = productRepository.findByNameContaining(keyword, Pageable.ofSize(1));
+        Page<Product> product = productRepository.findByNameContainingIgnoreCase(keyword, Pageable.ofSize(1));
 
         // Then
         product.forEach(p -> assertThat(p.getName().contains(keyword)).isTrue());
@@ -188,7 +188,7 @@ class ProductRepositoryTest {
         String keyword = "샴푸";
 
         // When
-        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContaining(
+        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContainingIgnoreCase(
                 null,
                 keyword,
                 Pageable.ofSize(1));
@@ -208,7 +208,7 @@ class ProductRepositoryTest {
         String keyword = "";
 
         // When
-        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContaining(
+        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContainingIgnoreCase(
                 keyword,
                 keyword,
                 Pageable.ofSize(10));

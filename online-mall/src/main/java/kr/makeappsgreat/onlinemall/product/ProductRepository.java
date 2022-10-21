@@ -10,6 +10,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCategory(Category category, Pageable pageable);
     Page<Product> findByManufacturerAndCategory(Manufacturer manufacturer, Category category, Pageable pageable);
 
-    Page<Product> findByNameContaining(String name, Pageable pageable);
-    Page<Product> findByNameContainingOrSimpleDetailContaining(String name, String simpleDetail, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(String name, String simpleDetail, Pageable pageable);
 }

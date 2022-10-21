@@ -32,6 +32,7 @@ public class ProductController {
     private final ProductService productService;
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductSortMethod productSortMethod;
 
     @GetMapping("/detail/{id}")
     public String detail(@PathVariable Long id, Model model) {
@@ -48,7 +49,8 @@ public class ProductController {
                     case "keyword":
                         if (!productPageRequest.getKeyword().isBlank())
                             // Case : Keyword is too short.
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                            productPageRequest.setKeyword(null);
                         break;
                     case "manufacturer":
                     case "category":
@@ -59,7 +61,7 @@ public class ProductController {
                     case "page":
                         productPageRequest.setPage(ProductPageRequest.DEFAULT_PAGE_VALUE);
                         break;
-                    case "sort":
+                    case "sortMethod":
                         productPageRequest.setSortMethod(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE);
                         break;
                 }
@@ -103,6 +105,9 @@ public class ProductController {
         model.addAttribute(
                 "pagination",
                 new Pagination(ServletUriComponentsBuilder.fromCurrentRequest(), result));
+        model.addAttribute(
+                "sort_method",
+                productSortMethod.get(ServletUriComponentsBuilder.fromCurrentRequest()));
 
 
         return "/product/list";

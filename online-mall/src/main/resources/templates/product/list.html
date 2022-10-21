@@ -8,7 +8,10 @@
 <header>
     <form>
         <label>상품 찾기 : </label>
-        <input type="text">
+        <input type="text" th:field="*{productPageRequest.keyword}" />
+        <input type="submit" value="검색"/>
+        <span th:if="${#fields.hasErrors('productPageRequest.keyword')}"
+              th:errors="*{productPageRequest.keyword}" style="color:red">Incorrect Data</span>
     </form>
 </header>
 <div class="product_list_top">
@@ -22,6 +25,8 @@
            th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${param.category})}">
             > <span th:text="${category}">(분류)</span>
         </a>
+        <a th:if="${productPageRequest.keyword} != null"
+           th:href="@{/product/list(keyword=${param.keyword})}">> <span>검색 결과</span></a>
     </p>
 
     <labe>제조사</labe>
@@ -40,6 +45,14 @@
                th:text="${ca.name}">(분류 이름)</a>
         </li>
     </ul>
+
+    <label>정렬방식 : </label>
+    <select th:field=*{productPageRequest.sort_method} >
+        <option th:each="method,idx : ${sort_method}"
+                th:value="${idx.index}"
+                th:text="${method.link}"
+                th:label="${method.text}">(정렬 방식)</option>
+    </select>
 </div>
 <div class="product_list_body">
     <div th:each="product : ${products}">
@@ -54,9 +67,17 @@
 <div class="product_list_bottom">
     <a th:href="${pagination.first.link}" th:text="${pagination.first.text}">First</a>
     <a th:href="${pagination.previous.link}" th:text="${pagination.previous.text}">Previous</a>
-    <span th:each="page : ${pagination.page}"><a th:href="${page.link}" th:text="${page.text}">(Page Number)</a>  </span>
+    <span th:each="page : ${pagination.page}">
+        <a th:href="${page.link}" th:text="${page.text}">(Page Number)</a>
+    </span>
     <a th:href="${pagination.next.link}" th:text="${pagination.next.text}">Next</a>
     <a th:href="${pagination.last.link}" th:text="${pagination.last.text}">Last</a>
 </div>
+<script>
+    document.getElementById("sort_method")
+        .addEventListener("change", function () {
+            location.href = this[this.selectedIndex].text;
+    });
+</script>
 </body>
 </html>

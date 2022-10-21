@@ -1,20 +1,15 @@
 package kr.makeappsgreat.onlinemall.common;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Getter @Setter
 @Slf4j
 public class Pagination {
 
@@ -60,24 +55,4 @@ public class Pagination {
         }
     }
 
-    @RequiredArgsConstructor
-    @Getter
-    private class Link {
-
-        private String link;
-        private final String text;
-
-        void setLink(String link) {
-            this.link = link;
-        }
-
-        void setLink(UriComponents uriComponents) {
-            MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
-
-            if (!queryParams.isEmpty())
-                this.link = "?" + queryParams.entrySet().stream()
-                        .map(e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse(""))
-                        .collect(Collectors.joining("&"));
-        }
-    }
 }

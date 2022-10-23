@@ -188,7 +188,7 @@ class ProductRepositoryTest {
         String keyword = "샴푸";
 
         // When
-        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContainingIgnoreCase(
+        Page<Product> product = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
                 null,
                 keyword,
                 Pageable.ofSize(1));
@@ -208,7 +208,7 @@ class ProductRepositoryTest {
         String keyword = "";
 
         // When
-        Page<Product> product = productRepository.findByNameContainingOrSimpleDetailContainingIgnoreCase(
+        Page<Product> product = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
                 keyword,
                 keyword,
                 Pageable.ofSize(10));

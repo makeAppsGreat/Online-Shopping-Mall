@@ -1,51 +1,6 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thmeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>List</title>
-</head>
+<html xmlns:th="http://www.thmeleaf.org"
+      th:replace="~{main :: layout ('List', ~{::body})}">
 <body>
-<header><!--/* @TODO : Move to fragment */-->
-    <form th:action="@{/product/list}">
-        <label>상품 찾기 : </label>
-        <input type="text" th:field="*{productPageRequest.keyword}" />
-        <input type="submit" value="검색"/>
-        <span th:if="${#fields.hasErrors('productPageRequest.keyword')}"
-              th:errors="*{productPageRequest.keyword}" style="color:red">Incorrect Data</span>
-
-        <hr>
-        <labe>제조사</labe>
-        <ul>
-            <li><a th:href="@{/product/list}">전체</a></li>
-            <li th:each="ma : ${manufacturers}">
-                <a th:href="@{/product/list(manufacturer=${ma.id})}"
-                   th:text="${ma.name}">(제조사 이름)</a>
-            </li>
-        </ul>
-        <labe>분류</labe>
-        <ul>
-            <li><a th:href="@{/product/list(manufacturer=${param.manufacturer})}">전체</a></li>
-            <li th:each="ca : ${categories}">
-                <a th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${ca.id})}"
-                   th:text="${ca.name}">(분류 이름)</a>
-            </li>
-        </ul>
-
-        <hr>
-        <p>
-            <a th:href="@{/}">홈 </a>
-            <a th:href="@{/product/list(manufacturer=${param.manufacturer})}">
-                > <span th:text="(${manufacturer} ? ${manufacturer} : '전체')">(제조사)</span>
-            </a>
-            <a th:if="${category} != null"
-               th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${param.category})}">
-                > <span th:text="${category}">(분류)</span>
-            </a>
-            <a th:if="${productPageRequest.keyword} != null"
-               th:href="@{/product/list(keyword=${param.keyword})}">> <span>검색 결과</span></a>
-        </p>
-    </form>
-</header>
 <div class="product_list_top">
     <hr>
     <label>정렬방식 : </label>

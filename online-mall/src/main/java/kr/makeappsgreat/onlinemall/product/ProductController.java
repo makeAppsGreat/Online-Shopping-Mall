@@ -3,7 +3,6 @@ package kr.makeappsgreat.onlinemall.product;
 import kr.makeappsgreat.onlinemall.common.Pagination;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -99,8 +98,6 @@ public class ProductController {
             }
         }
 
-        model.addAttribute("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
-        model.addAttribute("categories", categoryRepository.findAll(Sort.by("name")));
         model.addAttribute("products", result);
         model.addAttribute(
                 "pagination",

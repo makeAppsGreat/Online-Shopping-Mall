@@ -5,12 +5,165 @@
     <title>Detail</title>
 </head>
 <body>
-<img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
-<img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:400px">
-<h2 th:text="${product.name}">Product Name</h2>
-<p th:text="${product.simpleDetail}">Simple Detail</p>
-<h3><b><span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품 가격)</span> 원</b></h3>
-<p><label>제조사 : </label><span th:text="${product.manufacturer.name}">(상품 제조사)</span></p>
-<p><label>상품분류 : </label><span th:text="${product.category.name}">(상품 분류)</span></p>
+<div class="product_detail_top">
+    <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
+    <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:400px">
+    <h2 th:text="${product.name}">Product Name</h2>
+    <p th:text="${product.simpleDetail}">Simple Detail</p>
+    <p><b th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}" style="font-size:x-large">(상품 가격)</b> 원</p>
+    <p><label>제조사 : </label><span th:text="${product.manufacturer.name}">(상품 제조사)</span></p>
+    <p><label>상품분류 : </label><span th:text="${product.category.name}">(상품 분류)</span></p>
+
+    <div class="product_detail_top_options" th:unless="${#sets.isEmpty(product.options)}">
+        <hr>
+        <select id="options">
+            <option selected disabled>[선택] 옵션을 선택하여 주세요.</option>
+            <option th:each="option : ${product.options}"
+                    th:value="${option.id} + ',' + ${option.price}"
+                    th:label="${option.name} + ' - ' + ${#numbers.formatInteger(option.price, 3, 'COMMA')} + ' 원'"
+                    th:text="${option.name}"
+            >(상품 이름) - (상품 가격)</option>
+        </select>
+    </div>
+
+    <div class="product_detail_top_order-list">
+        <hr>
+        <table id="order_list">
+            <tbody>
+                <tr>
+                    <td><input name = "product_id" type="hidden" th:value="${product.id}" /></td>
+                    <td th:text="${product.name}">(Product Name)</td>
+                    <td><input name = "product_qty" onchange="onQtyChanged(this)" type="number" value="1" /></td>
+                    <td style="text-align:end">
+                        <input name = "product_price" type="hidden" th:value="${product.price}" />
+                        <b th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품 가격)</b> 원
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <hr>
+        <p>
+            TOTAL :
+            <b id="total_price" style="font-size:x-large" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(Total Price)</b>
+            원( <span id="total_qty" th:text="1">(Total Quantity)</span> 개)
+        </p>
+    </div>
+</div>
+<script>
+    let tbody = document.getElementById("order_list").getElementsByTagName("tbody")[0];
+
+    function onQtyChanged( target ) {
+        let price = target.parentElement.parentElement.cells[3].children.product_price.value;
+        let qty = target.value;
+
+        if (qty > 0) {
+            target.parentElement.parentElement.cells[3].children[1].textContent = new Intl.NumberFormat().format(price * qty);
+        } else {
+            alert("이 상품의 최소 구매 수량은 1개입니다.");
+            target.value = 1;
+        }
+
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let t_price = 0;
+        let t_qty = 0;
+        for (const tr of tbody.getElementsByTagName("tr")) {
+            t_price += tr.cells[2].children.product_qty.value * tr.cells[3].children.product_price.value;
+            t_qty +=  Number(tr.cells[2].children.product_qty.value);
+        }
+
+        document.getElementById("total_price").textContent = new Intl.NumberFormat().format(t_price);
+        document.getElementById("total_qty").textContent = t_qty;
+    }
+</script>
+<script th:unless="${#sets.isEmpty(product.options)}" th:inline="javascript">
+    document.getElementById("options")
+        .addEventListener("change", function () {
+            let id_price = this[this.selectedIndex].value.split(",");
+
+            let contains = false;
+            for (const tr of tbody.getElementsByTagName("tr")) {
+                if (tr.cells[0].children.product_id.value == id_price[0]) {
+                    contains = true;
+                    break;
+                }
+            }
+
+            if (!contains) {
+                addOptionToOrderList({
+                    id : id_price[0],
+                    price : id_price[1],
+                    name : this[this.selectedIndex].text
+                });
+
+                updateTotal();
+            }
+
+            this.options[0].selected = true;
+    });
+
+    function addOptionToOrderList( option ) {
+        let row = document.createElement("tr");
+
+        // id
+        let id = document.createElement("td");
+        let id_input = document.createElement("input");
+        id_input.name = "product_id";
+        id_input.type = "hidden";
+        id_input.value = option.id;
+        id.appendChild(id_input);
+
+        // name
+        let name = document.createElement("td");
+        let name_a = document.createElement("a");
+        name_a.href = [[@{/product/detail/}]] + option.id;
+        name_a.target = "_blank";
+        name_a.title = "새 창에서 열기";
+        name_a.text = option.name;
+        name.appendChild(name_a);
+
+        // quantity
+        let quantity = document.createElement("td");
+        let quantity_input = document.createElement("input");
+        quantity_input.name = "product_qty";
+        quantity_input.type = "number";
+        quantity_input.value = 1;
+        quantity_input.addEventListener("change", (__input) => { onQtyChanged(__input.target); });
+        quantity.appendChild(quantity_input);
+
+        // price
+        let price = document.createElement("td");
+        let price_input = document.createElement("input");
+        let price_b = document.createElement("b");
+        price_input.name = "product_price";
+        price_input.type = "hidden";
+        price_input.value = option.price;
+        price_b.textContent = new Intl.NumberFormat().format(option.price);
+        price.append(price_input, price_b, " 원");
+        price.style.textAlign = "end";
+
+        // button to delete this row
+        let button = document.createElement("td");
+        let button_btn = document.createElement("button");
+        button_btn.textContent = "X";
+        button_btn.addEventListener("click", (__button) => {
+            tbody.deleteRow(__button.target.closest("tr").rowIndex);
+            updateTotal();
+        });
+        button.appendChild(button_btn);
+
+
+        // table & row
+        row.appendChild(id);
+        row.appendChild(name);
+        row.appendChild(quantity);
+        row.appendChild(price);
+        row.appendChild(button);
+        tbody.appendChild(row);
+    }
+</script>
 </body>
 </html>

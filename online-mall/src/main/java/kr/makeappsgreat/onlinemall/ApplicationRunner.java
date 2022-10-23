@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +25,9 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
     private final String ROOT_PATH_OF_ASSETS = "/assets/product/";
 
+    @Transactional
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         List<Manufacturer> manufacturers = List.of(
                 Manufacturer.of("MAFRA"),
                 Manufacturer.of("Pro Staff"),
@@ -150,10 +152,12 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .simpleDetail("마로렉스 알칼리 내성 압축분무기")
                 .build());
 
+        productRepository.saveAll(products);
+
         products.get(0).getOptions().add(products.get(1));
         products.get(2).getOptions().add(products.get(3));
         products.get(4).getOptions().add(products.get(5));
-        productRepository.saveAll(products);
+
 
         log.info("Products saved... (Manufacturer : {}, Category : {}, Product : {})",
                 manufacturerRepository.count(),

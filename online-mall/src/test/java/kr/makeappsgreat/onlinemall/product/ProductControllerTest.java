@@ -246,17 +246,17 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Keyword with too short [400])")
-        public void list_shortKeyword_400() throws Exception {
+        @DisplayName("Keyword with too short [200, with having errors at keyword]")
+        public void list_shortKeyword_200() throws Exception {
             // Given
             String keyword = "마";
 
             // When & Then
-            /** @TODO : Check "#fields.errors"(thymeleaf) */
             mockMvc.perform(get("/product/list")
                             .param("keyword", keyword))
                     .andDo(print())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeHasFieldErrors("productPageRequest", "keyword"));
         }
 
         @Test

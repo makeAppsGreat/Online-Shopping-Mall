@@ -17,10 +17,12 @@ public class ProductInterceptor implements HandlerInterceptor {
     private final ManufacturerRepository manufacturerRepository;
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
-            throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         // HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-        request.setAttribute("manufacturers", manufacturerRepository.findAll(Sort.by("name")));;
+        request.setAttribute("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
         request.setAttribute("categories", categoryRepository.findAll(Sort.by("name")));
+
+        if (modelAndView != null &&modelAndView.getModel().get("productPageRequest") == null)
+            modelAndView.addObject(new ProductPageRequest());
     }
 }

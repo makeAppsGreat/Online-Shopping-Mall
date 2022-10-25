@@ -1,0 +1,5 @@
+/* Style of breadcrumb */
+ul.crumbs { list-style : none; }
+ul.crumbs li { display : inline; }
+ul.crumbs li+li:before { content : " > "; }
+/* End of style breadcrumb */

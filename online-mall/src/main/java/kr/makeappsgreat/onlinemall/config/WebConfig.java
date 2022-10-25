@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.config;
 import kr.makeappsgreat.onlinemall.product.ProductInterceptor;
 import lombok.RequiredArgsConstructor;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import nz.net.ultraq.thymeleaf.layoutdialect.decorators.strategies.GroupingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -16,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public LayoutDialect layoutDialect() {
-        return new LayoutDialect();
+        return new LayoutDialect(new GroupingStrategy());
     }
 
     @Override

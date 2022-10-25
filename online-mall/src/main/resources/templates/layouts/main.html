@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:fragment="layout (title, links)">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <title th:replace="${title}">My Online Mall</title>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Do Simple</title>
+    <link rel="stylesheet" th:href="@{/css/simple.css}"/>
 </head>
 <body>
 <header>
     <form th:action="@{/product/list}">
-        <label>상품 찾기 : </label>
+        <label>상품찾기 : </label>
         <input type="text" th:field="*{productPageRequest.keyword}" />
         <input type="submit" value="검색"/>
         <span th:if="${#fields.hasErrors('productPageRequest.keyword')}"
@@ -32,24 +33,20 @@
                    th:text="${ca.name}">(분류 이름)</a>
             </li>
         </ul>
-
         <hr>
-        <p>
-            <a th:href="@{/}">홈 </a>
-            <a th:href="@{/product/list(manufacturer=${param.manufacturer})}">
-                > <span th:text="(${manufacturer} ? ${manufacturer} : '전체')">(제조사)</span>
-            </a>
-            <a th:if="${category} != null"
-               th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${param.category})}">
-                > <span th:text="${category}">(분류)</span>
-            </a>
-            <a th:if="${productPageRequest.keyword} != null"
-               th:href="@{/product/list(keyword=${param.keyword})}">> <span>검색 결과</span></a>
-        </p>
+        <ul layout:fragment="breadcrumb" class="crumbs">
+            <li><a th:href="@{/}">홈</a></li>
+            <!--/* Breadcrumb */-->
+        </ul>
     </nav>
 </header>
-<div class="main-container">
-    <th:block th:replace="${links}" />
+<div class="main-container" layout:fragment="content">
+    <!--/* Main Container */-->
 </div>
+<footer>
+    <hr>
+    <p><strong>Do Simple</strong></p>
+    <p><label>Contact : </label><a href="mailto:makeappsgreat@gmail.com">makeappsgreat@gmail.com</a></p>
+</footer>
 </body>
 </html>

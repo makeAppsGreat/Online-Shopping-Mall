@@ -7,13 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
@@ -41,15 +44,20 @@ public class ProductController {
 
     @GetMapping("/list")
     public String list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
-                       Model model) {
+                       Model model, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            bindingResult.getFieldErrors().forEach(e -> {
+            for (FieldError e : bindingResult.getFieldErrors()) {
                 switch (e.getField()) {
                     case "keyword":
-                        if (!productPageRequest.getKeyword().isBlank())
+                        if (!productPageRequest.getKeyword().isBlank()) {
                             // Case : Keyword is too short.
                             // throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                             productPageRequest.setKeyword(null);
+
+                            String referer = request.getHeader("Referer");
+                            if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                            else return "redirect:" + UriComponentsBuilder.fromUriString(referer).build().getPath();
+                        }
                         break;
                     case "manufacturer":
                     case "category":
@@ -64,7 +72,7 @@ public class ProductController {
                         productPageRequest.setSortMethod(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE);
                         break;
                 }
-            });
+            }
         }
 
         Page<Product> result = productService.getPagedProducts(productPageRequest);

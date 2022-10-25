@@ -35,13 +35,11 @@ public class ProductService {
                     Manufacturer.of(productPageRequest.getManufacturer()),
                     Category.of(productPageRequest.getCategory()),
                     pageRequest);
-        }
-        else if (productPageRequest.getManufacturer() != null) {
+        } else if (productPageRequest.getManufacturer() != null) {
             result = productRepository.findByManufacturer(
                     Manufacturer.of(productPageRequest.getManufacturer()),
                     pageRequest);
-        }
-        else if (productPageRequest.getCategory() != null) {
+        } else if (productPageRequest.getCategory() != null) {
             result = productRepository.findByCategory(
                     Category.of(productPageRequest.getCategory()),
                     pageRequest);

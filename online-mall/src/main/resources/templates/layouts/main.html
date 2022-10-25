@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/simple.css}"/>
 </head>
 <body>
+<!--/* [Thymeleaf: add parameter to current url](https://stackoverflow.com/questions/27623405) */-->
 <header>
     <form th:action="@{/product/list}">
         <label>상품찾기 : </label>
@@ -18,18 +19,21 @@
     <nav>
         <hr>
         <labe>제조사</labe>
-        <ul>
+        <ul th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequestUri()}">
             <li><a th:href="@{/product/list}">전체</a></li>
             <li th:each="ma : ${manufacturers}">
-                <a th:href="@{/product/list(manufacturer=${ma.id})}"
+                <a th:href="@{${urlBuilder.replaceQueryParam('manufacturer', ma.id).toUriString()}}"
                    th:text="${ma.name}">(제조사 이름)</a>
             </li>
         </ul>
         <labe>분류</labe>
-        <ul>
-            <li><a th:href="@{/product/list(manufacturer=${param.manufacturer})}">전체</a></li>
+        <ul th:with="urlBuilder=( ${manufacturer}
+            ? ${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder)
+                .fromCurrentRequestUri().replaceQueryParam('manufacturer', manufacturer.id)}
+            : ${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequestUri()} )">
+            <li><a th:href="@{${urlBuilder.toUriString()}}">전체</a></li>
             <li th:each="ca : ${categories}">
-                <a th:href="@{/product/list(manufacturer=${param.manufacturer}, category=${ca.id})}"
+                <a th:href="@{${urlBuilder.replaceQueryParam('category', ca.id).toUriString()}}"
                    th:text="${ca.name}">(분류 이름)</a>
             </li>
         </ul>

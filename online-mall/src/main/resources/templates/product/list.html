@@ -4,21 +4,27 @@
       layout:decorate="~{layouts/main}">
 <head>
     <title th:text="( ${productPageRequest.keyword} ? '검색결과'
-        : ( ${category} ? ${category}
-        : ( ${manufacturer} ? ${manufacturer}
-        : '전체상품' )))">상품</title>
+        : ( ${category} ? ${category.name}
+        : ( ${manufacturer} ? ${manufacturer.name}
+        : '전체상품' )))">List</title>
 </head>
 <body>
 <!--/* Breadcrumb */-->
-<ul layout:fragment="breadcrumb">
+<ul layout:fragment="breadcrumb"
+    th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequestUri()}">
     <li><a th:href="@{/}">홈</a></li>
-    <li th:unless="${category} or ${productPageRequest.keyword} != null"
-        th:text="(${manufacturer} ? ${manufacturer} : '전체')">(제조사)</li>
-    <li th:if="${category} or ${productPageRequest.keyword}">
-        <a th:href="@{/product/list(manufacturer=${param.manufacturer})}"
-           th:text="(${manufacturer} ? ${manufacturer} : '전체')">(제조사)</a></li>
-    <li th:if="${category}"
-        th:text="${category}">(분류)</li>
+    <li>
+        <span th:unless="${manufacturer} or ${category} or ${productPageRequest.keyword}">전체상품</span>
+        <a th:if="${manufacturer} or ${category} or ${productPageRequest.keyword}"
+           th:href="@{/product/list}">전체상품</a>
+    </li>
+    <li th:if="${manufacturer}">
+        <span th:unless="${category}" th:text="${manufacturer.name}">(제조사)</span>
+        <a th:if="${category}"
+           th:href="@{${urlBuilder.replaceQueryParam('manufacturer', manufacturer.id).toUriString()}}"
+           th:text="${manufacturer.name}">(제조사)</a>
+    </li>
+    <li th:if="${category}" th:text="${category.name}">(분류)</li>
     <li th:if="${productPageRequest.keyword}">검색결과</li>
 </ul>
 <!--/* End of Breadcrumb */-->
@@ -28,16 +34,19 @@
         <hr>
         <label>정렬방식 : </label>
         <select th:field=*{productPageRequest.sort_method} >
-            <option th:each="method,idx : ${sort_method}"
-                    th:value="${idx.index}"
+            <option th:each="method,status : ${sort_method}"
+                    th:value="${status.index}"
                     th:label="${method.text}"
                     th:text="${method.link}">(정렬 방식)</option>
         </select>
     </div>
     <div class="product_list_body">
-        <div th:each="product : ${products}">
-            <hr>
-            <a th:href="@{/product/detail/{id}(id=${product.id})}">
+        <div th:each="product : ${products}"
+             th:with="urlBuilder=${T(org.springframework.web.util.UriComponentsBuilder).fromPath('/product/detail/{id}')
+                .queryParamIfPresent('manufacturer', param.manufacturer)
+                .queryParamIfPresent('category', param.category)
+                .queryParamIfPresent('keyword', param.keyword)}">
+            <a th:href="@{${urlBuilder.build(product.id)}}">
                 <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
                 <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:120px">
                 <p><b th:text="${product.name}">(상품이름)</b> | <span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품가격)</span> 원</p>

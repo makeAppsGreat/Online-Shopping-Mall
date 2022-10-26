@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thmeleaf.org">
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
-    <meta charset="UTF-8">
-    <title>Detail</title>
+    <title th:text="${product.name}">Detail</title>
 </head>
 <body>
-<div class="product_detail_top">
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb"
+    th:with="urlBuilder=${T(org.springframework.web.util.UriComponentsBuilder).fromPath('/product/list')},
+        manufacturer=${param.manufacturer},
+        category=${param.category},
+        keyword=${param.keyword}">
+    <li><a th:href="@{/}">홈</a></li>
+    <li><a th:href="@{/product/list}">전체상품</a></li>
+    <li th:if="${manufacturer}">
+        <a th:href="@{${urlBuilder.queryParamIfPresent('manufacturer', manufacturer).toUriString()}}"
+           th:text="${product.manufacturer.name}">(제조사)</a>
+    </li>
+    <li th:if="${category}">
+        <a th:href="@{${urlBuilder.replaceQueryParam('category', category).toUriString()}}"
+           th:text="${product.category.name}">(분류)</a>
+    </li>
+    <li th:if="${keyword}">
+        <a th:href="@{${urlBuilder.replaceQueryParam('keyword', keyword).toUriString()}}">검색결과</a>
+    </li>
+    <li>상품정보</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
     <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
     <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:400px">
     <h2 th:text="${product.name}">Product Name</h2>
@@ -49,121 +74,123 @@
             원( <span id="total_qty" th:text="1">(Total Quantity)</span> 개)
         </p>
     </div>
-</div>
-<script>
-    let tbody = document.getElementById("order_list").getElementsByTagName("tbody")[0];
 
-    function onQtyChanged( target ) {
-        let price = target.parentElement.parentElement.cells[3].children.product_price.value;
-        let qty = target.value;
+    <script>
+        let tbody = document.getElementById("order_list").getElementsByTagName("tbody")[0];
 
-        if (qty > 0) {
-            target.parentElement.parentElement.cells[3].children[1].textContent = new Intl.NumberFormat().format(price * qty);
-        } else {
-            alert("이 상품의 최소 구매 수량은 1개입니다.");
-            target.value = 1;
-        }
+        function onQtyChanged( target ) {
+            let price = target.parentElement.parentElement.cells[3].children.product_price.value;
+            let qty = target.value;
 
-        updateTotal();
-    }
-
-    function updateTotal() {
-        let t_price = 0;
-        let t_qty = 0;
-        for (const tr of tbody.getElementsByTagName("tr")) {
-            t_price += tr.cells[2].children.product_qty.value * tr.cells[3].children.product_price.value;
-            t_qty +=  Number(tr.cells[2].children.product_qty.value);
-        }
-
-        document.getElementById("total_price").textContent = new Intl.NumberFormat().format(t_price);
-        document.getElementById("total_qty").textContent = t_qty;
-    }
-</script>
-<script th:unless="${#sets.isEmpty(product.options)}" th:inline="javascript">
-    document.getElementById("options")
-        .addEventListener("change", function () {
-            let id_price = this[this.selectedIndex].value.split(",");
-
-            let contains = false;
-            for (const tr of tbody.getElementsByTagName("tr")) {
-                if (tr.cells[0].children.product_id.value == id_price[0]) {
-                    contains = true;
-                    break;
-                }
+            if (qty > 0) {
+                target.parentElement.parentElement.cells[3].children[1].textContent = new Intl.NumberFormat().format(price * qty);
+            } else {
+                alert("이 상품의 최소 구매 수량은 1개입니다.");
+                target.value = 1;
             }
 
-            if (!contains) {
-                addOptionToOrderList({
-                    id : id_price[0],
-                    price : id_price[1],
-                    name : this[this.selectedIndex].text
-                });
-
-                updateTotal();
-            }
-
-            this.options[0].selected = true;
-    });
-
-    function addOptionToOrderList( option ) {
-        let row = document.createElement("tr");
-
-        // id
-        let id = document.createElement("td");
-        let id_input = document.createElement("input");
-        id_input.name = "product_id";
-        id_input.type = "hidden";
-        id_input.value = option.id;
-        id.appendChild(id_input);
-
-        // name
-        let name = document.createElement("td");
-        let name_a = document.createElement("a");
-        name_a.href = [[@{/product/detail/}]] + option.id;
-        name_a.target = "_blank";
-        name_a.title = "새 창에서 열기";
-        name_a.text = option.name;
-        name.appendChild(name_a);
-
-        // quantity
-        let quantity = document.createElement("td");
-        let quantity_input = document.createElement("input");
-        quantity_input.name = "product_qty";
-        quantity_input.type = "number";
-        quantity_input.value = 1;
-        quantity_input.addEventListener("change", (__input) => { onQtyChanged(__input.target); });
-        quantity.appendChild(quantity_input);
-
-        // price
-        let price = document.createElement("td");
-        let price_input = document.createElement("input");
-        let price_b = document.createElement("b");
-        price_input.name = "product_price";
-        price_input.type = "hidden";
-        price_input.value = option.price;
-        price_b.textContent = new Intl.NumberFormat().format(option.price);
-        price.append(price_input, price_b, " 원");
-        price.style.textAlign = "end";
-
-        // button to delete this row
-        let button = document.createElement("td");
-        let button_btn = document.createElement("button");
-        button_btn.textContent = "X";
-        button_btn.addEventListener("click", (__button) => {
-            tbody.deleteRow(__button.target.closest("tr").rowIndex);
             updateTotal();
+        }
+
+        function updateTotal() {
+            let t_price = 0;
+            let t_qty = 0;
+            for (const tr of tbody.getElementsByTagName("tr")) {
+                t_price += tr.cells[2].children.product_qty.value * tr.cells[3].children.product_price.value;
+                t_qty +=  Number(tr.cells[2].children.product_qty.value);
+            }
+
+            document.getElementById("total_price").textContent = new Intl.NumberFormat().format(t_price);
+            document.getElementById("total_qty").textContent = t_qty;
+        }
+    </script>
+    <script th:unless="${#sets.isEmpty(product.options)}" th:inline="javascript">
+        document.getElementById("options")
+            .addEventListener("change", function () {
+                let id_price = this[this.selectedIndex].value.split(",");
+
+                let contains = false;
+                for (const tr of tbody.getElementsByTagName("tr")) {
+                    if (tr.cells[0].children.product_id.value == id_price[0]) {
+                        contains = true;
+                        break;
+                    }
+                }
+
+                if (!contains) {
+                    addOptionToOrderList({
+                        id : id_price[0],
+                        price : id_price[1],
+                        name : this[this.selectedIndex].text
+                    });
+
+                    updateTotal();
+                }
+
+                this.options[0].selected = true;
         });
-        button.appendChild(button_btn);
+
+        function addOptionToOrderList( option ) {
+            let row = document.createElement("tr");
+
+            // id
+            let id = document.createElement("td");
+            let id_input = document.createElement("input");
+            id_input.name = "product_id";
+            id_input.type = "hidden";
+            id_input.value = option.id;
+            id.appendChild(id_input);
+
+            // name
+            let name = document.createElement("td");
+            let name_a = document.createElement("a");
+            name_a.href = [[@{/product/detail/}]] + option.id;
+            name_a.target = "_blank";
+            name_a.title = "새 창에서 열기";
+            name_a.text = option.name;
+            name.appendChild(name_a);
+
+            // quantity
+            let quantity = document.createElement("td");
+            let quantity_input = document.createElement("input");
+            quantity_input.name = "product_qty";
+            quantity_input.type = "number";
+            quantity_input.value = 1;
+            quantity_input.addEventListener("change", (__input) => { onQtyChanged(__input.target); });
+            quantity.appendChild(quantity_input);
+
+            // price
+            let price = document.createElement("td");
+            let price_input = document.createElement("input");
+            let price_b = document.createElement("b");
+            price_input.name = "product_price";
+            price_input.type = "hidden";
+            price_input.value = option.price;
+            price_b.textContent = new Intl.NumberFormat().format(option.price);
+            price.append(price_input, price_b, " 원");
+            price.style.textAlign = "end";
+
+            // button to delete this row
+            let button = document.createElement("td");
+            let button_btn = document.createElement("button");
+            button_btn.textContent = "X";
+            button_btn.addEventListener("click", (__button) => {
+                tbody.deleteRow(__button.target.closest("tr").rowIndex);
+                updateTotal();
+            });
+            button.appendChild(button_btn);
 
 
-        // table & row
-        row.appendChild(id);
-        row.appendChild(name);
-        row.appendChild(quantity);
-        row.appendChild(price);
-        row.appendChild(button);
-        tbody.appendChild(row);
-    }
-</script>
+            // table & row
+            row.appendChild(id);
+            row.appendChild(name);
+            row.appendChild(quantity);
+            row.appendChild(price);
+            row.appendChild(button);
+            tbody.appendChild(row);
+        }
+    </script>
+</div>
+<!--/* End of Content */-->
 </body>
 </html>

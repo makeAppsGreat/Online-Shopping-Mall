@@ -11,7 +11,7 @@
 <body>
 <!--/* Breadcrumb */-->
 <ul layout:fragment="breadcrumb"
-    th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequestUri()}">
+    th:with="urlBuilder=${T(org.springframework.web.util.UriComponentsBuilder).fromPath('/product/list')}">
     <li><a th:href="@{/}">홈</a></li>
     <li>
         <span th:unless="${manufacturer} or ${category} or ${productPageRequest.keyword}">전체상품</span>
@@ -45,7 +45,8 @@
              th:with="urlBuilder=${T(org.springframework.web.util.UriComponentsBuilder).fromPath('/product/detail/{id}')
                 .queryParamIfPresent('manufacturer', param.manufacturer)
                 .queryParamIfPresent('category', param.category)
-                .queryParamIfPresent('keyword', param.keyword)}">
+                .queryParamIfPresent('keyword',
+                    (__${#fields.hasErrors('productPageRequest.keyword')}__ ? T(java.util.Optional).empty() : param.keyword))}">
             <a th:href="@{${urlBuilder.build(product.id)}}">
                 <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
                 <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:120px">

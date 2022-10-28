@@ -10,8 +10,10 @@ import javax.validation.constraints.Size;
 @Getter @Setter
 public class ProductPageRequest {
 
-    public static int DEFAULT_SORT_METHOD_VALUE = 0;
-    public static int DEFAULT_PAGE_VALUE = 1;
+    public static final int DEFAULT_SORT_METHOD_VALUE = 0;
+    public static final int DEFAULT_PAGE_VALUE = 1;
+
+    private static final ProductPageRequest EMPTY = new ProductPageRequest();
 
     @Size(min = 2)
     private String keyword;
@@ -41,5 +43,9 @@ public class ProductPageRequest {
             case 3:
                 return Sort.by("registeredDate").descending();
         }
+    }
+
+    public static ProductPageRequest empty() {
+        return ProductPageRequest.EMPTY;
     }
 }

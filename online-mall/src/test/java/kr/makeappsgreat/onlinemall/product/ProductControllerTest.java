@@ -253,6 +253,7 @@ class ProductControllerTest {
 
             // When & Then
             mockMvc.perform(get("/product/list")
+                            .header("Referer", "/product/list")
                             .param("keyword", keyword))
                     .andDo(print())
                     .andExpect(status().isOk())

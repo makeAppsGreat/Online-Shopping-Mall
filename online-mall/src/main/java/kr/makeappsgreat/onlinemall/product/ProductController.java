@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 
 @Controller
 @RequiredArgsConstructor
@@ -55,8 +59,11 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public String list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
-                       Model model) {
+    public ModelAndView list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
+                             HttpServletRequest request, RedirectAttributes attributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        String viewName = "/product/list";
+
         if (bindingResult.hasErrors()) {
             for (FieldError e : bindingResult.getFieldErrors()) {
                 switch (e.getField()) {
@@ -65,6 +72,20 @@ public class ProductController {
                             // Case : Keyword is too short.
                             // throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                             productPageRequest.setKeyword(null);
+
+                            String referer = request.getHeader("Referer");
+                            if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+                            URI uri = URI.create(referer);
+                            if (!uri.getPath().equals(viewName)) {
+                                attributes.addFlashAttribute(productPageRequest);
+                                attributes.addFlashAttribute(
+                                        "org.springframework.validation.BindingResult.productPageRequest",
+                                        bindingResult);
+
+                                modelAndView.setViewName("redirect:" + referer);
+                                return modelAndView;
+                            }
                         }
                         break;
                     case "manufacturer":
@@ -82,15 +103,16 @@ public class ProductController {
                 }
             }
         }
+        modelAndView.setViewName(viewName);
 
         Page<Product> result = productService.getPagedProducts(productPageRequest);
         if (productPageRequest.getManufacturer() != null) {
             Product product = result.stream().findFirst().orElse(null);
 
             if (product != null) {
-                model.addAttribute("manufacturer", product.getManufacturer());
+                modelAndView.addObject("manufacturer", product.getManufacturer());
             } else {
-                model.addAttribute(
+                modelAndView.addObject(
                         "manufacturer",
                         manufacturerRepository.findById(productPageRequest.getManufacturer())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST))
@@ -102,9 +124,9 @@ public class ProductController {
             Product product = result.stream().findFirst().orElse(null);
 
             if (product != null) {
-                model.addAttribute("category", product.getCategory());
+                modelAndView.addObject("category", product.getCategory());
             } else {
-                model.addAttribute(
+                modelAndView.addObject(
                         "category",
                         categoryRepository.findById(productPageRequest.getCategory())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST))
@@ -112,16 +134,16 @@ public class ProductController {
             }
         }
 
-        model.addAttribute("products", result);
-        model.addAttribute(
+        modelAndView.addObject("products", result);
+        modelAndView.addObject(
                 "pagination",
                 new Pagination(ServletUriComponentsBuilder.fromCurrentRequest(), result));
-        model.addAttribute(
+        modelAndView.addObject(
                 "sort_method",
                 productSortMethod.get(
                         ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page")));
 
 
-        return "/product/list";
+        return modelAndView;
     }
 }

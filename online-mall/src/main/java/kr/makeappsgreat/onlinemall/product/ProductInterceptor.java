@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.product;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -10,7 +11,7 @@ public class ProductInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
-        if (modelAndView.getModel().get("productPageRequest") == null)
-            modelAndView.getModel().put("productPageRequest", new ProductPageRequest());
+        if (response.getStatus() == HttpStatus.OK.value() && modelAndView.getModel().get("productPageRequest") == null)
+            modelAndView.getModel().put("productPageRequest", ProductPageRequest.empty());
     }
 }

@@ -31,7 +31,7 @@ class ProductRepositoryTest {
     private Product savedProduct;
 
     @BeforeEach
-    void saveTestProductS() {
+    void saveTestProducts() {
         Manufacturer m1 = new Manufacturer();
         m1.setName("MAFRA");
         manufacturerRepository.save(m1);
@@ -127,7 +127,7 @@ class ProductRepositoryTest {
     }
 
     @Test @Disabled
-    void selectAll() {
+    void findAll() {
         // Then
         List<Product> all = productRepository.findAll();
         all.forEach(System.out::println);

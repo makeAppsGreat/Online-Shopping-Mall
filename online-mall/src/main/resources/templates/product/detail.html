@@ -31,7 +31,7 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
+    <img th:unless="${product.imageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:400px">
     <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:400px">
     <h2 th:text="${product.name}">Product Name</h2>
     <p th:text="${product.simpleDetail}">Simple Detail</p>

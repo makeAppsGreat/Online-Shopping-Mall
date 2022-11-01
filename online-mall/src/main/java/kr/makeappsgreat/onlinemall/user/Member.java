@@ -23,7 +23,7 @@ public class Member extends NamedEntity {
 
     @Column(unique = true)
     @NotEmpty @Email
-    private String email;
+    private String username;
 
     @NotNull
     private String password;
@@ -31,7 +31,7 @@ public class Member extends NamedEntity {
     @ElementCollection
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Set<AccountRole> roles = Set.of(AccountRole.USER);
+    private Set<AccountRole> roles = Set.of(AccountRole.ROLE_USER);
 
     @Embedded
     private Address address;

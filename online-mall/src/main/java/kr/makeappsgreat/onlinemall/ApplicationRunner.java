@@ -1,8 +1,11 @@
 package kr.makeappsgreat.onlinemall;
 
+import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
+import kr.makeappsgreat.onlinemall.user.Member;
+import kr.makeappsgreat.onlinemall.user.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,19 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class ApplicationRunner implements org.springframework.boot.ApplicationRunner {
 
-    @Autowired
-    ManufacturerRepository manufacturerRepository;
+    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    CategoryRepository categoryRepository;
-
-    @Autowired
-    ProductRepository productRepository;
-
-    private final String ROOT_PATH_OF_ASSETS = "/assets/product/";
+    private static final String ROOT_PATH_OF_IMAGES = "/images/product/";
 
     @Transactional
     @Override
@@ -50,7 +50,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(28_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(0))
-                .imageLink(ROOT_PATH_OF_ASSETS + "b0d9d2e0.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "b0d9d2e0.jpeg")
                 .simpleDetail("약알칼리성 프리워시, 스프레이/폼건 가용가능")
                 .build());
 
@@ -59,7 +59,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(98_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(0))
-                .imageLink(ROOT_PATH_OF_ASSETS + "03e4d408.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "03e4d408.jpeg")
                 .simpleDetail("약알칼리성 프리워시, 스프레이/폼건 가용가능")
                 .build());
 
@@ -68,7 +68,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(14_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(1))
-                .imageLink(ROOT_PATH_OF_ASSETS + "01d61812.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "01d61812.jpeg")
                 .simpleDetail("변색된 타이어를 본연의 색으로, 터치 없이 휠 분진 제거")
                 .build());
 
@@ -85,7 +85,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(40_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(0))
-                .imageLink(ROOT_PATH_OF_ASSETS + "fd00b760.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "fd00b760.jpeg")
                 .simpleDetail("석회 및 물때만을 제거하여 무너진 비딩 재생 탁월한 산성 카 샴푸")
                 .build());
 
@@ -94,7 +94,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(108_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(0))
-                .imageLink(ROOT_PATH_OF_ASSETS + "006b50b8.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "006b50b8.jpeg")
                 .simpleDetail("석회 및 물때만을 제거하여 무너진 비딩 재생 탁월한 산성 카 샴푸")
                 .build());
 
@@ -103,7 +103,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(30_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(1))
-                .imageLink(ROOT_PATH_OF_ASSETS + "06f36c22.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "06f36c22.jpeg")
                 .simpleDetail("희석비 깡패, 뛰어난 윤할력의 중성 카 샴푸")
                 .build());
 
@@ -112,7 +112,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(38_000)
                 .manufacturer(manufacturers.get(0))
                 .category(categories.get(1))
-                .imageLink(ROOT_PATH_OF_ASSETS + "80e5387c.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "80e5387c.jpeg")
                 .simpleDetail("라보코스메티카 유막제거+글라스 폴리쉬")
                 .build());
 
@@ -121,7 +121,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(24_900)
                 .manufacturer(manufacturers.get(1))
                 .category(categories.get(2))
-                .imageLink(ROOT_PATH_OF_ASSETS + "42bded84.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "42bded84.jpeg")
                 .simpleDetail("차량 본연의 색을 더욱 깊고 진하게!, 블랙 계열 차량 전용 왁스")
                 .build());
 
@@ -130,7 +130,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(24_900)
                 .manufacturer(manufacturers.get(1))
                 .category(categories.get(2))
-                .imageLink(ROOT_PATH_OF_ASSETS + "45577e20.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "45577e20.jpeg")
                 .simpleDetail("차량 본연의 색을 더욱 깊고 진하게!, 화이트 계열 차량 전용 왁스")
                 .build());
 
@@ -139,7 +139,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(29_000)
                 .manufacturer(manufacturers.get(1))
                 .category(categories.get(2))
-                .imageLink(ROOT_PATH_OF_ASSETS + "489a760a.jpeg")
+                .imageLink(ROOT_PATH_OF_IMAGES + "489a760a.jpeg")
                 .simpleDetail("젖은 상태 OK!, 광택/코팅/발수, 연마제 無")
                 .build());
 
@@ -148,7 +148,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .price(41_000)
                 .manufacturer(manufacturers.get(2))
                 .category(categories.get(3))
-                .imageLink(ROOT_PATH_OF_ASSETS + "dfe75a2e.png")
+                .imageLink(ROOT_PATH_OF_IMAGES + "dfe75a2e.png")
                 .simpleDetail("마로렉스 알칼리 내성 압축분무기")
                 .build());
 
@@ -163,5 +163,25 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 manufacturerRepository.count(),
                 categoryRepository.count(),
                 productRepository.count());
+
+
+        List<Member> members = new ArrayList<>();
+
+        members.add(Member.builder()
+                .name("김가연")
+                .username("makeappsgreat@gmail.com")
+                .password("simple")
+                .address(Address.builder()
+                        .zipcode("42731")
+                        .address("대구광역시 달서구")
+                        .address2("")
+                        .build())
+                .phoneNumber("053-123-4567")
+                .mobileNumber("010-1234-5678")
+                .build());
+
+
+        memberRepository.saveAll(members);
+        log.info("Members saved... ({})", memberRepository.count());
     }
 }

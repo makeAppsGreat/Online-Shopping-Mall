@@ -48,7 +48,7 @@
                 .queryParamIfPresent('keyword',
                     (__${#fields.hasErrors('productPageRequest.keyword')}__ ? T(java.util.Optional).empty() : param.keyword))}">
             <a th:href="@{${urlBuilder.build(product.id)}}">
-                <img th:unless="${product.imageLink}" th:src="@{/assets/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
+                <img th:unless="${product.imageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" style="width:120px">
                 <img th:if="${product.imageLink}" th:src="${product.imageLink}" th:title="${product.name}" th:alt="${product.name}" style="width:120px">
                 <p><b th:text="${product.name}">(상품이름)</b> | <span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품가격)</span> 원</p>
             </a>

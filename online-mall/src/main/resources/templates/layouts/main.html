@@ -9,6 +9,10 @@
 <body>
 <!--/* [Thymeleaf: add parameter to current url](https://stackoverflow.com/questions/27623405) */-->
 <header>
+    <p>
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/logout}">Logout</a>
+    </p>
     <form th:action="@{/product/list}">
         <label>상품찾기 : </label>
         <input type="text" th:field="*{productPageRequest.keyword}" />

@@ -31,7 +31,7 @@ class MemberRepositoryTest {
 
             // Then
             assertThat(member.getName()).isEqualTo(savedMember.getName());
-            assertThat(member.getEmail()).isEqualTo(savedMember.getEmail());
+            assertThat(member.getUsername()).isEqualTo(savedMember.getUsername());
             assertThat(member.getPhoneNumber()).isEqualTo(savedMember.getPhoneNumber());
         }
 
@@ -42,7 +42,6 @@ class MemberRepositoryTest {
                 memberRepository.saveAll(List.of(createAMember(), createAMember()));
                 memberRepository.findAll();
             });
-            /** @TODO : check to duplicated value */
         }
 
     }
@@ -68,7 +67,7 @@ class MemberRepositoryTest {
     private Member createAMember() {
         return Member.builder()
                 .name("김가연")
-                .email("makeappsgreat@gmail.com")
+                .username("makeappsgreat@gmail.com")
                 .password("simple")
                 .address(Address.builder()
                         .zipcode("42731")

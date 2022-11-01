@@ -1,14 +1,14 @@
 package kr.makeappsgreat.onlinemall.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
 
 @Embeddable
-@Builder
-@Getter
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class Address {
 
     @NotBlank

@@ -4,23 +4,25 @@ import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.model.NamedEntity;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@RequiredArgsConstructor @SuperBuilder
+@NoArgsConstructor @SuperBuilder
 @Getter @Setter
 public class Member extends NamedEntity {
 
     @Column(unique = true)
-    @NotBlank @Email
+    @NotEmpty @Email
     private String email;
 
     @NotNull
@@ -38,4 +40,7 @@ public class Member extends NamedEntity {
 
     @NotBlank
     private String mobileNumber;
+
+    @Builder.Default
+    private LocalDateTime registeredDate = LocalDateTime.now();
 }

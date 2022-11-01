@@ -2,7 +2,7 @@ package kr.makeappsgreat.onlinemall.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -12,7 +12,7 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 
 @MappedSuperclass
-@RequiredArgsConstructor @SuperBuilder
+@NoArgsConstructor @SuperBuilder
 @Getter @Setter
 @EqualsAndHashCode(of = "id")
 public class NamedEntity {

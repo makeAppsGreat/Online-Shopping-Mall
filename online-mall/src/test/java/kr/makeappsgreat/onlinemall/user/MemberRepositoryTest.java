@@ -7,17 +7,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @DataJpaTest
 class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Nested
     class Save{
@@ -60,22 +65,35 @@ class MemberRepositoryTest {
 
             // Then
             assertThat(all.size()).isGreaterThan(0);
+            assertThat(all).allSatisfy(member -> {
+               assertThat(member.getRoles()).containsAnyOf(AccountRole.USER, AccountRole.ADMIN);
+            });
+        }
+
+        @Test
+        void findByUsername() {
+            // When
+            Optional<Member> member = memberRepository.findByUsername(username);
+
+            // Then
+            assertThat(member.isPresent()).isTrue();
         }
 
     }
 
+    private final String username = "makeappsgreat@gmail.com";
     private Member createAMember() {
         return Member.builder()
                 .name("김가연")
-                .username("makeappsgreat@gmail.com")
+                .email(username)
                 .password("simple")
                 .address(Address.builder()
                         .zipcode("42731")
                         .address("대구광역시 달서구")
-                        .address2("")
                         .build())
                 .phoneNumber("053-123-4567")
                 .mobileNumber("010-1234-5678")
-                .build();
+                .build()
+                .foo(passwordEncoder);
     }
 }

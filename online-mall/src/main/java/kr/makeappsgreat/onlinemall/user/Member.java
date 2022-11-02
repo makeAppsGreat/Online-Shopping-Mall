@@ -1,37 +1,24 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.model.Address;
-import kr.makeappsgreat.onlinemall.model.NamedEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor @SuperBuilder
-@Getter @Setter
-public class Member extends NamedEntity {
+@Getter
+public class Member extends Account {
 
-    @Column(unique = true)
-    @NotEmpty @Email
-    private String username;
-
-    @NotNull
-    private String password;
-
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private Set<AccountRole> roles = Set.of(AccountRole.ROLE_USER);
+    @NotEmpty @NotNull
+    private String email; // Do set email to username.
 
     @Embedded
     private Address address;
@@ -41,6 +28,11 @@ public class Member extends NamedEntity {
     @NotBlank
     private String mobileNumber;
 
-    @Builder.Default
-    private LocalDateTime registeredDate = LocalDateTime.now();
+    public Member foo(PasswordEncoder passwordEncoder) {
+        setUsername(this.email);
+        encodePassword(passwordEncoder);
+        addRole(AccountRole.USER);
+
+        return this;
+    }
 }

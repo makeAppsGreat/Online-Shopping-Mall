@@ -7,6 +7,7 @@ import kr.makeappsgreat.onlinemall.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
 
     private static final String ROOT_PATH_OF_IMAGES = "/images/product/";
@@ -169,16 +171,16 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
         members.add(Member.builder()
                 .name("김가연")
-                .username("makeappsgreat@gmail.com")
+                .email("makeappsgreat@gmail.com")
                 .password("simple")
                 .address(Address.builder()
                         .zipcode("42731")
                         .address("대구광역시 달서구")
-                        .address2("")
                         .build())
                 .phoneNumber("053-123-4567")
                 .mobileNumber("010-1234-5678")
-                .build());
+                .build()
+                .foo(passwordEncoder));
 
 
         memberRepository.saveAll(members);

@@ -34,7 +34,7 @@ public class Product extends NamedEntity {
 
     @OneToMany
     @Builder.Default
-    private Set<Product> options =  new HashSet<>();
+    private Set<Product> options = new HashSet<>();
 
     /* @OneToMany
     @Builder.Default

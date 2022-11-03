@@ -43,7 +43,7 @@
         <hr>
         <select id="options">
             <option selected disabled>[선택] 옵션을 선택하여 주세요.</option>
-            <option th:each="option : ${product.options}"
+            <option th:each="option : ${options}"
                     th:value="${option.id} + ',' + ${option.price}"
                     th:label="${option.name} + ' - ' + ${#numbers.formatInteger(option.price, 3, 'COMMA')} + ' 원'"
                     th:text="${option.name}"

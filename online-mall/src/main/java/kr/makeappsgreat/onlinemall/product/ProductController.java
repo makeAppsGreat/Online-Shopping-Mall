@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -53,8 +54,13 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{id}")
+    @Transactional(readOnly = true)
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getProduct(id));
+        Product product = productService.getProduct(id);
+
+        model.addAttribute("product", product);
+        if (!product.getOptions().isEmpty())
+            model.addAttribute("options", product.getOptions());
         return "/product/detail";
     }
 

@@ -1,7 +1,6 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,12 +22,6 @@ public class AccountService implements UserDetailsService {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        return User.builder()
-                .username(account.getUsername())
-                .password(account.getPassword())
-                .roles(account.getRoles()
-                        .stream().map(accountRole -> accountRole.name())
-                        .toArray(String[]::new))
-                .build();
+        return new AccountUserDetails(account);
     }
 }

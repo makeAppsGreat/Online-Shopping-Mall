@@ -2,5 +2,6 @@ package kr.makeappsgreat.onlinemall.user;
 
 public enum AccountRole {
 
-    USER, ADMIN
+    ROLE_USER, ROLE_ADMIN
+
 }

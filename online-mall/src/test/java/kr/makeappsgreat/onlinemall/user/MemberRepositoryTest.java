@@ -4,6 +4,7 @@ import kr.makeappsgreat.onlinemall.model.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +15,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 class MemberRepositoryTest {
@@ -21,7 +24,7 @@ class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @Autowired
+    @Mock
     PasswordEncoder passwordEncoder;
 
     @Nested
@@ -33,6 +36,7 @@ class MemberRepositoryTest {
 
             // When
             Member savedMember = memberRepository.save(member);
+            memberRepository.findAll();
 
             // Then
             assertThat(member.getName()).isEqualTo(savedMember.getName());
@@ -65,8 +69,8 @@ class MemberRepositoryTest {
 
             // Then
             assertThat(all.size()).isGreaterThan(0);
-            assertThat(all).allSatisfy(member -> {
-               assertThat(member.getRoles()).containsAnyOf(AccountRole.USER, AccountRole.ADMIN);
+            assertThat(all).allSatisfy((member) -> {
+               assertThat(member.getRoles()).containsAnyOf(AccountRole.ROLE_USER, AccountRole.ROLE_ADMIN);
             });
         }
 
@@ -83,6 +87,9 @@ class MemberRepositoryTest {
 
     private final String username = "makeappsgreat@gmail.com";
     private Member createAMember() {
+        when(passwordEncoder.encode(anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(0, String.class));
+
         return Member.builder()
                 .name("김가연")
                 .email(username)

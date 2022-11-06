@@ -42,11 +42,11 @@ public class Account extends NamedEntity {
         password = passwordEncoder.encode(password);
     }
 
-    protected void setUsername(String username) {
-        this.username = username;
+    public void addRole(AccountRole role) {
+        roles.add(role);
     }
 
-    protected void addRole(AccountRole role) {
-        roles.add(role);
+    protected void setUsername(String username) {
+        this.username = username;
     }
 }

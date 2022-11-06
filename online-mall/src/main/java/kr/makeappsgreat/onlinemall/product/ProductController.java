@@ -4,7 +4,6 @@ import kr.makeappsgreat.onlinemall.common.Pagination;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,15 +42,6 @@ public class ProductController {
 
     private final MessageSource messageSource;
 
-    @ModelAttribute
-    public void navigation(Model model) {
-        model.addAttribute(
-                "manufacturers",
-                manufacturerRepository.findAll(Sort.by("name")));
-        model.addAttribute(
-                "categories",
-                categoryRepository.findAll(Sort.by("name")));
-    }
 
     @GetMapping("/detail/{id}")
     @Transactional(readOnly = true)

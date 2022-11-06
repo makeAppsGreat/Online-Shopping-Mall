@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE" th:text="#{homepage.name}">Homepage Name</title>
     <link rel="stylesheet" th:href="@{/css/simple.css}"/>
 </head>
 <body>
-<!--/* [Thymeleaf: add parameter to current url](https://stackoverflow.com/questions/27623405) */-->
 <header>
-    <p>
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/logout}">Logout</a>
-    </p>
+    <div>
+        <p sec:authorize="isAuthenticated()">
+            <b sec:authentication="principal.account.name">(Login user name)</b> 님 |
+            <a th:href="@{/logout}">로그아웃</a>
+        </p>
+        <p sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}">로그인</a> |
+            <a th:href="@{/member/join/}">회원가입</a>
+        </p>
+    </div>
     <form th:action="@{/product/list}">
         <label>상품찾기 : </label>
         <input type="text" th:field="*{productPageRequest.keyword}" />
@@ -23,6 +29,7 @@
     <nav>
         <hr>
         <labe>제조사</labe>
+        <!--/* [Thymeleaf: add parameter to current url](https://stackoverflow.com/questions/27623405) */-->
         <ul th:with="urlBuilder=${T(org.springframework.web.util.UriComponentsBuilder).fromPath('/product/list')}">
             <li><a th:href="@{/product/list}">전체</a></li>
             <li th:each="ma : ${manufacturers}">

@@ -11,9 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AccountServiceTest {
 
     @Autowired
-    AccountRepository<Account> accountRepository;
-
-    @Autowired
     AccountService accountService;
 
     @Test

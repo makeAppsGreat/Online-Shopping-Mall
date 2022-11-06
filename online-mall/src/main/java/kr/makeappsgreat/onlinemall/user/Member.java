@@ -8,16 +8,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @NoArgsConstructor @SuperBuilder
 @Getter
 public class Member extends Account {
 
-    @NotEmpty @NotNull
+    @NotEmpty @Email
     private String email; // Do set email to username.
 
     @Embedded
@@ -31,7 +31,7 @@ public class Member extends Account {
     public Member foo(PasswordEncoder passwordEncoder) {
         setUsername(this.email);
         encodePassword(passwordEncoder);
-        addRole(AccountRole.USER);
+        addRole(AccountRole.ROLE_USER);
 
         return this;
     }

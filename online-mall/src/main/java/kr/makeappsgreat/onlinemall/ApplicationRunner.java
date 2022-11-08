@@ -2,8 +2,8 @@ package kr.makeappsgreat.onlinemall;
 
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
-import kr.makeappsgreat.onlinemall.user.Member;
-import kr.makeappsgreat.onlinemall.user.MemberRepository;
+import kr.makeappsgreat.onlinemall.user.member.Member;
+import kr.makeappsgreat.onlinemall.user.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;

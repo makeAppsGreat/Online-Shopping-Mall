@@ -14,7 +14,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    @Value("${product.list.page_request.page_size}")
+    @Value("${product.list.page_request_size}")
     private int PAGE_SIZE;
 
     public Product getProduct(Long id) {

@@ -1,4 +1,4 @@
-package kr.makeappsgreat.onlinemall.user;
+package kr.makeappsgreat.onlinemall.user.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

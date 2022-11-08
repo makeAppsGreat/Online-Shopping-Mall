@@ -1,6 +1,10 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.model.Address;
+import kr.makeappsgreat.onlinemall.user.member.Agreement;
+import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
+import kr.makeappsgreat.onlinemall.user.member.Member;
+import kr.makeappsgreat.onlinemall.user.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,6 +28,9 @@ class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    AgreementRepository agreementRepository;
+
     @Mock
     PasswordEncoder passwordEncoder;
 
@@ -42,6 +49,7 @@ class MemberRepositoryTest {
             assertThat(member.getName()).isEqualTo(savedMember.getName());
             assertThat(member.getUsername()).isEqualTo(savedMember.getUsername());
             assertThat(member.getPhoneNumber()).isEqualTo(savedMember.getPhoneNumber());
+            assertThat(member.getId()).isEqualTo(member.getAgreement().getId());
         }
 
         @Test
@@ -90,10 +98,14 @@ class MemberRepositoryTest {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        return Member.builder()
+        Agreement agreement = new Agreement(true, true, true);
+        agreement.updateMarketingAgreement(false);
+
+        Member member = Member.builder()
                 .name("김가연")
                 .email(username)
                 .password("simple")
+                .agreement(agreement)
                 .address(Address.builder()
                         .zipcode("42731")
                         .address("대구광역시 달서구")
@@ -102,5 +114,11 @@ class MemberRepositoryTest {
                 .mobileNumber("010-1234-5678")
                 .build()
                 .foo(passwordEncoder);
+
+        agreement.setMember(member);
+        agreementRepository.save(agreement);
+
+
+        return member;
     }
 }

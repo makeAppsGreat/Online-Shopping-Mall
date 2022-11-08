@@ -25,12 +25,6 @@ public class GlobalInterceptor implements HandlerInterceptor {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         if (response.getStatus() == HttpStatus.OK.value()) {
             Map<String, Object> model = modelAndView.getModel();
-
-            /* Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object principal = authentication.getPrincipal();
-            Account account = principal.equals("anonymousUser") ? null : ((AccountUserDetails) principal).getAccount();
-
-            model.put("currentUser", account); */
             model.put("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
             model.put("categories", categoryRepository.findAll(Sort.by("name")));
 

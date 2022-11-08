@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE" th:text="#{homepage.name}">Homepage Name</title>
-    <link rel="stylesheet" th:href="@{/css/simple.css}"/>
+    <link rel="stylesheet" th:href="@{/css/simple.css}" />
 </head>
 <body>
 <header>
@@ -19,12 +19,12 @@
             <a th:href="@{/member/join/}">회원가입</a>
         </p>
     </div>
-    <form th:action="@{/product/list}">
-        <label>상품찾기 : </label>
-        <input type="text" th:field="*{productPageRequest.keyword}" />
-        <input type="submit" value="검색"/>
-        <span th:if="${#fields.hasErrors('productPageRequest.keyword')}"
-              th:errors="*{productPageRequest.keyword}" style="color:red">Incorrect Data</span>
+    <form th:action="@{/product/list}" th:object="${productPageRequest}">
+        <label th:for="keyword">상품찾기 : </label>
+        <input type="text" th:field="*{keyword}" th:autofocus="${#fields.hasErrors('keyword')}" />
+        <input type="submit" value="검색" />
+        <span th:if="${#fields.hasErrors('keyword')}"
+              th:errors="*{keyword}" style="color:red">Incorrect Data</span>
     </form>
     <nav>
         <hr>
@@ -59,7 +59,11 @@
 <footer>
     <hr>
     <p><strong>Do Simple</strong></p>
-    <p><label>Contact : </label><a href="mailto:makeappsgreat@gmail.com">makeappsgreat@gmail.com</a></p>
+    <p>Contact : <a href="mailto:makeappsgreat@gmail.com">makeappsgreat@gmail.com</a></p>
 </footer>
+<script th:if="${#fields.hasErrors('productPageRequest.keyword')}">
+    let keywordBox = document.getElementById("keyword");
+    keywordBox.selectionStart = keywordBox.selectionEnd = keywordBox.value.length;
+</script>
 </body>
 </html>

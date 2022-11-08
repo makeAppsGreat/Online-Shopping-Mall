@@ -2,6 +2,8 @@ package kr.makeappsgreat.onlinemall;
 
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
+import kr.makeappsgreat.onlinemall.user.member.Agreement;
+import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
 import kr.makeappsgreat.onlinemall.user.member.Member;
 import kr.makeappsgreat.onlinemall.user.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,10 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final AgreementRepository agreementRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ROOT_PATH_OF_IMAGES = "/images/product/";
 
@@ -169,10 +173,18 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
         List<Member> members = new ArrayList<>();
 
+        Agreement agreement = Agreement.builder()
+                .terms1(true)
+                .terms2(true)
+                .terms3(true)
+                .build();
+        agreement.updateMarketingAgreement(false);
+
         members.add(Member.builder()
                 .name("김가연")
                 .email("makeappsgreat@gmail.com")
                 .password("simple")
+                .agreement(agreement)
                 .address(Address.builder()
                         .zipcode("42731")
                         .address("대구광역시 달서구")
@@ -182,8 +194,11 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .build()
                 .foo(passwordEncoder));
 
+        agreement.setMember(members.get(0));
+        agreementRepository.save(agreement);
+
 
         memberRepository.saveAll(members);
-        log.info("Members saved... ({})", memberRepository.count());
+        log.info("Members saved... (Member : {})", memberRepository.count());
     }
 }

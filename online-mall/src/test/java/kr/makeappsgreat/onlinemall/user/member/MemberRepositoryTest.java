@@ -1,10 +1,7 @@
-package kr.makeappsgreat.onlinemall.user;
+package kr.makeappsgreat.onlinemall.user.member;
 
 import kr.makeappsgreat.onlinemall.model.Address;
-import kr.makeappsgreat.onlinemall.user.member.Agreement;
-import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
-import kr.makeappsgreat.onlinemall.user.member.Member;
-import kr.makeappsgreat.onlinemall.user.member.MemberRepository;
+import kr.makeappsgreat.onlinemall.user.AccountRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -98,7 +95,11 @@ class MemberRepositoryTest {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        Agreement agreement = new Agreement(true, true, true);
+        Agreement agreement = Agreement.builder()
+                .terms1(true)
+                .terms2(true)
+                .terms3(true)
+                .build();
         agreement.updateMarketingAgreement(false);
 
         Member member = Member.builder()

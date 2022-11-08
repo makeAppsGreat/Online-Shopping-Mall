@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>회원가입</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li>회원가입</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <p>
+        <input type="checkbox" id="agreeAll">
+        <label th:for="agreeAll">전체 이용약관에 동의합니다</label>
+    </p>
+    <form th:action="@{/member/join/step2}" th:object="${agreement}" method="post" id="agreement">
+        <ul style="list-style:none">
+            <li>
+                <input type="checkbox" th:field="*{terms1}" />
+                <label th:for="${#ids.prev('terms1')}"><b>Do Simple</b> 이용약관</label>
+            </li>
+            <li>
+                <input type="checkbox" th:field="*{terms2}" />
+                <label th:for="${#ids.prev('terms2')}">개인정보 수집 이용에 관한 동의</label>
+            </li>
+            <li>
+                <input type="checkbox" th:field="*{terms3}" />
+                <label th:for="${#ids.prev('terms3')}">개인정보 제3자 제공에 관한 동의</label>
+            </li>
+            <li>
+                <input type="checkbox" th:field="*{marketing}" />
+                <label th:for="${#ids.prev('marketing')}">마케팅 수신 항목 동의(선택)</label>
+            </li>
+        </ul>
+        <input type="submit" value="회원가입" />
+    </form>
+    <script th:inline="javascript">
+        document.getElementById("agreeAll")
+            .addEventListener("change", (__checkbox) => {
+                let checked = __checkbox.target.checked;
+
+                for (const checkbox of document.getElementById("agreement").getElementsByTagName("input")) {
+                    checkbox.checked = checked;
+                }
+            });
+    </script>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

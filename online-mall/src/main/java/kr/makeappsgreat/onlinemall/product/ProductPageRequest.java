@@ -24,6 +24,10 @@ public class ProductPageRequest {
     @Min(1)
     private int page = this.DEFAULT_PAGE_VALUE;
 
+    public static ProductPageRequest empty() {
+        return ProductPageRequest.EMPTY;
+    }
+
     public int getSort_method() { return this.sortMethod; }
     public void setSort_method(int sortMethod) {
         this.sortMethod = sortMethod;
@@ -43,9 +47,5 @@ public class ProductPageRequest {
             case 3:
                 return Sort.by("registeredDate").descending();
         }
-    }
-
-    public static ProductPageRequest empty() {
-        return ProductPageRequest.EMPTY;
     }
 }

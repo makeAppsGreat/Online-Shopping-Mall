@@ -17,7 +17,7 @@ public class ProductSortMethod {
 
     public List<Link> get(UriComponentsBuilder currentRequest) {
         List<Link> list = List.of(
-                /** @TODO : Refactor to type-safe (Map<String, String> ?) */
+                /** @TODO : Refactor to type-safe (Using Map<String, String>?) */
                 new Link(messageSource.getMessage("nameAtoZ", null, Locale.getDefault())),
                 new Link(messageSource.getMessage("priceLowToHigh", null, Locale.getDefault())),
                 new Link(messageSource.getMessage("priceHighToLow", null, Locale.getDefault())),

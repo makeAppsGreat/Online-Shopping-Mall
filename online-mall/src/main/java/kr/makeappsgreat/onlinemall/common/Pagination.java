@@ -1,7 +1,6 @@
 package kr.makeappsgreat.onlinemall.common;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -9,7 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @Slf4j
 public class Pagination {
 

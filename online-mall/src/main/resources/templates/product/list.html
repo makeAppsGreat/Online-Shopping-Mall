@@ -36,7 +36,7 @@
             <select th:field=*{productPageRequest.sort_method}>
                 <option th:each="method,status : ${sort_method}"
                         th:value="${status.index}"
-                        th:label="${method.text}"
+                        th:label="${method.name}"
                         th:text="${method.link}">(정렬 방식)
                 </option>
             </select>
@@ -58,13 +58,13 @@
     </div>
     <div class="product_list_bottom">
         <hr>
-        <a th:href="${pagination.first.link}" th:text="${pagination.first.text}">First</a>
-        <a th:href="${pagination.previous.link}" th:text="${pagination.previous.text}">Previous</a>
+        <a th:href="${pagination.first.link}" th:text="${pagination.first.name}">First</a>
+        <a th:href="${pagination.previous.link}" th:text="${pagination.previous.name}">Previous</a>
         <span th:each="page : ${pagination.page}">
-            <a th:href="${page.link}" th:text="${page.text}">(Page Number)</a>
+            <a th:href="${page.link}" th:text="${page.name}">(Page Number)</a>
         </span>
-        <a th:href="${pagination.next.link}" th:text="${pagination.next.text}">Next</a>
-        <a th:href="${pagination.last.link}" th:text="${pagination.last.text}">Last</a>
+        <a th:href="${pagination.next.link}" th:text="${pagination.next.name}">Next</a>
+        <a th:href="${pagination.last.link}" th:text="${pagination.last.name}">Last</a>
     </div>
 
     <script>

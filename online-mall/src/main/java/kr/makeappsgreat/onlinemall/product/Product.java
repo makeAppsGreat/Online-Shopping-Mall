@@ -4,7 +4,6 @@ import kr.makeappsgreat.onlinemall.model.NamedEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
@@ -18,7 +17,7 @@ import java.util.Set;
 
 @Entity
 @NoArgsConstructor @SuperBuilder
-@Getter @Setter
+@Getter
 public class Product extends NamedEntity {
 
     @Min(0)

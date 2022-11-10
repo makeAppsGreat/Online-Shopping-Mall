@@ -32,17 +32,14 @@ class ProductRepositoryTest {
 
     @BeforeEach
     void saveTestProducts() {
-        Manufacturer m1 = new Manufacturer();
-        m1.setName("MAFRA");
+        Manufacturer m1 = Manufacturer.of("MAFRA");
         manufacturerRepository.save(m1);
 
         // 프리워시, 본세차, LSP, 세차용품
-        Category c1 = new Category();
-        c1.setName("프리워시");
+        Category c1 = Category.of("프리워시");
         categoryRepository.save(c1);
 
-        Category c2 = new Category();
-        c2.setName("본세차");
+        Category c2 = Category.of("본세차");
         categoryRepository.save(c2);
 
         Product p1 = Product.builder()

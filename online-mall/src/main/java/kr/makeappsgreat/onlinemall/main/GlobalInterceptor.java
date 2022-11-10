@@ -23,7 +23,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
-        if (response.getStatus() == HttpStatus.OK.value()) {
+        if (modelAndView != null && response.getStatus() == HttpStatus.OK.value()) {
             Map<String, Object> model = modelAndView.getModel();
             model.put("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
             model.put("categories", categoryRepository.findAll(Sort.by("name")));

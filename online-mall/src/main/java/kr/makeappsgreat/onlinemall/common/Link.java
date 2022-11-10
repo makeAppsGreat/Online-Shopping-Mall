@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 @Getter
 public class Link {
 
+    private final String name;
     private String link;
-    private final String text;
 
     public void setLink(String link) {
         this.link = link;
@@ -22,8 +22,8 @@ public class Link {
         MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
 
         if (!queryParams.isEmpty())
-            this.link = "?" + queryParams.entrySet().stream()
-                    .map(e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse(""))
+            this.link = "?" + queryParams.entrySet()
+                    .stream().map(e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse(""))
                     .collect(Collectors.joining("&"));
     }
 }

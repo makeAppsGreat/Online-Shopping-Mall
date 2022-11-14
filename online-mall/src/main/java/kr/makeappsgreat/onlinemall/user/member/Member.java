@@ -34,6 +34,7 @@ public class Member extends Account {
     @NotBlank
     private String mobileNumber;
 
+    /** @TODO : Edit the method name. */
     public Member foo(PasswordEncoder passwordEncoder) {
         setUsername(this.email);
         encodePassword(passwordEncoder);

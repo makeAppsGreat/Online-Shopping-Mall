@@ -2,12 +2,10 @@ package kr.makeappsgreat.onlinemall;
 
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
-import kr.makeappsgreat.onlinemall.user.member.Agreement;
-import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
-import kr.makeappsgreat.onlinemall.user.member.Member;
-import kr.makeappsgreat.onlinemall.user.member.MemberRepository;
+import kr.makeappsgreat.onlinemall.user.member.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -28,6 +26,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     private final AgreementRepository agreementRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     private static final String ROOT_PATH_OF_IMAGES = "/images/product/";
 
@@ -173,12 +172,13 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
         List<Member> members = new ArrayList<>();
 
-        Agreement agreement = Agreement.builder()
+        AgreementRequest request = AgreementRequest.builder()
                 .terms1(true)
                 .terms2(true)
                 .terms3(true)
+                .marketing(false)
                 .build();
-        agreement.updateMarketingAgreement(false);
+        Agreement agreement = modelMapper.map(request, Agreement.class);
 
         members.add(Member.builder()
                 .name("김가연")

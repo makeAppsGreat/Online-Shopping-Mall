@@ -1,11 +1,13 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
+import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataAccessException;
@@ -31,8 +33,11 @@ class MemberRepositoryTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+    private final ModelMapper modelMapper = ApplicationConfig.myModelMapper();
+
     @Nested
     class Save{
+
         @Test
         void save() {
             // Given
@@ -62,8 +67,10 @@ class MemberRepositoryTest {
 
     @Nested
     class Retrieve {
+
         @BeforeEach
         void saveTestMember() {
+            memberRepository.deleteAll();
             memberRepository.save(createAMember());
         }
 
@@ -95,12 +102,13 @@ class MemberRepositoryTest {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        Agreement agreement = Agreement.builder()
+        AgreementRequest request = AgreementRequest.builder()
                 .terms1(true)
                 .terms2(true)
                 .terms3(true)
+                .marketing(false)
                 .build();
-        agreement.updateMarketingAgreement(false);
+        Agreement agreement = modelMapper.map(request, Agreement.class);
 
         Member member = Member.builder()
                 .name("김가연")

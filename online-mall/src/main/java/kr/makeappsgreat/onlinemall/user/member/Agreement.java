@@ -1,6 +1,7 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
@@ -8,8 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor @AllArgsConstructor @Builder
-@Getter @Setter
+@Getter
 public class Agreement {
 
     @Id
@@ -18,6 +18,7 @@ public class Agreement {
     @OneToOne
     @JoinColumn(name = "id")
     @MapsId
+    @Setter
     private Member member;
 
     // 필수
@@ -33,7 +34,7 @@ public class Agreement {
     @NotNull
     private Boolean marketing;
     @NotNull
-    private LocalDateTime updateDate;
+    private LocalDateTime updateDate = acceptanceDate;
 
     public void updateMarketingAgreement(boolean marketing) {
         this.marketing = marketing;

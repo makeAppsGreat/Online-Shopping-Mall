@@ -1,20 +1,20 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 
-@Builder
 @Getter @Setter
 public class AgreementRequest {
 
-    @AssertTrue
+    @NotNull @AssertTrue
     private Boolean terms1;
-    @AssertTrue
+    @NotNull @AssertTrue
     private Boolean terms2;
-    @AssertTrue
+    @NotNull @AssertTrue
     private Boolean terms3;
+    @NotNull
     private Boolean marketing;
 }

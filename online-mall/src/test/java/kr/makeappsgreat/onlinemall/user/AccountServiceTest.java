@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AccountServiceTest {
 
     @Autowired
-    AccountService accountService;
+    AccountService<Account> accountService;
 
     @Test
     public void loadUserByUsername() {

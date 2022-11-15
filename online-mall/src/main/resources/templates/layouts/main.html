@@ -24,7 +24,7 @@
         <input type="text" th:field="*{keyword}" th:autofocus="${#fields.hasErrors('keyword')}" />
         <input type="submit" value="검색" />
         <span th:if="${#fields.hasErrors('keyword')}"
-              th:errors="*{keyword}" style="color:red">Incorrect Data</span>
+              th:errors="*{keyword}" class="red">Incorrect Data</span>
     </form>
     <nav>
         <hr>

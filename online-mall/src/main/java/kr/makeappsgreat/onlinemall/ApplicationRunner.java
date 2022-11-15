@@ -2,7 +2,11 @@ package kr.makeappsgreat.onlinemall;
 
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
-import kr.makeappsgreat.onlinemall.user.member.*;
+import kr.makeappsgreat.onlinemall.user.AccountRepository;
+import kr.makeappsgreat.onlinemall.user.member.Agreement;
+import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
+import kr.makeappsgreat.onlinemall.user.member.AgreementRequest;
+import kr.makeappsgreat.onlinemall.user.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,7 +26,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final MemberRepository memberRepository;
+    private final AccountRepository<Member> memberRepository;
     private final AgreementRepository agreementRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -172,12 +176,12 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
         List<Member> members = new ArrayList<>();
 
-        AgreementRequest request = AgreementRequest.builder()
-                .terms1(true)
-                .terms2(true)
-                .terms3(true)
-                .marketing(false)
-                .build();
+
+        AgreementRequest request = new AgreementRequest();
+        request.setTerms1(true);
+        request.setTerms2(true);
+        request.setTerms3(true);
+        request.setMarketing(false);
         Agreement agreement = modelMapper.map(request, Agreement.class);
 
         members.add(Member.builder()

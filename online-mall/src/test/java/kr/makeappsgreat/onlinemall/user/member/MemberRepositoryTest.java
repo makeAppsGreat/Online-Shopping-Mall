@@ -2,6 +2,7 @@ package kr.makeappsgreat.onlinemall.user.member;
 
 import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
 import kr.makeappsgreat.onlinemall.model.Address;
+import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 class MemberRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    AccountRepository<Member> memberRepository;
 
     @Autowired
     AgreementRepository agreementRepository;
@@ -102,12 +103,11 @@ class MemberRepositoryTest {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        AgreementRequest request = AgreementRequest.builder()
-                .terms1(true)
-                .terms2(true)
-                .terms3(true)
-                .marketing(false)
-                .build();
+        AgreementRequest request = new AgreementRequest();
+        request.setTerms1(true);
+        request.setTerms2(true);
+        request.setTerms3(true);
+        request.setMarketing(false);
         Agreement agreement = modelMapper.map(request, Agreement.class);
 
         Member member = Member.builder()

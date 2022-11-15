@@ -15,11 +15,7 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <p>
-        <input type="checkbox" id="agreeAll">
-        <label th:for="agreeAll">전체 이용약관에 동의합니다</label>
-    </p>
-    <form th:action="@{/member/join/step2}" th:object="${agreement}" method="post" id="agreement">
+    <form th:action="@{''}" th:object="${agreement}" method="post" id="agreement">
         <ul style="list-style:none">
             <li>
                 <input type="checkbox" th:field="*{terms1}" />
@@ -43,10 +39,8 @@
     <script th:inline="javascript">
         document.getElementById("agreeAll")
             .addEventListener("change", (__checkbox) => {
-                let checked = __checkbox.target.checked;
-
                 for (const checkbox of document.getElementById("agreement").getElementsByTagName("input")) {
-                    checkbox.checked = checked;
+                    checkbox.checked = __checkbox.target.checked;
                 }
             });
     </script>

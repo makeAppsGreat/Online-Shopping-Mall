@@ -1,5 +1,9 @@
+@charset "UTF-8";
+
 /* Style of breadcrumb */
 ul.crumbs { list-style : none; }
 ul.crumbs li { display : inline; }
 ul.crumbs li+li:before { content : " > "; }
 /* End of style breadcrumb */
+
+.red{ color : red }

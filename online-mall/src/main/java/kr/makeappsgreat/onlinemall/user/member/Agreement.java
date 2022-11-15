@@ -33,11 +33,14 @@ public class Agreement {
     // 선택
     @NotNull
     private Boolean marketing;
-    @NotNull
     private LocalDateTime updateDate = acceptanceDate;
 
-    public void updateMarketingAgreement(boolean marketing) {
-        this.marketing = marketing;
-        updateDate = LocalDateTime.now();
+    public LocalDateTime updateMarketingAgreement(boolean marketing) {
+        if (this.marketing != marketing) {
+            this.marketing = marketing;
+            updateDate = LocalDateTime.now();
+        }
+
+        return updateDate;
     }
 }

@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class Account extends NamedEntity {
 
     @Column(unique = true)
-    @NotEmpty
+    @NotBlank
     private String username;
 
     @NotNull

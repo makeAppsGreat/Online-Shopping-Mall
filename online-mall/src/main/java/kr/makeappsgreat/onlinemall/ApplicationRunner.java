@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall;
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
 import kr.makeappsgreat.onlinemall.user.AccountRepository;
+import kr.makeappsgreat.onlinemall.user.AccountRole;
 import kr.makeappsgreat.onlinemall.user.member.Agreement;
 import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
 import kr.makeappsgreat.onlinemall.user.member.AgreementRequest;
@@ -197,6 +198,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 .mobileNumber("010-1234-5678")
                 .build()
                 .foo(passwordEncoder));
+        members.get(0).addRole(AccountRole.ROLE_ADMIN);
 
         agreement.setMember(members.get(0));
         agreementRepository.save(agreement);

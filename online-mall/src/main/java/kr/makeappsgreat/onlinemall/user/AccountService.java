@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService implements UserDetailsService {
+public class AccountService<T extends Account> implements UserDetailsService {
 
-    private final AccountRepository<Account> accountRepository;
+    private final AccountRepository<T> accountRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -20,5 +20,9 @@ public class AccountService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
         return new AccountUserDetails(account);
+    }
+
+    public boolean isDuplicatedUser(String username) {
+        return accountRepository.existsByUsername(username);
     }
 }

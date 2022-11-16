@@ -18,10 +18,14 @@ public class ProductSortMethod {
     public List<Link> get(UriComponentsBuilder currentRequest) {
         List<Link> list = List.of(
                 /** @TODO : Refactor to type-safe (Using Map<String, String>?) */
-                new Link(messageSource.getMessage("nameAtoZ", null, Locale.getDefault())),
-                new Link(messageSource.getMessage("priceLowToHigh", null, Locale.getDefault())),
-                new Link(messageSource.getMessage("priceHighToLow", null, Locale.getDefault())),
-                new Link(messageSource.getMessage("newProduct", null, Locale.getDefault()))
+                new Link(messageSource.getMessage(
+                        "product.sort-method.nameAtoZ", null, Locale.getDefault())),
+                new Link(messageSource.getMessage(
+                        "product.sort-method.priceLowToHigh", null, Locale.getDefault())),
+                new Link(messageSource.getMessage(
+                        "product.sort-method.priceHighToLow", null, Locale.getDefault())),
+                new Link(messageSource.getMessage(
+                        "product.sort-method.newProduct", null, Locale.getDefault()))
         );
 
         for (int i = 0; i < list.size(); i++)

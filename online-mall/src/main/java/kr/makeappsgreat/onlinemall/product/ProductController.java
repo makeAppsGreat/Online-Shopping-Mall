@@ -2,7 +2,6 @@ package kr.makeappsgreat.onlinemall.product;
 
 import kr.makeappsgreat.onlinemall.common.Pagination;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,12 +20,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.net.URI;
 
-@Controller
+@Controller @RequestMapping("/product")
 @RequiredArgsConstructor
-@RequestMapping("/product")
 public class ProductController {
 
     /**
@@ -40,8 +38,6 @@ public class ProductController {
     private final CategoryRepository categoryRepository;
     private final ProductSortMethod productSortMethod;
 
-    private final MessageSource messageSource;
-
 
     @GetMapping("/detail/{id}")
     @Transactional(readOnly = true)
@@ -55,33 +51,32 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public ModelAndView list(@ModelAttribute @Valid ProductPageRequest productPageRequest, BindingResult bindingResult,
+    public ModelAndView list(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
                              HttpServletRequest request, RedirectAttributes attributes) {
         ModelAndView modelAndView = new ModelAndView();
         String viewName = "/product/list";
+        String badKeyword = null;
 
         if (bindingResult.hasErrors()) {
             for (FieldError e : bindingResult.getFieldErrors()) {
                 switch (e.getField()) {
                     case "keyword":
-                        if (!productPageRequest.getKeyword().isBlank()) {
-                            // Case : Keyword is too short.
-                            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                        // Case : Keyword is too short or blank.
+                        String referer = request.getHeader("Referer");
+                        if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+                        URI uri = URI.create(referer);
+                        if (!uri.getPath().equals(viewName)) {
+                            attributes.addFlashAttribute(productPageRequest);
+                            attributes.addFlashAttribute(
+                                    "org.springframework.validation.BindingResult.productPageRequest",
+                                    bindingResult);
+
+                            modelAndView.setViewName("redirect:" + referer);
+                            return modelAndView;
+                        } else {
+                            badKeyword = productPageRequest.getKeyword();
                             productPageRequest.setKeyword(null);
-
-                            String referer = request.getHeader("Referer");
-                            if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-
-                            URI uri = URI.create(referer);
-                            if (!uri.getPath().equals(viewName)) {
-                                attributes.addFlashAttribute(productPageRequest);
-                                attributes.addFlashAttribute(
-                                        "org.springframework.validation.BindingResult.productPageRequest",
-                                        bindingResult);
-
-                                modelAndView.setViewName("redirect:" + referer);
-                                return modelAndView;
-                            }
                         }
                         break;
                     case "manufacturer":
@@ -98,6 +93,15 @@ public class ProductController {
                         break;
                 }
             }
+        } else {
+            if (productPageRequest.getKeyword() != null && !productPageRequest.isKeywordOnly()) {
+                attributes.addFlashAttribute(
+                        "productPageRequest",
+                        ProductPageRequest.of(productPageRequest.getKeyword()));
+
+                modelAndView.setViewName("redirect:/product/list?keyword=" + productPageRequest.getKeyword());
+                return modelAndView;
+            }
         }
         modelAndView.setViewName(viewName);
 
@@ -111,7 +115,7 @@ public class ProductController {
                 modelAndView.addObject(
                         "manufacturer",
                         manufacturerRepository.findById(productPageRequest.getManufacturer())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST))
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
                 );
             }
         }
@@ -125,7 +129,7 @@ public class ProductController {
                 modelAndView.addObject(
                         "category",
                         categoryRepository.findById(productPageRequest.getCategory())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST))
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
                 );
             }
         }
@@ -138,6 +142,8 @@ public class ProductController {
                 "sort_method",
                 productSortMethod.get(
                         ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page")));
+
+        if (badKeyword != null) productPageRequest.setKeyword(badKeyword);
 
 
         return modelAndView;

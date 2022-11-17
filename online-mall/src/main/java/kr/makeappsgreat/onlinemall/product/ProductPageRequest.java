@@ -24,6 +24,14 @@ public class ProductPageRequest {
     @Min(1)
     private int page = this.DEFAULT_PAGE_VALUE;
 
+
+    public static ProductPageRequest of(String keyword) {
+        ProductPageRequest request = new ProductPageRequest();
+        request.setKeyword(keyword);
+
+        return request;
+    }
+
     public static ProductPageRequest empty() {
         return ProductPageRequest.EMPTY;
     }
@@ -34,7 +42,7 @@ public class ProductPageRequest {
     }
 
     /**
-     * Sort by product name(A-Z), price(high-low, low-high), new product, best seller
+     * Sort by product name(A-Z), price(high-low, low-high), new product, best seller7
      */
     public Sort getSort() {
         switch (this.sortMethod) {
@@ -47,5 +55,10 @@ public class ProductPageRequest {
             case 3:
                 return Sort.by("registeredDate").descending();
         }
+    }
+
+    public boolean isKeywordOnly() {
+        if (keyword == null) throw new RuntimeException("Unexpected usage.");
+        return manufacturer == null && category == null;
     }
 }

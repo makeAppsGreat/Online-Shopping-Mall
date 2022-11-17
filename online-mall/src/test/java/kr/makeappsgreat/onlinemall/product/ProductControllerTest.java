@@ -307,13 +307,13 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Manufacturer with not exist [400]")
-        public void list_notExistManufacturer_400() throws Exception {
+        @DisplayName("Manufacturer with not exist [404]")
+        public void list_notExistManufacturer_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("manufacturer", "-1"))
                     .andDo(print())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isNotFound());
         }
 
 
@@ -364,13 +364,13 @@ class ProductControllerTest {
         }
 
         @Test
-        @DisplayName("Category with not exist [400]")
-        public void list_notExistCategory_400() throws Exception {
+        @DisplayName("Category with not exist [404]")
+        public void list_notExistCategory_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("category", "-1"))
                     .andDo(print())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isNotFound());
         }
     }
 }

@@ -13,10 +13,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
 import java.util.Locale;
+import java.util.Set;
 
 @Controller @RequestMapping("/account")
 @Validated
@@ -28,8 +31,9 @@ public class AccountController {
     private final MessageSource messageSource;
 
     /** ID 사용 가능(중복 확인) 요청 시, 최초 요청 받는 Handler Method */
-    @GetMapping("/usable-username/{username}")
-    public String isUsableUsername(@PathVariable @Email String username, HttpServletRequest request) {
+    @GetMapping({"/usable-username/", "/usable-username/{username}"})
+    public String isUsableUsername(@PathVariable(required = false) @NotEmpty @Email String username,
+                                   HttpServletRequest request) {
         return String.format("forward:%s/response", request.getRequestURI());
     }
 
@@ -38,6 +42,7 @@ public class AccountController {
     @ResponseBody
     public ResponseEntity<SimpleResult> isUsableUsernameResponse(@PathVariable String username) {
         SimpleResult result;
+
         if (accountService.isDuplicatedUser(username)) {
             result = SimpleResult.builder()
                     .request(username)
@@ -61,23 +66,27 @@ public class AccountController {
 
     @GetMapping("/error")
     @ResponseBody
-    public ResponseEntity<SimpleResult> error(@RequestAttribute(required = false) Exception exception,
-                                              @RequestAttribute(required = false) HttpServletRequest request) {
+    public ResponseEntity<SimpleResult> error(@RequestAttribute Exception exception,
+                                              @RequestAttribute HttpServletRequest request) {
         SimpleResult result;
 
         /** Case : ID 사용 가능(중복 확인) 요청 시, 올바른 형식의 Email 주소가 아닌 경우 */
         if (exception != null && exception.getClass().isAssignableFrom(ConstraintViolationException.class)) {
+            Set<ConstraintViolation<?>> constraintViolations =
+                    ((ConstraintViolationException) exception).getConstraintViolations();
+            ConstraintViolation[] constraintViolations2 =
+                    constraintViolations.toArray(new ConstraintViolation[constraintViolations.size()]);
+            String[] nodes = constraintViolations2[0].getPropertyPath().toString().split("\\.");
+
             result = SimpleResult.builder()
-                    .request(null)
+                    .request((String) constraintViolations2[0].getInvalidValue())
                     .result(false)
                     .code(HttpStatus.BAD_REQUEST.value())
-                    .name("username")
-                    .message(null)
+                    .name(nodes[nodes.length - 1])
+                    .message(constraintViolations2[0].getMessage())
                     .build();
         } else {
-            if (request != null) log.warn("Unexpected exception {request_uri : \"{}\"}", request.getRequestURI(), exception);
-            else log.warn("Unexpected exception", exception);
-
+            log.warn("Unexpected exception {request_uri : \"{}\"}", request.getRequestURI(), exception);
             result = SimpleResult.builder()
                     .result(false)
                     .code(HttpStatus.BAD_REQUEST.value())

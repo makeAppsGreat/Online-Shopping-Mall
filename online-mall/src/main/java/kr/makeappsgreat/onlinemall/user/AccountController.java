@@ -40,7 +40,7 @@ public class AccountController {
     /** ID 사용 가능(중복 확인) 요청 시, 실제 응답하는 Handler Method */
     @GetMapping("/usable-username/{username}/response")
     @ResponseBody
-    public ResponseEntity<SimpleResult> isUsableUsernameResponse(@PathVariable String username) {
+    public ResponseEntity<SimpleResult> isUsableUsernameResponse(@PathVariable String username, Locale locale) {
         SimpleResult result;
 
         if (accountService.isDuplicatedUser(username)) {
@@ -49,7 +49,7 @@ public class AccountController {
                     .result(false)
                     .code(HttpStatus.CONFLICT.value())
                     .name("username")
-                    .message(messageSource.getMessage("account.duplicated-username", null, Locale.getDefault()))
+                    .message(messageSource.getMessage("account.duplicated-username", null, locale))
                     .build();
         } else {
             result = SimpleResult.builder()

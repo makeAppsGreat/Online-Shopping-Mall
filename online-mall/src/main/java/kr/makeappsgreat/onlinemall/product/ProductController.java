@@ -10,17 +10,16 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Controller @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -52,7 +51,8 @@ public class ProductController {
 
     @GetMapping("/list")
     public ModelAndView list(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
-                             HttpServletRequest request, RedirectAttributes attributes) {
+                             @RequestHeader(value = "Referer", required = false) String referer, RedirectAttributes attributes,
+                             Locale locale) {
         ModelAndView modelAndView = new ModelAndView();
         String viewName = "/product/list";
         String badKeyword = null;
@@ -62,7 +62,6 @@ public class ProductController {
                 switch (e.getField()) {
                     case "keyword":
                         // Case : Keyword is too short or blank.
-                        String referer = request.getHeader("Referer");
                         if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
                         URI uri = URI.create(referer);
@@ -98,8 +97,10 @@ public class ProductController {
                 attributes.addFlashAttribute(
                         "productPageRequest",
                         ProductPageRequest.of(productPageRequest.getKeyword()));
+                modelAndView.setViewName(
+                        "redirect:/product/list?keyword=" +
+                        URLEncoder.encode(productPageRequest.getKeyword(), StandardCharsets.UTF_8));
 
-                modelAndView.setViewName("redirect:/product/list?keyword=" + productPageRequest.getKeyword());
                 return modelAndView;
             }
         }
@@ -141,7 +142,7 @@ public class ProductController {
         modelAndView.addObject(
                 "sort_method",
                 productSortMethod.get(
-                        ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page")));
+                        ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page"), locale));
 
         if (badKeyword != null) productPageRequest.setKeyword(badKeyword);
 

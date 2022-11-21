@@ -239,6 +239,7 @@ class ProductControllerTest {
         public void list_blankKeyword_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
+                            .header("Referer", "/product/list")
                             .param("keyword", ""))
                     .andDo(print())
                     .andExpect(status().isOk())

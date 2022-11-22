@@ -32,9 +32,9 @@
 <div layout:fragment="content">
     <div class="product_list_top">
         <hr>
-        <p><label th:for="sort_method">정렬방식 : </label>
-            <select th:field=*{productPageRequest.sort_method}>
-                <option th:each="method,status : ${sort_method}"
+        <p><label th:for="sortMethod">정렬방식 : </label>
+            <select th:field=*{productPageRequest.sortMethod}>
+                <option th:each="method,status : ${sortMethod}"
                         th:value="${status.index}"
                         th:label="${method.name}"
                         th:text="${method.link}">(정렬 방식)
@@ -68,7 +68,7 @@
     </div>
 
     <script>
-        document.getElementById("sort_method")
+        document.getElementById("sortMethod")
             .addEventListener("change", function () {
                 location.href = this[this.selectedIndex].text;
         });

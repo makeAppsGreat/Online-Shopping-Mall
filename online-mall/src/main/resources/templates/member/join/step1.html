@@ -19,25 +19,25 @@
         <input type="checkbox" id="agreeAll">
         <label for="agreeAll">전체 이용약관에 동의합니다</label>
     </p>
-    <form th:action="@{''}" th:object="${agreement}" method="post" id="agreement">
+    <form th:action="@{''}" th:object="${agreementRequest}" method="post" id="agreement">
         <ul style="list-style:none">
             <li>
                 <input type="checkbox" th:field="*{terms1}" />
                 <label th:for="${#ids.prev('terms1')}"><b>Do Simple</b> 이용약관</label>
                 <span th:if="${#fields.hasErrors('terms1')}"
-                      th:errors="*{terms1}" class="red">Must be true</span>
+                      th:errors="*{terms1}" class="red">Incorrect Data</span>
             </li>
             <li>
                 <input type="checkbox" th:field="*{terms2}" />
                 <label th:for="${#ids.prev('terms2')}">개인정보 수집 이용에 관한 동의</label>
                 <span th:if="${#fields.hasErrors('terms2')}"
-                      th:errors="*{terms2}" class="red">Must be true</span>
+                      th:errors="*{terms2}" class="red">Incorrect Data</span>
             </li>
             <li>
                 <input type="checkbox" th:field="*{terms3}" />
                 <label th:for="${#ids.prev('terms3')}">개인정보 제3자 제공에 관한 동의</label>
                 <span th:if="${#fields.hasErrors('terms3')}"
-                      th:errors="*{terms3}" class="red">Must be true</span>
+                      th:errors="*{terms3}" class="red">Incorrect Data</span>
             </li>
             <li>
                 <input type="checkbox" th:field="*{marketing}" />
@@ -45,9 +45,9 @@
             </li>
         </ul>
         <input type="submit" value="회원가입" />
-        <span th:if="${#fields.hasErrors('${agreement.*}')}" class="red">회원가입하기 위해 필수 이용약관의 동의가 필요합니다.</span>
+        <span th:if="${#fields.hasErrors('${agreementRequest.*}')}" class="red">회원가입하기 위해 필수 이용약관의 동의가 필요합니다.</span>
     </form>
-    <script th:inline="javascript">
+    <script>
         document.getElementById("agreeAll")
             .addEventListener("change", (__checkbox) => {
                 for (const checkbox of document.getElementById("agreement").getElementsByTagName("input")) {

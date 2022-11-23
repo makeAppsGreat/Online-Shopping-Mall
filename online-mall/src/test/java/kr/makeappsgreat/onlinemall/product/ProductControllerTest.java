@@ -148,14 +148,14 @@ class ProductControllerTest {
         @DisplayName("Sort Method [200]")
         public void list_properSortMethod() throws Exception {
             // Given
-            int sort_method = 2;
+            int sortMethod = 2;
 
             // When & Then
             mockMvc.perform(get("/product/list")
-                            .param("sort_method", String.valueOf(sort_method)))
+                            .param("sortMethod", String.valueOf(sortMethod)))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(model().attribute("productPageRequest", hasProperty("sortMethod", is(sort_method))));
+                    .andExpect(model().attribute("productPageRequest", hasProperty("sortMethod", is(sortMethod))));
         }
 
         @Test
@@ -163,7 +163,7 @@ class ProductControllerTest {
         public void list_blankSortMethod_200() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
-                            .param("sort_method", ""))
+                            .param("sortMethod", ""))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
@@ -177,7 +177,7 @@ class ProductControllerTest {
         public void list_typeMismatchedSortMethod_200WithDefaultSortMethod() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/list")
-                            .param("sort_method", "notANumber"))
+                            .param("sortMethod", "notANumber"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
@@ -193,7 +193,7 @@ class ProductControllerTest {
 
             // When & Then
             mockMvc.perform(get("/product/list")
-                            .param("sort_method", "-1"))
+                            .param("sortMethod", "-1"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
@@ -202,7 +202,7 @@ class ProductControllerTest {
                     ));
 
             mockMvc.perform(get("/product/list")
-                            .param("sort_method", String.valueOf(1_000_000_000)))
+                            .param("sortMethod", String.valueOf(1_000_000_000)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(

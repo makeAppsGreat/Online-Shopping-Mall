@@ -140,7 +140,7 @@ public class ProductController {
                 "pagination",
                 new Pagination(ServletUriComponentsBuilder.fromCurrentRequest(), result));
         modelAndView.addObject(
-                "sort_method",
+                "sortMethod",
                 productSortMethod.get(
                         ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page"), locale));
 

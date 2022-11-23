@@ -36,11 +36,6 @@ public class ProductPageRequest {
         return ProductPageRequest.EMPTY;
     }
 
-    public int getSort_method() { return this.sortMethod; }
-    public void setSort_method(int sortMethod) {
-        this.sortMethod = sortMethod;
-    }
-
     /**
      * Sort by product name(A-Z), price(high-low, low-high), new product, best seller7
      */
@@ -58,7 +53,7 @@ public class ProductPageRequest {
     }
 
     public boolean isKeywordOnly() {
-        if (keyword == null) throw new RuntimeException("Unexpected usage.");
+        if (keyword == null) throw new RuntimeException("Unexpected usage");
         return manufacturer == null && category == null;
     }
 }

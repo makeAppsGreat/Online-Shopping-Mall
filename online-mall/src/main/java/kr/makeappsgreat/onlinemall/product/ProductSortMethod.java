@@ -20,8 +20,8 @@ public class ProductSortMethod {
     private final MessageSource messageSource;
 
     public List<Link> get(UriComponentsBuilder currentRequest, Locale locale) {
+        /** @TODO : Add expired time and checking */
         if (cache.containsKey(locale)) return cache.get(locale);
-
         List<Link> list = List.of(
                 /** @TODO : Refactor to type-safe (Using Map<String, String>?) */
                 new Link(messageSource.getMessage("product.sort-method.nameAtoZ", null, locale)),
@@ -31,7 +31,7 @@ public class ProductSortMethod {
         );
 
         for (int i = 0; i < list.size(); i++)
-            list.get(i).setLink(currentRequest.replaceQueryParam("sort_method", i).build());
+            list.get(i).setLink(currentRequest.replaceQueryParam("sortMethod", i).build());
 
 
         cache.put(locale, list);

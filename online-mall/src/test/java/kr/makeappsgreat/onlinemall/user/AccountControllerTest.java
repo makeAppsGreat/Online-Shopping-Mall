@@ -32,7 +32,7 @@ class AccountControllerTest {
 
     private AccountUserDetails admin = new AccountUserDetails(
             Account.builder()
-                    .username("admin")
+                    .username("simpleadmin")
                     .password("simple")
                     .roles(Set.of(AccountRole.ROLE_ADMIN))
                     .build());

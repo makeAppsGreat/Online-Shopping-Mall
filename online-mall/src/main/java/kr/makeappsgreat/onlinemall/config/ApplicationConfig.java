@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Component
 public class ApplicationConfig implements ApplicationRunner {
@@ -18,6 +20,19 @@ public class ApplicationConfig implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Pagination.init(PAGINATION_SIZE);
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean getValidator() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("messages/ValidationMessages");
+        messageSource.setDefaultEncoding("UTF-8");
+
+        LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
+        factoryBean.setValidationMessageSource(messageSource);
+
+
+        return factoryBean;
     }
 
     @Bean

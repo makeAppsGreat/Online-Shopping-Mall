@@ -1,6 +1,7 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AccountService<T extends Account> implements UserDetailsService {
 
-    private final AccountRepository<T> accountRepository;
+    protected final AccountRepository<T> accountRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -24,5 +25,12 @@ public class AccountService<T extends Account> implements UserDetailsService {
 
     public boolean isDuplicatedUser(String username) {
         return accountRepository.existsByUsername(username);
+    }
+
+    public T join(T account) {
+        String username = account.getUsername();
+        if (isDuplicatedUser(username)) throw new DuplicateKeyException("Duplicated username : " + username);
+
+        return accountRepository.save(account);
     }
 }

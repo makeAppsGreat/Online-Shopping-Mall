@@ -25,14 +25,13 @@ public class ApplicationConfig implements ApplicationRunner {
     @Bean
     public LocalValidatorFactoryBean getValidator() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("messages/ValidationMessages");
+        messageSource.setBasename("messages/validationMessages");
         messageSource.setDefaultEncoding("UTF-8");
 
-        LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
-        factoryBean.setValidationMessageSource(messageSource);
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource);
 
-
-        return factoryBean;
+        return bean;
     }
 
     @Bean

@@ -4,7 +4,6 @@
       layout:decorate="~{layouts/main}">
 <head>
     <title>회원가입</title>
-    <srcipt th:src="@{/js/simple.js}"></srcipt>
 </head>
 <body>
 <!--/* Breadcrumb */-->
@@ -16,63 +15,8 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <form th:action="@{''}" th:object="${memberRequest}" method="post">
-        <p>
-            <label th:for="email">아이디</label>
-            <span th:utext="#{account.rules.username}" class="hint">(아이디 규칙)</span><br>
-            <input type="text" th:field="*{email}"/>
-            <button>중복확인</button>
-            <br th:if="${#fields.hasErrors('email')}">
-            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="red">Incorrect Data</span>
-        </p>
-        <p>
-            <label th:for="password">비밀번호</label><br>
-            <input type="password" th:field="*{password}"/>
-            <span th:utext="#{account.rules.password}" class="hint">(비밀번호 규칙)</span><br>
-            <br th:if="${#fields.hasErrors('password')}">
-            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="red">Incorrect Data</span>
-            <br th:if="${#fields.hasErrors('password_confirm')}">
-            <span th:if="${#fields.hasErrors('password_confirm')}" th:errors="*{password_confirm}" class="red">Incorrect Data</span>
-        </p>
-        <p>
-            <label th:for="name">이름</label><br>
-            <input type="text" th:field="*{name}"/>
-            <br th:if="${#fields.hasErrors('name')}">
-            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="red">Incorrect Data</span>
-        </p>
-        <p>
-            <label th:for="mobile_number">연락처1</label><br>
-            <input type="text" th:field="*{mobile_number}"/>
-            <br th:if="${#fields.hasErrors('mobile_number')}">
-            <span th:if="${#fields.hasErrors('mobile_number')}" th:errors="*{mobile_number}" class="red">Incorrect Data</span>
-        </p>
-        <p>
-            <label th:for="phone_number">연락처2</label><br>
-            <input type="text" th:field="*{phone_number}"/>
-            <span th:utext="#{account.option}" class="hint">선택</span><br>
-            <br th:if="${#fields.hasErrors('phone_number')}">
-            <span th:if="${#fields.hasErrors('phone_number')}" th:errors="*{phone_number}" class="red">Incorrect Data</span>
-        </p>
-        <p>
-            기본 주소<br>
-            <input type="text" th:field="*{address.zipcode}"/>
-            <label th:for="address.zipcode" class="hint">우편번호</label><br>
-            <span th:if="${#fields.hasErrors('address.zipcode')}" th:errors="*{address.zipcode}" class="red">Incorrect Data</span>
-            <br th:if="${#fields.hasErrors('address.zipcode')}">
-
-            <input type="text" th:field="*{address.address}"/>
-            <label th:for="address.address" class="hint">도로명건물번호</label><br>
-            <span th:if="${#fields.hasErrors('address.address')}" th:errors="*{address.address}" class="red">Incorrect Data</span>
-            <br th:if="${#fields.hasErrors('address.address')}">
-
-            <input type="text" th:field="*{address.address2}"/>
-            <label th:for="address.address2" class="hint">상세주소</label>
-        </p>
-        <input type="submit" value="회원가입"/>
-    </form>
-    <script>
-        // email -> 다시 검증 onchanged
-    </script>
+    <h2>Welcome!</h2>
+    <p><span th:text="${name}" style="font-size:x-large"></span>님 환영합니다!</p>
 </div>
 <!--/* End of Content */-->
 </body>

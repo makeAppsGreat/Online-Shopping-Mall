@@ -3,7 +3,6 @@ package kr.makeappsgreat.onlinemall.user.member;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Locale;
@@ -22,8 +20,11 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class MemberJoinController {
 
+    private final MemberService memberService;
+
     private final ModelMapper modelMapper;
     private final MessageSource messageSource;
+
 
     @InitBinder("memberRequest")
     public void initBinder(WebDataBinder binder) {
@@ -36,7 +37,8 @@ public class MemberJoinController {
     }
 
     @GetMapping("/step1")
-    public String step1(@ModelAttribute AgreementRequest agreementRequest) {
+    public String step1(@ModelAttribute AgreementRequest agreementRequest, SessionStatus status) {
+        status.setComplete();
         return "/member/join/step1";
     }
 
@@ -49,19 +51,11 @@ public class MemberJoinController {
         model.addAttribute("agreement", agreement);
 
 
-        System.out.println(">> 100 " + agreement.getAcceptanceDate());
         return "redirect:/member/join/step2";
     }
 
     @GetMapping("/step2")
-    public String step2(@ModelAttribute MemberRequest memberRequest, Model model) { // , @SessionAttribute Agreement agreement
-        /* if (agreement == null) {
-            // Case : Not a proper request.
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        } */
-
-        // System.out.println(">> 200 " + agreement.getAcceptanceDate());
-        model.addAttribute("agreement", new Agreement());
+    public String step2(@ModelAttribute MemberRequest memberRequest, @SessionAttribute Agreement agreement) {
         return "/member/join/step2";
     }
 
@@ -69,31 +63,28 @@ public class MemberJoinController {
     public String step2Submit(@ModelAttribute @Validated MemberRequest memberRequest, BindingResult bindingResult,
                               @SessionAttribute Agreement agreement,
                               RedirectAttributes attributes, SessionStatus status, Locale locale) {
-
-        System.out.println(">> 300 Acceptance Date  " + agreement.getAcceptanceDate());
-        System.out.println(">> 300 User Name        " + memberRequest.getUsername());
-        System.out.println(">> 300 Password         " + memberRequest.getPassword());
-        System.out.println(">> 300 Password Confirm " + memberRequest.getPasswordConfirm());
-        System.out.println(">> 300 Email            " + memberRequest.getEmail());
-        System.out.println(">> 300 Address.Zipcode  " + memberRequest.getAddress().getZipcode());
-
-
         if (!memberRequest.verify()) {
             bindingResult.addError(new FieldError(
                     "memberRequest", "passwordConfirm",
                     messageSource.getMessage("account.rules.password-confirm", null, locale)));
         }
-        if (bindingResult.hasErrors()) return "/member/join/step2";
-
-        // Member member = modelMapper.map(memberRequest, Member.class);
-        attributes.addFlashAttribute("member", memberRequest);
+        if (bindingResult.hasErrors() && bindingResult.getFieldErrors().size() > 1) {
+            // Field 'username' must have field error.
+            return "/member/join/step2";
+        }
         status.setComplete();
+
+        Member member = modelMapper.map(memberRequest, Member.class);
+        member.setAgreement(agreement);
+        Member savedMember = memberService.join(member);
+
+
+        attributes.addFlashAttribute("name", savedMember.getName());
         return "redirect:/member/join/welcome";
     }
 
     @GetMapping("/welcome")
-    public String welcome(@ModelAttribute MemberRequest member) {
-        if (member == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    public String welcome(@ModelAttribute String name) {
         return "/member/join/welcome";
     }
 }

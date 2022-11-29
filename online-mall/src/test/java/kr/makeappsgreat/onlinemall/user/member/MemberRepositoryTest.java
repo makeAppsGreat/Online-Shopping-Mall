@@ -116,7 +116,7 @@ class MemberRepositoryTest {
                 .password("simple")
                 .agreement(agreement)
                 .address(Address.builder()
-                        .zipcode("") // 42731
+                        .zipcode("42731")
                         .address("대구광역시 달서구")
                         .build())
                 .phoneNumber("053-123-4567")

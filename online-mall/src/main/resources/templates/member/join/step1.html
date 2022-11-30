@@ -49,9 +49,9 @@
     </form>
     <script>
         document.getElementById("agreeAll")
-            .addEventListener("change", (__checkbox) => {
+            .addEventListener("change", (event) => {
                 for (const checkbox of document.getElementById("agreement").getElementsByTagName("input")) {
-                    checkbox.checked = __checkbox.target.checked;
+                    checkbox.checked = event.currentTarget.checked;
                 }
             });
     </script>

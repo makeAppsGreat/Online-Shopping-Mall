@@ -106,8 +106,9 @@
     </script>
     <script th:unless="${#sets.isEmpty(product.options)}" th:inline="javascript">
         document.getElementById("options")
-            .addEventListener("change", function () {
-                let id_price = this[this.selectedIndex].value.split(",");
+            .addEventListener("change", (event) => {
+                let __this = event.currentTarget;
+                let id_price = __this[__this.selectedIndex].value.split(",");
 
                 let contains = false;
                 for (const tr of tbody.getElementsByTagName("tr")) {
@@ -121,13 +122,13 @@
                     addOptionToOrderList({
                         id : id_price[0],
                         price : id_price[1],
-                        name : this[this.selectedIndex].text
+                        name : __this[__this.selectedIndex].text
                     });
 
                     updateTotal();
                 }
 
-                this.options[0].selected = true;
+                __this.options[0].selected = true;
         });
 
         function addOptionToOrderList( option ) {
@@ -156,7 +157,7 @@
             quantity_input.name = "product_qty";
             quantity_input.type = "number";
             quantity_input.value = 1;
-            quantity_input.addEventListener("change", (__input) => { onQtyChanged(__input.target); });
+            quantity_input.addEventListener("change", (event) => { onQtyChanged(event.currentTarget); });
             quantity.appendChild(quantity_input);
 
             // price
@@ -174,8 +175,8 @@
             let button = document.createElement("td");
             let button_btn = document.createElement("button");
             button_btn.textContent = "X";
-            button_btn.addEventListener("click", (__button) => {
-                tbody.deleteRow(__button.target.closest("tr").rowIndex);
+            button_btn.addEventListener("click", (event) => {
+                tbody.deleteRow(event.currentTarget.closest("tr").rowIndex);
                 updateTotal();
             });
             button.appendChild(button_btn);

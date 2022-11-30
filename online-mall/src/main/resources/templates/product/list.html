@@ -33,7 +33,7 @@
     <div class="product_list_top">
         <hr>
         <p><label th:for="sortMethod">정렬방식 : </label>
-            <select th:field=*{productPageRequest.sortMethod}>
+            <select th:field=*{productPageRequest.sortMethod} onchange="location.href=this[this.selectedIndex].text;">
                 <option th:each="method,status : ${sortMethod}"
                         th:value="${status.index}"
                         th:label="${method.name}"
@@ -66,13 +66,6 @@
         <a th:href="${pagination.next.link}" th:text="${pagination.next.name}">Next</a>
         <a th:href="${pagination.last.link}" th:text="${pagination.last.name}">Last</a>
     </div>
-
-    <script>
-        document.getElementById("sortMethod")
-            .addEventListener("change", function () {
-                location.href = this[this.selectedIndex].text;
-        });
-    </script>
 </div>
 <!--/* End of Content */-->
 </body>

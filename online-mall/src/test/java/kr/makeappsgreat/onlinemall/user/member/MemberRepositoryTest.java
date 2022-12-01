@@ -42,9 +42,10 @@ class MemberRepositoryTest {
         @Test
         void save() {
             // Given
-            Member member = createAMember();
+            Member member = getTestMember();
 
             // When
+            agreementRepository.save(member.getAgreement());
             Member savedMember = memberRepository.save(member);
             memberRepository.findAll();
 
@@ -57,11 +58,38 @@ class MemberRepositoryTest {
 
         @Test
         void saveDuplicatedEmail() {
+            // Given
+            Member member = getTestMember();
+            Member member2 = Member.builder()
+                    .name("김나연")
+                    .email(username)
+                    .password("simple")
+                    .address(Address.builder()
+                            .zipcode("42700")
+                            .address("대구광역시 달서구")
+                            .build())
+                    .mobileNumber("010-5678-9000")
+                    .build();
+            AgreementRequest request = new AgreementRequest();
+            request.setTerms1(true);
+            request.setTerms2(true);
+            request.setTerms3(true);
+            request.setMarketing(true);
+            Agreement agreement = modelMapper.map(request, Agreement.class);
+            member2.setAgreement(agreement);
+            member2.foo(passwordEncoder);
+
             // When & Then
-            assertThatExceptionOfType(DataAccessException.class).isThrownBy(() -> {
-                memberRepository.saveAll(List.of(createAMember(), createAMember()));
-                memberRepository.findAll();
-            });
+            assertThatExceptionOfType(DataAccessException.class)
+                    .isThrownBy(() -> {
+                        agreementRepository.save(member.getAgreement());
+                        memberRepository.save(member);
+
+                        agreementRepository.save(member2.getAgreement());
+                        memberRepository.save(member2);
+
+                        memberRepository.findAll();
+                    });
         }
 
     }
@@ -71,8 +99,13 @@ class MemberRepositoryTest {
 
         @BeforeEach
         void saveTestMember() {
+            Member member = getTestMember();
+
+            agreementRepository.deleteAll();
             memberRepository.deleteAll();
-            memberRepository.save(createAMember());
+
+            agreementRepository.save(member.getAgreement());
+            memberRepository.save(member);
         }
 
         @Test
@@ -98,36 +131,15 @@ class MemberRepositoryTest {
 
     }
 
-    private final String username = "makeappsgreat@gmail.com";
-    private Member createAMember() {
+    /** Wrap method for mocking */
+    private Member getTestMember() {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        AgreementRequest request = new AgreementRequest();
-        request.setTerms1(true);
-        request.setTerms2(true);
-        request.setTerms3(true);
-        request.setMarketing(false);
-        Agreement agreement = modelMapper.map(request, Agreement.class);
-
-        Member member = Member.builder()
-                .name("김가연")
-                .email(username)
-                .password("simple")
-                .agreement(agreement)
-                .address(Address.builder()
-                        .zipcode("42731")
-                        .address("대구광역시 달서구")
-                        .build())
-                .phoneNumber("053-123-4567")
-                .mobileNumber("010-1234-5678")
-                .build()
-                .foo(passwordEncoder);
-
-        agreement.setMember(member);
-        agreementRepository.save(agreement);
-
+        Member member = MemberTest.getTestMember(modelMapper);
+        member.foo(passwordEncoder);
 
         return member;
     }
+    private final String username = MemberTest.getUsername();
 }

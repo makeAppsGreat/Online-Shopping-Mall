@@ -1,9 +1,7 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.model.NamedEntity;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,6 +20,7 @@ public class Account extends NamedEntity {
 
     @Column(unique = true)
     @NotBlank
+    @Setter(AccessLevel.PROTECTED)
     private String username;
 
     @NotNull
@@ -44,9 +43,5 @@ public class Account extends NamedEntity {
 
     public void addRole(AccountRole role) {
         roles.add(role);
-    }
-
-    protected void setUsername(String username) {
-        this.username = username;
     }
 }

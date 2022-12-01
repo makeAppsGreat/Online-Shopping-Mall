@@ -22,15 +22,12 @@ public class MemberService extends AccountService<Member> {
     }
 
     @Override
-    public Member join(Member account) {
-        if (account.getAgreement() == null) throw new NullPointerException();
+    public Member join(Member member) {
+        Agreement agreement = member.getAgreement();
+        if (agreement == null) throw new NullPointerException("Unexpected usage");
+        member.foo(passwordEncoder);
 
-        account.foo(passwordEncoder);
-
-        Agreement savedAgreement = agreementRepository.save(account.getAgreement());
-        account.setAgreement(savedAgreement);
-
-
-        return super.join(account);
+        agreementRepository.save(agreement);
+        return accountRepository.save(member);
     }
 }

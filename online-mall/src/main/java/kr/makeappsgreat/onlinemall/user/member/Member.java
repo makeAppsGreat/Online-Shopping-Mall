@@ -5,7 +5,6 @@ import kr.makeappsgreat.onlinemall.user.Account;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,7 +25,6 @@ public class Member extends Account {
     private String email; // Do set email to username.
 
     @OneToOne(mappedBy = "member", optional = false)
-    @Setter
     private Agreement agreement;
 
     @Embedded
@@ -38,14 +36,17 @@ public class Member extends Account {
 
     private String phoneNumber;
 
+    public void setAgreement(Agreement agreement) {
+        this.agreement = agreement;
+        agreement.setMember(this);
+    }
+
     /** @TODO : Edit the method name. */
-    public Member foo(PasswordEncoder passwordEncoder) {
+    public void foo(PasswordEncoder passwordEncoder) {
         if (getUsername() != null) throw new RuntimeException("Unexpected usage");
 
         setUsername(this.email);
         encodePassword(passwordEncoder);
         addRole(AccountRole.ROLE_USER);
-
-        return this;
     }
 }

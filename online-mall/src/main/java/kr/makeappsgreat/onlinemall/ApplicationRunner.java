@@ -2,17 +2,15 @@ package kr.makeappsgreat.onlinemall;
 
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.product.*;
-import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
 import kr.makeappsgreat.onlinemall.user.member.Agreement;
-import kr.makeappsgreat.onlinemall.user.member.AgreementRepository;
 import kr.makeappsgreat.onlinemall.user.member.AgreementRequest;
 import kr.makeappsgreat.onlinemall.user.member.Member;
+import kr.makeappsgreat.onlinemall.user.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +25,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final AccountRepository<Member> memberRepository;
-    private final AgreementRepository agreementRepository;
+    private final MemberService memberService;
 
-    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
     private static final String ROOT_PATH_OF_IMAGES = "/images/product/";
@@ -177,7 +173,6 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
         List<Member> members = new ArrayList<>();
 
-
         AgreementRequest request = new AgreementRequest();
         request.setTerms1(true);
         request.setTerms2(true);
@@ -185,26 +180,23 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
         request.setMarketing(false);
         Agreement agreement = modelMapper.map(request, Agreement.class);
 
-        members.add(Member.builder()
+        Member member = Member.builder()
                 .name("김가연")
                 .email("makeappsgreat@gmail.com")
                 .password("simple")
-                .agreement(agreement)
                 .address(Address.builder()
                         .zipcode("42731")
                         .address("대구광역시 달서구")
                         .build())
                 .phoneNumber("053-123-4567")
                 .mobileNumber("010-1234-5678")
-                .build()
-                .foo(passwordEncoder));
-        members.get(0).addRole(AccountRole.ROLE_ADMIN);
-
-        agreement.setMember(members.get(0));
-        agreementRepository.save(agreement);
+                .build();
+        member.setAgreement(agreement);
+        member.addRole(AccountRole.ROLE_ADMIN);
+        members.add(member);
 
 
-        memberRepository.saveAll(members);
-        log.info("Members saved... (Member : {})", memberRepository.count());
+        members.forEach(m -> memberService.join(m));
+        log.info("Members saved... (Member : {})", members.size());
     }
 }

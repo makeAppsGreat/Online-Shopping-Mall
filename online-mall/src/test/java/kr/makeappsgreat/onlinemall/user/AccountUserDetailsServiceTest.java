@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class AccountServiceTest {
+class AccountUserDetailsServiceTest {
 
     @Autowired
-    AccountService<Account> accountService;
+    AccountUserDetailsService userDetailsService;
 
     @Test
     public void loadUserByUsername() {
@@ -19,7 +19,7 @@ class AccountServiceTest {
         String username = "makeappsgreat@gmail.com";
 
         // When
-        UserDetails userDetails = accountService.loadUserByUsername(username);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         // Then
         assertThat(userDetails.getUsername()).isEqualTo(username);

@@ -2,35 +2,32 @@ package kr.makeappsgreat.onlinemall.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService<T extends Account> implements UserDetailsService {
+public class AccountService<T extends Account> {
 
     protected final AccountRepository<T> accountRepository;
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-
-        return new AccountUserDetails(account);
-    }
 
     public boolean isDuplicatedUser(String username) {
         return accountRepository.existsByUsername(username);
     }
 
     public T join(T account) {
-        String username = account.getUsername();
-        if (isDuplicatedUser(username)) throw new DuplicateKeyException("Duplicated username : " + username);
-
+        verifyAccount(account);
         return accountRepository.save(account);
+    }
+
+    /**
+     * Do call this method before #join
+     * @TODO : Refactor this method
+     *   * 코드 중복 회피, 상속된 클래스에서 부모 메소드 사용하도록.
+     */
+    protected void verifyAccount(T account) {
+        String username = account.getUsername();
+
+        if (isDuplicatedUser(username))
+            throw new DuplicateKeyException(String.format("Duplicated username { username : \"%s\" }", username));
     }
 }

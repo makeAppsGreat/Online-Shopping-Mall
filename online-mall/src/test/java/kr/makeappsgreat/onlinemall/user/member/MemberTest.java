@@ -17,7 +17,7 @@ class MemberTest {
 
         Member member = Member.builder()
                 .name("김가연")
-                .email("simpleuser@email.com")
+                .email(username)
                 .password("simple")
                 .address(Address.builder()
                         .zipcode("42700")

@@ -27,6 +27,8 @@ public class MemberService extends AccountService<Member> {
         if (agreement == null) throw new NullPointerException("Unexpected usage");
         member.foo(passwordEncoder);
 
+        verifyAccount(member);
+
         agreementRepository.save(agreement);
         return accountRepository.save(member);
     }

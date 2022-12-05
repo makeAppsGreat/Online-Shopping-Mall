@@ -7,4 +7,6 @@ ul.crumbs li+li:before { content : " > "; }
 /* End of style breadcrumb */
 
 .red { color : red }
+.green { color : green }
+.blue { color : blue }
 .hint { font-size : smaller; color : gray }

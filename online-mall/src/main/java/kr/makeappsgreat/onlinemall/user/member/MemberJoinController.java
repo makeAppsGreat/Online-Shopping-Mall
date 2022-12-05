@@ -19,6 +19,7 @@ import java.util.Locale;
 @SessionAttributes("agreement")
 @RequiredArgsConstructor
 public class MemberJoinController {
+    /** @TODO : Block access of authenticated user */
 
     private final MemberService memberService;
 

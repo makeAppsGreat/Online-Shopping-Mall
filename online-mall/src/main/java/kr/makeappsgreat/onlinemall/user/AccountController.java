@@ -49,7 +49,7 @@ public class AccountController {
                     .result(false)
                     .code(HttpStatus.CONFLICT.value())
                     .name("username")
-                    .message(messageSource.getMessage("account.duplicated-username", null, locale))
+                    .message(messageSource.getMessage("account.username.duplicated", null, locale))
                     .build();
         } else {
             result = SimpleResult.builder()
@@ -68,7 +68,7 @@ public class AccountController {
     @ResponseBody
     public ResponseEntity<SimpleResult> error(@RequestAttribute Exception exception,
                                               @RequestAttribute HttpServletRequest request) {
-        SimpleResult result;
+        ResponseEntity<SimpleResult> response;
 
         /** Case : ID 사용 가능(중복 확인) 요청 시, 올바른 형식의 Email 주소가 아닌 경우 */
         if (exception != null && exception.getClass().isAssignableFrom(ConstraintViolationException.class)) {
@@ -78,22 +78,25 @@ public class AccountController {
                     constraintViolations.toArray(new ConstraintViolation[constraintViolations.size()]);
             String[] nodes = constraintViolations2[0].getPropertyPath().toString().split("\\.");
 
-            result = SimpleResult.builder()
-                    .request((String) constraintViolations2[0].getInvalidValue())
-                    .result(false)
-                    .code(HttpStatus.BAD_REQUEST.value())
-                    .name(nodes[nodes.length - 1])
-                    .message(constraintViolations2[0].getMessage())
-                    .build();
+            response = ResponseEntity.ok(
+                    SimpleResult.builder()
+                            .request((String) constraintViolations2[0].getInvalidValue())
+                            .result(false)
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .name(nodes[nodes.length - 1])
+                            .message(constraintViolations2[0].getMessage())
+                            .build());
         } else {
             log.warn("Unexpected exception {request_uri : \"{}\"}", request.getRequestURI(), exception);
-            result = SimpleResult.builder()
-                    .result(false)
-                    .code(HttpStatus.BAD_REQUEST.value())
-                    .build();
+            response = ResponseEntity.badRequest().body(
+                    SimpleResult.builder()
+                            .result(false)
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .build());
         }
 
-        return ResponseEntity.badRequest().body(result);
+
+        return response;
     }
 
     @ExceptionHandler

@@ -94,12 +94,12 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.message").value(messageSource.getMessage(
-                        "account.duplicated-username", null, Locale.getDefault())
+                        "account.username.duplicated", null, Locale.getDefault())
                 ));
     }
 
     @Test
-    public void isUsableUsername_notAEmail_400() throws Exception {
+    public void isUsableUsername_notAEmail_200() throws Exception {
         // Given
         String username = "makeappsgreat";
 
@@ -115,14 +115,14 @@ class AccountControllerTest {
                         .requestAttr("exception", forwardedModel.get("exception"))
                         .requestAttr("request", forwardedModel.get("request")))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("must be a well-formed email address"));
     }
 
     @Test
-    public void isUsableUsername_empty_400() throws Exception {
+    public void isUsableUsername_empty_200() throws Exception {
         // Given
         String username = "";
 
@@ -138,14 +138,14 @@ class AccountControllerTest {
                         .requestAttr("exception", forwardedModel.get("exception"))
                         .requestAttr("request", forwardedModel.get("request")))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("must not be empty"));
     }
 
     @Test
-    public void isUsableUsername_blank_400() throws Exception {
+    public void isUsableUsername_blank_200() throws Exception {
         // Given
         String username = " ";
 
@@ -161,7 +161,7 @@ class AccountControllerTest {
                         .requestAttr("exception", forwardedModel.get("exception"))
                         .requestAttr("request", forwardedModel.get("request")))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("must be a well-formed email address"));

@@ -6,14 +6,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Locale;
 
 @Controller @RequestMapping("/member/join")
 @SessionAttributes("agreement")
@@ -63,12 +60,7 @@ public class MemberJoinController {
     @PostMapping("/step2")
     public String step2Submit(@ModelAttribute @Validated MemberRequest memberRequest, BindingResult bindingResult,
                               @SessionAttribute Agreement agreement,
-                              RedirectAttributes attributes, SessionStatus status, Locale locale) {
-        if (!memberRequest.verify()) {
-            bindingResult.addError(new FieldError(
-                    "memberRequest", "passwordConfirm",
-                    messageSource.getMessage("account.rules.password-confirm", null, locale)));
-        }
+                              RedirectAttributes attributes, SessionStatus status) {
         if (bindingResult.hasErrors() && bindingResult.getFieldErrors().size() > 1) {
             // Field 'username' must have field error.
             return "/member/join/step2";

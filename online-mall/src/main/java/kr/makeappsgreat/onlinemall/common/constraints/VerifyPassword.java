@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface VerifyPassword {
 
-    String message() default "{account.rules.password-verify}";
+    String message() default "{message.password-verify-not-match}";
 
     Class<?>[] groups() default {};
 

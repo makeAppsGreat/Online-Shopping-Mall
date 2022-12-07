@@ -30,10 +30,10 @@
             <span th:utext="#{account.rules.password}" class="hint">(비밀번호 규칙)</span><br>
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="red">Incorrect Data</span>
             <br th:if="${#fields.hasErrors('password')}">
-            <input type="password" th:field="*{passwordConfirm}"/>
-            <span th:utext="#{account.password-confirm}" class="hint">(비밀번호 확인)</span>
+            <input type="password" th:field="*{passwordVerify}"/>
+            <span th:utext="#{account.password-verify}" class="hint">(비밀번호 확인)</span>
             <br>
-            <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" class="red">Incorrect Data</span>
+            <span th:if="${#fields.hasErrors('passwordVerify')}" th:errors="*{passwordVerify}" class="red">Incorrect Data</span>
         </p>
         <p>
             <label th:for="name">이름</label><br>
@@ -76,6 +76,7 @@
         let usernameChkResult = username.parentElement.querySelector(".hasErrors");
         if (usernameChkResult === null) {
             usernameChkResult = document.createElement("span");
+            usernameChkResult.className = "hasErrors";
             username.parentElement.appendChild(usernameChkResult);
         }
 

@@ -7,8 +7,11 @@ import javax.validation.ConstraintValidatorContext;
 
 public class VerifyPasswordValidator implements ConstraintValidator<VerifyPassword, AccountRequest> {
 
+    private String message;
+
     @Override
     public void initialize(VerifyPassword constraintAnnotation) {
+        message = constraintAnnotation.message();
     }
 
     @Override
@@ -16,7 +19,13 @@ public class VerifyPasswordValidator implements ConstraintValidator<VerifyPasswo
         String password = request.getPassword();
         String passwordVerify = request.getPasswordVerify();
 
-        if (password != null) return password.equals(passwordVerify);
-        else return passwordVerify == null;
+        if ((password != null && !password.equals(passwordVerify)) ||(password == null && passwordVerify != null)) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(message)
+                    .addPropertyNode("passwordVerify")
+                    .addConstraintViolation();
+
+            return false;
+        } else return true;
     }
 }

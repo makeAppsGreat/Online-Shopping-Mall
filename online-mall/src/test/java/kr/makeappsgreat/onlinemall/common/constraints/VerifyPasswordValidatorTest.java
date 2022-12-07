@@ -38,6 +38,7 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
+        violations.forEach(System.out::println);
 
         // Then
         assertThat(violations).hasSizeGreaterThan(0);
@@ -51,6 +52,7 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
+        violations.forEach(System.out::println);
 
         // Then
         assertThat(violations).isEmpty();
@@ -64,11 +66,12 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
+        violations.forEach(System.out::println);
 
         // Then
-        assertThat(violations).hasSizeGreaterThan(0);
+        assertThat(violations).hasSize(1);
         assertThat(violations).allSatisfy(input -> {
-                    assertThat(input.getMessageTemplate()).isEqualTo("{account.rules.password-verify}");
+                    assertThat(input.getMessageTemplate()).isEqualTo("{message.password-verify-not-match}");
                 });
     }
 

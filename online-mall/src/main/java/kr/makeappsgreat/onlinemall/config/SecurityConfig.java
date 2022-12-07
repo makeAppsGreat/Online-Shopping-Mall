@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${spring.h2.console.enabled:false}")
+    Boolean isH2ConsoleEnabled;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -21,9 +25,14 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer customizer() {
-        return (web) -> web.ignoring().requestMatchers(
-                PathRequest.toStaticResources().atCommonLocations(),
-                PathRequest.toH2Console());
+        if (isH2ConsoleEnabled == true) {
+            return (web) -> web.ignoring().requestMatchers(
+                    PathRequest.toStaticResources().atCommonLocations(),
+                    PathRequest.toH2Console());
+        } else {
+            return (web) -> web.ignoring().requestMatchers(
+                    PathRequest.toStaticResources().atCommonLocations());
+        }
     }
 
     @Bean

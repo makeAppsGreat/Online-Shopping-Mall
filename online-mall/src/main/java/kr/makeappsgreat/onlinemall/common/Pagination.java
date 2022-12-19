@@ -41,8 +41,7 @@ public class Pagination {
         if (current >= page.getTotalPages()) last.setLink("#none");
         else last.setLink(currentRequest.replaceQueryParam("page", page.getTotalPages()).build());
 
-        for (int start = page.getNumber() / PAGINATION_SIZE * PAGINATION_SIZE + 1,
-             i = 0; i < PAGINATION_SIZE; i++) {
+        for (int start = page.getNumber() / PAGINATION_SIZE * PAGINATION_SIZE + 1, i = 0; i < PAGINATION_SIZE; i++) {
             int now = start + i;
 
             Link link = new Link(String.valueOf(now));

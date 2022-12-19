@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ApplicationRunner implements org.springframework.boot.ApplicationRunner {
+public class InsertDemoData implements ApplicationRunner {
 
     private final ManufacturerRepository manufacturerRepository;
     private final CategoryRepository categoryRepository;

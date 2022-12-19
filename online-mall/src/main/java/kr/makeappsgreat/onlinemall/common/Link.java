@@ -21,9 +21,10 @@ public class Link {
     public void setLink(UriComponents uriComponents) {
         MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
 
-        if (!queryParams.isEmpty())
-            this.link = "?" + queryParams.entrySet()
-                    .stream().map(e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse(""))
-                    .collect(Collectors.joining("&"));
+        if (!queryParams.isEmpty()) {
+            this.link = "?" + queryParams.entrySet().stream().map(
+                    e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse("")
+                    ).collect(Collectors.joining("&"));
+        }
     }
 }

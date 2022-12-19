@@ -4,7 +4,6 @@ import kr.makeappsgreat.onlinemall.user.AccountRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -14,7 +13,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
 class VerifyPasswordValidatorTest {
 
     static ValidatorFactory validatorFactory;
@@ -38,7 +36,6 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
-        violations.forEach(System.out::println);
 
         // Then
         assertThat(violations).hasSizeGreaterThan(0);
@@ -52,7 +49,6 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
-        violations.forEach(System.out::println);
 
         // Then
         assertThat(violations).isEmpty();
@@ -66,13 +62,12 @@ class VerifyPasswordValidatorTest {
 
         // When
         Set<ConstraintViolation<AccountRequest>> violations = validator.validate(request);
-        violations.forEach(System.out::println);
 
         // Then
         assertThat(violations).hasSize(1);
-        assertThat(violations).allSatisfy(input -> {
-                    assertThat(input.getMessageTemplate()).isEqualTo("{message.password-verify-not-match}");
-                });
+        ConstraintViolation<AccountRequest> violation = violations.iterator().next();
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("passwordVerify");
+        assertThat(violation.getMessage()).isEqualTo("{message.password-verify-not-match}");
     }
 
     private String password = "simple";

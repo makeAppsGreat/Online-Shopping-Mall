@@ -1,25 +1,34 @@
 package kr.makeappsgreat.onlinemall.config;
 
 import kr.makeappsgreat.onlinemall.common.Pagination;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
+import kr.makeappsgreat.onlinemall.user.Account;
+import kr.makeappsgreat.onlinemall.user.AccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-@Component
-public class ApplicationConfig implements ApplicationRunner {
+@Configuration
+@RequiredArgsConstructor
+public class ApplicationConfig {
+
+    private final AccountRepository<Account> accountRepository;
 
     @Value("${common.pagination_size}")
     private int PAGINATION_SIZE;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        Pagination.init(PAGINATION_SIZE);
+    @Bean
+    public ApplicationRunner initApplication() {
+        return args -> {
+            Pagination.init(PAGINATION_SIZE);
+
+            if (accountRepository.count() < 1L) {
+                // @TODO : register master admin account
+            }
+        };
     }
 
     @Bean
@@ -32,19 +41,5 @@ public class ApplicationConfig implements ApplicationRunner {
         bean.setValidationMessageSource(messageSource);
 
         return bean;
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return ApplicationConfig.myModelMapper();
-    }
-
-    public static ModelMapper myModelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-                .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
-
-        return modelMapper;
     }
 }

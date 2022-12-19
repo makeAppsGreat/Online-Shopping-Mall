@@ -1,6 +1,6 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
-import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
+import kr.makeappsgreat.onlinemall.config.MyModelMapper;
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@DataJpaTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(classes = MyModelMapper.class, type = FilterType.ASSIGNABLE_TYPE))
 class MemberRepositoryTest {
 
     @Autowired
@@ -31,10 +33,11 @@ class MemberRepositoryTest {
     @Autowired
     AgreementRepository agreementRepository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @Mock
     PasswordEncoder passwordEncoder;
-
-    private final ModelMapper modelMapper = ApplicationConfig.myModelMapper();
 
     @Nested
     class Save{

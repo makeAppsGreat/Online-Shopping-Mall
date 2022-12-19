@@ -16,7 +16,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     @Value("${spring.h2.console.enabled:false}")
-    Boolean isH2ConsoleEnabled;
+    private boolean isH2ConsoleEnabled;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

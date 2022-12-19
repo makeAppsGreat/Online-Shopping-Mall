@@ -19,7 +19,7 @@ public class VerifyPasswordValidator implements ConstraintValidator<VerifyPasswo
         String password = request.getPassword();
         String passwordVerify = request.getPasswordVerify();
 
-        if ((password != null && !password.equals(passwordVerify)) ||(password == null && passwordVerify != null)) {
+        if ((password != null && !password.equals(passwordVerify)) || (password == null && passwordVerify != null)) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(message)
                     .addPropertyNode("passwordVerify")

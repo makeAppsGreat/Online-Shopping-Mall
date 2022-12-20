@@ -1,6 +1,8 @@
 package kr.makeappsgreat.onlinemall.model;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.GeneratedValue;
@@ -10,12 +12,12 @@ import javax.validation.constraints.NotBlank;
 
 @MappedSuperclass
 @NoArgsConstructor @SuperBuilder
-@Getter @Setter(AccessLevel.PROTECTED)
+@Getter
 @EqualsAndHashCode(of = "id")
 public class NamedEntity {
 
     @Id @GeneratedValue
-    private Long id;
+    protected Long id;
     @NotBlank
-    private String name;
+    protected String name;
 }

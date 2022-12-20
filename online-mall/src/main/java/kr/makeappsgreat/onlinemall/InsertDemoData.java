@@ -181,14 +181,15 @@ public class InsertDemoData implements ApplicationRunner {
         request.setMarketing(false);
         Agreement agreement = modelMapper.map(request, Agreement.class);
 
+        Address address = new Address();
+        address.setZipcode("42700");
+        address.setAddress("대구광역시 달서구");
+
         Member member = Member.builder()
                 .name("김가연")
                 .email("makeappsgreat@gmail.com")
                 .password("simple")
-                .address(Address.builder()
-                        .zipcode("42731")
-                        .address("대구광역시 달서구")
-                        .build())
+                .address(address)
                 .phoneNumber("053-123-4567")
                 .mobileNumber("010-1234-5678")
                 .build();

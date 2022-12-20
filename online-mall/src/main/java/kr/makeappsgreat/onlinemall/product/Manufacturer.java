@@ -9,14 +9,14 @@ public class Manufacturer extends NamedEntity {
 
     public static Manufacturer of(Long id) {
         Manufacturer manufacturer = new Manufacturer();
-        manufacturer.setId(id);
+        manufacturer.id = id;
 
         return manufacturer;
     }
 
     public static Manufacturer of(String name) {
         Manufacturer manufacturer = new Manufacturer();
-        manufacturer.setName(name);
+        manufacturer.name = name;
 
         return manufacturer;
     }

@@ -20,9 +20,9 @@ public class ProductPageRequest {
     private Long manufacturer;
     private Long category;
     @Min(0)
-    private int sortMethod = this.DEFAULT_SORT_METHOD_VALUE;
+    private int sortMethod = ProductPageRequest.DEFAULT_SORT_METHOD_VALUE;
     @Min(1)
-    private int page = this.DEFAULT_PAGE_VALUE;
+    private int page = ProductPageRequest.DEFAULT_PAGE_VALUE;
 
 
     public static ProductPageRequest of(String keyword) {
@@ -37,7 +37,7 @@ public class ProductPageRequest {
     }
 
     /**
-     * Sort by product name(A-Z), price(high-low, low-high), new product, best seller7
+     * Sort by product name(A-Z), price(high-low, low-high), new product, best seller
      */
     public Sort getSort() {
         switch (this.sortMethod) {
@@ -52,8 +52,7 @@ public class ProductPageRequest {
         }
     }
 
-    public boolean isKeywordOnly() {
-        if (keyword == null) throw new RuntimeException("Unexpected usage");
-        return manufacturer == null && category == null;
+    public boolean hasKeywordOnly() {
+        return keyword != null && manufacturer == null && category == null;
     }
 }

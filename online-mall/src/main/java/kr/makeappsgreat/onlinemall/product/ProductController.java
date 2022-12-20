@@ -93,7 +93,7 @@ public class ProductController {
                 }
             }
         } else {
-            if (productPageRequest.getKeyword() != null && !productPageRequest.isKeywordOnly()) {
+            if (!productPageRequest.hasKeywordOnly()) {
                 attributes.addFlashAttribute(
                         "productPageRequest",
                         ProductPageRequest.of(productPageRequest.getKeyword()));

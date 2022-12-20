@@ -63,14 +63,16 @@ class MemberRepositoryTest {
         void saveDuplicatedEmail() {
             // Given
             Member member = getTestMember();
+
+            Address address = new Address();
+            address.setZipcode("42700");
+            address.setAddress("대구광역시 달서구");
+
             Member member2 = Member.builder()
                     .name("김나연")
                     .email(username)
                     .password("simple")
-                    .address(Address.builder()
-                            .zipcode("42700")
-                            .address("대구광역시 달서구")
-                            .build())
+                    .address(address)
                     .mobileNumber("010-5678-9000")
                     .build();
             AgreementRequest request = new AgreementRequest();
@@ -139,10 +141,10 @@ class MemberRepositoryTest {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        Member member = MemberTest.getTestMember(modelMapper);
+        Member member = TestMember.getTestMember(modelMapper);
         member.foo(passwordEncoder);
 
         return member;
     }
-    private final String username = MemberTest.getUsername();
+    private final String username = TestMember.getUsername();
 }

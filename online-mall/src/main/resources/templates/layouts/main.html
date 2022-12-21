@@ -20,16 +20,7 @@
             <a th:href="@{/member/join/}">회원가입</a>
         </p>
     </div>
-    <form th:action="@{/product/list}" th:object="${productPageRequest}">
-        <input th:if="${productPageRequest.manufacturer}" type="hidden"
-               th:field="*{manufacturer}" th:value="${productPageRequest.manufacturer}" />
-        <input th:if="${productPageRequest.category}" type="hidden"
-               th:field="*{category}" th:value="${productPageRequest.category}" />
-        <input th:if="${productPageRequest.sortMethod}" type="hidden"
-               th:field="*{sortMethod}" th:value="${productPageRequest.sortMethod}" />
-        <input th:if="${productPageRequest.page} and ${productPageRequest.page} != 1" type="hidden"
-               th:field="*{page}" th:value="${productPageRequest.page}" />
-
+    <form th:action="@{/product/search}" th:object="${productPageRequest}">
         <label th:for="keyword">상품찾기 : </label>
         <input type="text" th:field="*{keyword}" th:autofocus="${#fields.hasErrors('keyword')}" />
         <input type="submit" value="검색" />

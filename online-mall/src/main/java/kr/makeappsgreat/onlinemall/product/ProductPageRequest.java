@@ -3,6 +3,10 @@ package kr.makeappsgreat.onlinemall.product;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -19,10 +23,10 @@ public class ProductPageRequest {
     private String keyword;
     private Long manufacturer;
     private Long category;
-    @Min(0)
-    private int sortMethod = ProductPageRequest.DEFAULT_SORT_METHOD_VALUE;
     @Min(1)
     private int page = ProductPageRequest.DEFAULT_PAGE_VALUE;
+    @Min(0)
+    private int sortMethod = ProductPageRequest.DEFAULT_SORT_METHOD_VALUE;
 
 
     public static ProductPageRequest of(String keyword) {
@@ -52,7 +56,34 @@ public class ProductPageRequest {
         }
     }
 
-    public boolean hasKeywordOnly() {
-        return keyword != null && manufacturer == null && category == null;
+    /**
+     * @param bindingResult the binding result to be handled
+     * @return {@code ture} if {@code keyword} has error,
+     *         {@code false} otherwise
+     */
+    public boolean handleBindingResult(BindingResult bindingResult) {
+        boolean returnValue = false;
+
+        for (FieldError e : bindingResult.getFieldErrors()) {
+            switch (e.getField()) {
+                case "keyword":
+                    returnValue = true;
+                    break;
+                case "manufacturer":
+                case "category":
+                    if (e.isBindingFailure() && !((String) e.getRejectedValue()).isBlank())
+                        // Case : Type mismatched.
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                    break;
+                case "page":
+                    page = ProductPageRequest.DEFAULT_PAGE_VALUE;
+                    break;
+                case "sortMethod":
+                    sortMethod = ProductPageRequest.DEFAULT_SORT_METHOD_VALUE;
+                    break;
+            }
+        }
+
+        return returnValue;
     }
 }

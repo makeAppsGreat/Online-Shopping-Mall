@@ -8,17 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 @Controller @RequestMapping("/product")
@@ -26,10 +23,10 @@ import java.util.Locale;
 public class ProductController {
 
     /**
-     * @TODO : detail(detail of product and shopping mall notice(shared details)
-     * @TODO : list(manufacturer, category and sorting)
-     * @TODO : list -> Print no product if selecting manufacturer or category that not saved product and no search result found.
-     * @TODO : search(with product name, in manufacturer or category)
+     * @TODO detail(detail of product and shopping mall notice ( shared details)
+     * @TODO list(manufacturer, category and sorting)
+     * @TODO list -> Print no product if selecting manufacturer or category that not saved product and no search result found.
+     * @TODO search(with product name, in manufacturer or category)
      */
 
     private final ProductService productService;
@@ -50,70 +47,20 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public ModelAndView list(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
-                             @RequestHeader(value = "Referer", required = false) String referer, RedirectAttributes attributes,
-                             Locale locale) {
-        ModelAndView modelAndView = new ModelAndView();
-        String viewName = "/product/list";
-        String badKeyword = null;
-
-        if (bindingResult.hasErrors()) {
-            for (FieldError e : bindingResult.getFieldErrors()) {
-                switch (e.getField()) {
-                    case "keyword":
-                        // Case : Keyword is too short or blank.
-                        if (referer == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-
-                        URI uri = URI.create(referer);
-                        if (!uri.getPath().equals(viewName)) {
-                            attributes.addFlashAttribute(productPageRequest);
-                            attributes.addFlashAttribute(
-                                    "org.springframework.validation.BindingResult.productPageRequest",
-                                    bindingResult);
-
-                            modelAndView.setViewName("redirect:" + referer);
-                            return modelAndView;
-                        } else {
-                            badKeyword = productPageRequest.getKeyword();
-                            productPageRequest.setKeyword(null);
-                        }
-                        break;
-                    case "manufacturer":
-                    case "category":
-                        if (e.isBindingFailure() && !((String) e.getRejectedValue()).isBlank())
-                            // Case : Type Mismatched.
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                        break;
-                    case "page":
-                        productPageRequest.setPage(ProductPageRequest.DEFAULT_PAGE_VALUE);
-                        break;
-                    case "sortMethod":
-                        productPageRequest.setSortMethod(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE);
-                        break;
-                }
-            }
-        } else {
-            if (!productPageRequest.hasKeywordOnly()) {
-                attributes.addFlashAttribute(
-                        "productPageRequest",
-                        ProductPageRequest.of(productPageRequest.getKeyword()));
-                modelAndView.setViewName(
-                        "redirect:/product/list?keyword=" +
-                        URLEncoder.encode(productPageRequest.getKeyword(), StandardCharsets.UTF_8));
-
-                return modelAndView;
-            }
-        }
-        modelAndView.setViewName(viewName);
+    public String list(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
+                       Model model, Locale locale) {
+        if (bindingResult.hasErrors()) productPageRequest.handleBindingResult(bindingResult);
 
         Page<Product> result = productService.getPagedProducts(productPageRequest);
+        ServletUriComponentsBuilder currentRequest = ServletUriComponentsBuilder.fromCurrentRequest();
+
         if (productPageRequest.getManufacturer() != null) {
             Product product = result.stream().findFirst().orElse(null);
 
             if (product != null) {
-                modelAndView.addObject("manufacturer", product.getManufacturer());
+                model.addAttribute("manufacturer", product.getManufacturer());
             } else {
-                modelAndView.addObject(
+                model.addAttribute(
                         "manufacturer",
                         manufacturerRepository.findById(productPageRequest.getManufacturer())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
@@ -125,9 +72,9 @@ public class ProductController {
             Product product = result.stream().findFirst().orElse(null);
 
             if (product != null) {
-                modelAndView.addObject("category", product.getCategory());
+                model.addAttribute("category", product.getCategory());
             } else {
-                modelAndView.addObject(
+                model.addAttribute(
                         "category",
                         categoryRepository.findById(productPageRequest.getCategory())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
@@ -135,18 +82,31 @@ public class ProductController {
             }
         }
 
-        modelAndView.addObject("products", result);
-        modelAndView.addObject(
-                "pagination",
-                new Pagination(ServletUriComponentsBuilder.fromCurrentRequest(), result));
-        modelAndView.addObject(
-                "sortMethod",
-                productSortMethod.get(
-                        ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam("page"), locale));
 
-        if (badKeyword != null) productPageRequest.setKeyword(badKeyword);
+        model.addAttribute("products", result);
+        model.addAttribute("pagination", new Pagination(currentRequest, result));
+        model.addAttribute("sortMethod", productSortMethod.get(currentRequest.replaceQueryParam("page"), locale));
+
+        return "/product/list";
+    }
+
+    @GetMapping("/search")
+    public String search(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
+                         Model model, Locale locale) {
+        Page<Product> result;
+        ServletUriComponentsBuilder currentRequest = ServletUriComponentsBuilder.fromCurrentRequest();
+
+        if (bindingResult.hasErrors() && productPageRequest.handleBindingResult(bindingResult)) {
+            result = Page.empty();
+        } else {
+            result = productService.getPagedProducts(productPageRequest);
+        }
 
 
-        return modelAndView;
+        model.addAttribute("products", result);
+        model.addAttribute("pagination", new Pagination(currentRequest, result));
+        model.addAttribute("sortMethod", productSortMethod.get(currentRequest.replaceQueryParam("page"), locale));
+
+        return "/product/list";
     }
 }

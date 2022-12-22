@@ -26,7 +26,7 @@ public class ApplicationConfig {
             Pagination.init(PAGINATION_SIZE);
 
             if (accountRepository.count() < 1L) {
-                // @TODO : register master admin account
+                // @TODO register master admin account
             }
         };
     }

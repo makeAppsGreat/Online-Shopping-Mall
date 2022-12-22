@@ -41,8 +41,10 @@ public class ProductController {
         Product product = productService.getProduct(id);
 
         model.addAttribute("product", product);
-        if (!product.getOptions().isEmpty())
+        if (!product.getOptions().isEmpty()) {
             model.addAttribute("options", product.getOptions());
+        }
+
         return "/product/detail";
     }
 
@@ -51,6 +53,7 @@ public class ProductController {
                        Model model, Locale locale) {
         if (bindingResult.hasErrors()) productPageRequest.handleBindingResult(bindingResult);
 
+        productPageRequest.setKeyword(null); // Ignore keyword in this handler method.
         Page<Product> result = productService.getPagedProducts(productPageRequest);
         ServletUriComponentsBuilder currentRequest = ServletUriComponentsBuilder.fromCurrentRequest();
 

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
     /**
-     * @TODO : Remove unnecessary builder and setter
+     * @TODO Remove unnecessary builder and setter
      */
 
     public static void main(String[] args) {

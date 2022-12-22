@@ -29,13 +29,6 @@ public class ProductPageRequest {
     private int sortMethod = ProductPageRequest.DEFAULT_SORT_METHOD_VALUE;
 
 
-    public static ProductPageRequest of(String keyword) {
-        ProductPageRequest request = new ProductPageRequest();
-        request.setKeyword(keyword);
-
-        return request;
-    }
-
     public static ProductPageRequest empty() {
         return ProductPageRequest.EMPTY;
     }

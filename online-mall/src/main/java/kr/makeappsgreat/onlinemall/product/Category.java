@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 @Entity
 public class Category extends NamedEntity {
 
-    /** @TODO : Add order */
+    /** @TODO Add order */
 
     public static Category of(Long id) {
         Category category = new Category();

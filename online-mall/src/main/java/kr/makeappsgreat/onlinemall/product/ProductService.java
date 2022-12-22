@@ -12,10 +12,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository productRepository;
-
     @Value("${product.list.page_request_size}")
     private int PAGE_SIZE;
+
+    private final ProductRepository productRepository;
 
     public Product getProduct(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

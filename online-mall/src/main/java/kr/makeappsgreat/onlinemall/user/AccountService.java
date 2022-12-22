@@ -21,8 +21,7 @@ public class AccountService<T extends Account> {
 
     /**
      * Do call this method before #join
-     * @TODO : Refactor this method
-     *   * 코드 중복 회피, 상속된 클래스에서 부모 메소드 사용하도록.
+     * @TODO Refactor this method(코드 중복 회피, 상속된 클래스에서 부모 메소드 사용하도록.)
      */
     protected void verifyAccount(T account) {
         String username = account.getUsername();

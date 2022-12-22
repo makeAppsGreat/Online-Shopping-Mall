@@ -16,7 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class ProductRepositoryTest {
 
     /**
-     * @TODO : Do test removing option of product and check query.
+     * @TODO Do test removing option of product and check query.
      */
 
     @Autowired
@@ -197,7 +197,7 @@ class ProductRepositoryTest {
     }
 
     /**
-     * @TODO : Need to validate keyword from controller
+     * @TODO Need to validate keyword from controller
      */
     @Test
     void findByNameContainingOrSimpleDetailContaining_blank() {

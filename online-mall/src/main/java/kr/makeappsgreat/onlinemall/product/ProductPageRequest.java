@@ -37,16 +37,7 @@ public class ProductPageRequest {
      * Sort by product name(A-Z), price(high-low, low-high), new product, best seller
      */
     public Sort getSort() {
-        switch (this.sortMethod) {
-            case 0: default:
-                return Sort.by("name").ascending();
-            case 1:
-                return Sort.by("price").ascending();
-            case 2:
-                return Sort.by("price").descending();
-            case 3:
-                return Sort.by("registeredDate").descending();
-        }
+        return ProductSortMethod.SortMethod.SORT.get(this.sortMethod);
     }
 
     /**

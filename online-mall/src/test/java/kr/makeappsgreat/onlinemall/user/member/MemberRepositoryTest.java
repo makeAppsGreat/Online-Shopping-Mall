@@ -82,7 +82,7 @@ class MemberRepositoryTest {
             request.setMarketing(true);
             Agreement agreement = modelMapper.map(request, Agreement.class);
             member2.setAgreement(agreement);
-            member2.foo(passwordEncoder);
+            member2.adaptToAccount(passwordEncoder);
 
             // When & Then
             assertThatExceptionOfType(DataAccessException.class)
@@ -142,7 +142,7 @@ class MemberRepositoryTest {
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
         Member member = TestMember.getTestMember(modelMapper);
-        member.foo(passwordEncoder);
+        member.adaptToAccount(passwordEncoder);
 
         return member;
     }

@@ -25,7 +25,7 @@ public class MemberService extends AccountService<Member> {
     public Member join(Member member) {
         Agreement agreement = member.getAgreement();
         if (agreement == null) throw new NullPointerException("Unexpected usage");
-        member.foo(passwordEncoder);
+        member.adaptToAccount(passwordEncoder);
 
         verifyAccount(member);
 

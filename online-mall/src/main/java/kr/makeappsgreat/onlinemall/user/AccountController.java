@@ -104,8 +104,10 @@ public class AccountController {
                               Principal principal,
                               HttpServletRequest request, Model model) {
         if (principal != null &&
-                ((AccountUserDetails) ((Authentication) principal).getPrincipal()).getAccount().getRoles().contains(AccountRole.ROLE_ADMIN))
+                ((AccountUserDetails) ((Authentication) principal).getPrincipal())
+                        .getAccount().getRoles().contains(AccountRole.ROLE_ADMIN)) {
             return String.format("forward:%s/response", request.getRequestURI());
+        }
 
         model.addAttribute("exception", exception);
         model.addAttribute("request", request);

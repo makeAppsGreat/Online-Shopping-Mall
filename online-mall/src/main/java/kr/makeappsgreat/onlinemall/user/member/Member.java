@@ -41,8 +41,7 @@ public class Member extends Account {
         agreement.setMember(this);
     }
 
-    /** @TODO Edit the method name. */
-    public void foo(PasswordEncoder passwordEncoder) {
+    public void adaptToAccount(PasswordEncoder passwordEncoder) {
         if (getUsername() != null) throw new RuntimeException("Unexpected usage");
 
         setUsername(this.email);

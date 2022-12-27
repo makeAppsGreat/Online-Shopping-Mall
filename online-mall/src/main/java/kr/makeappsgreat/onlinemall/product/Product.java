@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -43,8 +44,8 @@ public class Product extends NamedEntity {
     private String simpleDetail;
     private String detail;
 
-    @Builder.Default
-    private LocalDateTime registeredDate = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime registeredDate;
 
     @Override
     public String toString() {

@@ -18,7 +18,7 @@ class MemberServiceTest {
 
     @Test
     void join() {
-        Member member = TestMember.getTestMember(modelMapper);
+        Member member = new TestMember(modelMapper).getMember();
         memberService.join(member);
     }
 

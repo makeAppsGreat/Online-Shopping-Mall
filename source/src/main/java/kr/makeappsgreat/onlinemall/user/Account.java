@@ -1,8 +1,10 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.model.NamedEntity;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -14,7 +16,6 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@NoArgsConstructor @SuperBuilder
 @Getter
 public class Account extends NamedEntity {
 
@@ -28,11 +29,10 @@ public class Account extends NamedEntity {
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    @Builder.Default
     private Set<AccountRole> roles = new HashSet<>();
 
-    @Builder.Default
-    private LocalDateTime registeredDate = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime registeredDate;
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         if (password.startsWith("{bcrypt}"))

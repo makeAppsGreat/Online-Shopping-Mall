@@ -38,11 +38,7 @@ SET @P3 = SELECT id FROM product WHERE name = '마프라 휠앤타이어클리�
 SET @P4 = SELECT id FROM product WHERE name = '라보코스메티카 퓨리피카 1000mL';
 SET @P5 = SELECT id FROM product WHERE name = '라보코스메티카 퓨리피카 4.5L';
 
-INSERT INTO product_options (product_id, options_id) VALUES
+INSERT INTO product_options (product_id, option_id) VALUES
     (@P0, @P1),
     (@P2, @P3),
     (@P4, @P5);
-
--- INSERT INTO account (name, username, password) VALUES ();
--- INSERT INTO member (email, zipcode, address, address2, mobile_number, phone_number) VALUES ();
--- INSERT INTO agreement (terms1, terms2, terms3, acceptance_date, marketing, update_date) VALUES ();

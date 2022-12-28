@@ -16,7 +16,7 @@ public class Agreement {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "member_id")
     @MapsId
     @Setter
     private Member member;

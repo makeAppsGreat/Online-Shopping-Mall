@@ -4,20 +4,19 @@ import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.user.Account;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-@NoArgsConstructor @SuperBuilder
+@PrimaryKeyJoinColumn(name = "account_id")
 @Getter
 public class Member extends Account {
 

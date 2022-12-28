@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.user;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +13,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,14 +28,12 @@ class AccountControllerTest {
     MessageSource messageSource;
 
     @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
     MockMvc mockMvc;
 
-    private AccountUserDetails admin = new AccountUserDetails(
-            Account.builder()
-                    .username("simpleadmin")
-                    .password("simple")
-                    .roles(Set.of(AccountRole.ROLE_ADMIN))
-                    .build());
+    private AccountUserDetails admin = new AccountUserDetails(createAdminAccount());
 
     @Test
     public void isUsableUsername_properRequest_200() throws Exception {
@@ -165,5 +163,16 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("must be a well-formed email address"));
+    }
+
+    private Account createAdminAccount() {
+        AccountRequest request = new AccountRequest();
+        request.setUsername("simpleadmin");
+        request.setPassword("simple");
+
+        Account account = modelMapper.map(request, Account.class);
+        account.addRole(AccountRole.ROLE_ADMIN);
+
+        return account;
     }
 }

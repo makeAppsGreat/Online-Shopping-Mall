@@ -5,33 +5,40 @@ import org.modelmapper.ModelMapper;
 
 class TestMember {
 
-    private static final String username = "simpleuser@email.com";
+    private Member member;
+    private String username;
 
-    public static Member getTestMember(ModelMapper modelMapper) {
-        AgreementRequest request = new AgreementRequest();
-        request.setTerms1(true);
-        request.setTerms2(true);
-        request.setTerms3(true);
-        request.setMarketing(false);
-        Agreement agreement = modelMapper.map(request, Agreement.class);
+    public TestMember(ModelMapper modelMapper) {
+        new TestMember(modelMapper, "김가연", "simpleuser@email.com");
+    }
+    public TestMember(ModelMapper modelMapper, String name, String username) {
+        AgreementRequest agreementRequest = new AgreementRequest();
+        agreementRequest.setTerms1(true);
+        agreementRequest.setTerms2(true);
+        agreementRequest.setTerms3(true);
+        agreementRequest.setMarketing(false);
+        Agreement agreement = modelMapper.map(agreementRequest, Agreement.class);
 
         Address address = new Address();
         address.setZipcode("42700");
         address.setAddress("대구광역시 달서구");
 
-        Member member = Member.builder()
-                .name("김가연")
-                .email(username)
-                .password("simple")
-                .address(address)
-                .mobileNumber("010-1234-5678")
-                .build();
-        member.setAgreement(agreement);
+        MemberRequest memberRequest = new MemberRequest();
+        memberRequest.setName(name);
+        memberRequest.setEmail(username);
+        memberRequest.setPassword("simple");
+        memberRequest.setAddress(address);
+        memberRequest.setMobileNumber("010-1234-5678");
 
-
-        return member;
+        this.member = modelMapper.map(memberRequest, Member.class);
+        this.member.setAgreement(agreement);
     }
 
-    public static String getUsername() { return username; }
+    public String getUsername() {
+        return username;
+    }
 
+    public Member getMember() {
+        return member;
+    }
 }

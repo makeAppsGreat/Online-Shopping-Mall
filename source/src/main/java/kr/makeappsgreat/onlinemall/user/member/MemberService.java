@@ -10,15 +10,13 @@ import org.springframework.stereotype.Service;
 public class MemberService extends AccountService<Member> {
 
     private final AgreementRepository agreementRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public MemberService(AccountRepository<Member> accountRepository,
-                         AgreementRepository agreementRepository,
-                         PasswordEncoder passwordEncoder) {
-        super(accountRepository);
+                         PasswordEncoder passwordEncoder,
+                         AgreementRepository agreementRepository) {
+        super(accountRepository, passwordEncoder);
         this.agreementRepository = agreementRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override

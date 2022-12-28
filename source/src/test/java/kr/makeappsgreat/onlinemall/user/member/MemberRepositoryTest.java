@@ -45,7 +45,7 @@ class MemberRepositoryTest {
         @Test
         void save() {
             // Given
-            Member member = getTestMember();
+            Member member = createTestMember();
 
             // When
             agreementRepository.save(member.getAgreement());
@@ -62,27 +62,14 @@ class MemberRepositoryTest {
         @Test
         void saveDuplicatedEmail() {
             // Given
-            Member member = getTestMember();
+            Member member = createTestMember();
+            String duplicatedEmail = member.getEmail();
 
             Address address = new Address();
             address.setZipcode("42700");
             address.setAddress("대구광역시 달서구");
 
-            Member member2 = Member.builder()
-                    .name("김나연")
-                    .email(username)
-                    .password("simple")
-                    .address(address)
-                    .mobileNumber("010-5678-9000")
-                    .build();
-            AgreementRequest request = new AgreementRequest();
-            request.setTerms1(true);
-            request.setTerms2(true);
-            request.setTerms3(true);
-            request.setMarketing(true);
-            Agreement agreement = modelMapper.map(request, Agreement.class);
-            member2.setAgreement(agreement);
-            member2.adaptToAccount(passwordEncoder);
+            Member member2 = new TestMember(modelMapper, "김나연", duplicatedEmail).getMember();
 
             // When & Then
             assertThatExceptionOfType(DataAccessException.class)
@@ -102,9 +89,12 @@ class MemberRepositoryTest {
     @Nested
     class Retrieve {
 
+        private String username;
+
         @BeforeEach
         void saveTestMember() {
-            Member member = getTestMember();
+            Member member = createTestMember();
+            username = member.getUsername();
 
             agreementRepository.deleteAll();
             memberRepository.deleteAll();
@@ -137,14 +127,13 @@ class MemberRepositoryTest {
     }
 
     /** Wrap method for mocking */
-    private Member getTestMember() {
+    private Member createTestMember() {
         when(passwordEncoder.encode(anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
-        Member member = TestMember.getTestMember(modelMapper);
+        Member member = new TestMember(modelMapper).getMember();
         member.adaptToAccount(passwordEncoder);
 
         return member;
     }
-    private final String username = TestMember.getUsername();
 }

@@ -23,7 +23,13 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+        if (modelAndView == null) System.err.println(String.format(">> 800 %s (\"modelAndView\" is null.)", request.getRequestURI()));
+        else if (modelAndView.getView() == null) System.err.println(">> 802 " + modelAndView.getViewName());
+        else System.err.println(">> 804 " + modelAndView.getView().toString());
+
         if (modelAndView != null && response.getStatus() == HttpStatus.OK.value()) {
+            System.err.println(">> 810 GlobalInterceptor#postHandel was called. \n");
+
             Map<String, Object> model = modelAndView.getModel();
             model.put("manufacturers", manufacturerRepository.findAll(Sort.by("name")));
             model.put("categories", categoryRepository.findAll(Sort.by("name")));

@@ -1,9 +1,7 @@
 package kr.makeappsgreat.onlinemall.common.constraints;
 
 import kr.makeappsgreat.onlinemall.user.AccountRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -13,10 +11,11 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VerifyPasswordValidatorTest {
 
-    static ValidatorFactory validatorFactory;
-    static Validator validator;
+    private static ValidatorFactory validatorFactory;
+    private static Validator validator;
 
     @BeforeAll
     static void createValidator() {
@@ -30,6 +29,7 @@ class VerifyPasswordValidatorTest {
     }
 
     @Test
+    @Order(1)
     void shouldReturnViolation() {
         // Given
         AccountRequest request = new AccountRequest();
@@ -42,6 +42,7 @@ class VerifyPasswordValidatorTest {
     }
 
     @Test
+    @Order(2)
     void success() {
         // Given
         AccountRequest request = createRequest();
@@ -55,6 +56,7 @@ class VerifyPasswordValidatorTest {
     }
 
     @Test
+    @Order(3)
     void fail() {
         // Given
         AccountRequest request = createRequest();

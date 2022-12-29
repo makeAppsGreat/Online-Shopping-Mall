@@ -18,6 +18,9 @@ public class SecurityConfig {
     @Value("${spring.h2.console.enabled:false}")
     private boolean isH2ConsoleEnabled;
 
+    /**
+     *  Edit {@code passwordEncoder in AccountRepositoryTest}, if change declaring this bean.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

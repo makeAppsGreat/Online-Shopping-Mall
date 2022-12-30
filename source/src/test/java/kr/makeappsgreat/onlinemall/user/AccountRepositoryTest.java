@@ -1,20 +1,23 @@
 package kr.makeappsgreat.onlinemall.user;
 
-import kr.makeappsgreat.onlinemall.config.MyModelMapper;
+import kr.makeappsgreat.onlinemall.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static kr.makeappsgreat.onlinemall.common.Constants.H2_DUPLICATE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -24,9 +27,7 @@ class AccountRepositoryTest {
     @Autowired
     private AccountRepository<Account> accountRepository;
 
-    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-    private ModelMapper modelMapper = new MyModelMapper();
+    private static PasswordEncoder passwordEncoder = new SecurityConfig().passwordEncoder();
 
     @Nested
     class Create {
@@ -49,16 +50,52 @@ class AccountRepositoryTest {
         }
 
         @Test
-        void save_withNoData_throwException() {
+        void save_hasNoData_throwException() {
             // Given
             Account account = new Account();
 
             // When & Then
-            assertThatExceptionOfType(ConstraintViolationException.class)
-                    .isThrownBy(() -> accountRepository.save(account))
-                    .withMessageStartingWith("Validation failed for classes");
+            try {
+                accountRepository.save(account);
+            } catch (ConstraintViolationException e) {
+                assertThat(e.getConstraintViolations()).hasSize(3);
+            }
         }
 
+        @Test
+        void save_duplicatedUsername_throwException() {
+            // Given
+            Account account = createTestAccount();
+            Account duplicatedAccount = TestAccount.get("김나연", account.getUsername());
+            duplicatedAccount.encodePassword(passwordEncoder);
+
+            accountRepository.save(account);
+
+            // When & Then
+            assertThatExceptionOfType(DataAccessException.class)
+                    .isThrownBy(() -> accountRepository.save(duplicatedAccount))
+                    .withStackTraceContaining(H2_DUPLICATE_KEY);
+        }
+
+        @Test
+        void save_notEncodedPassword_throwException() throws NoSuchMethodException {
+            // Given
+            Account account = TestAccount.get();
+
+            // When & Then
+            try {
+                accountRepository.save(account);
+            } catch (ConstraintViolationException e) {
+                Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+                assertThat(violations).hasSize(1);
+
+                ConstraintViolation<?> violation = violations.iterator().next();
+                assertThat(violation.getPropertyPath().toString()).isEqualTo("password");
+                assertThat(violation.getMessageTemplate()).isEqualTo(
+                        Pattern.class.getMethod("message").getDefaultValue()
+                );
+            }
+        }
     }
 
     @Nested

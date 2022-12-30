@@ -21,7 +21,7 @@ import java.util.Set;
 public class Account extends NamedEntity {
 
     @Getter(AccessLevel.NONE) private final String PASSWORD_PREFIX = "{bcrypt}";
-    @Getter(AccessLevel.NONE) private final String PASSWORD_REGEXP = "\\{bcrypt\\}.*";
+    @Getter(AccessLevel.NONE) private final String PASSWORD_REGEXP = "\\{bcrypt\\}.+";
 
     @Column(unique = true)
     @NotBlank

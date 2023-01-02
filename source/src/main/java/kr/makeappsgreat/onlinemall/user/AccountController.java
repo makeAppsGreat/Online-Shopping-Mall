@@ -2,26 +2,26 @@ package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.common.SimpleResult;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import java.security.Principal;
 import java.util.Locale;
-import java.util.Set;
 
-@Controller @RequestMapping("/account")
+@Controller
+@RequestMapping("/account")
 @Validated
 @RequiredArgsConstructor
 @Slf4j
@@ -30,22 +30,28 @@ public class AccountController {
     private final AccountService<Account> accountService;
     private final MessageSource messageSource;
 
-    /** ID 사용 가능(중복 확인) 요청 시, 최초 요청 받는 Handler Method */
     @GetMapping({"/usable-username/", "/usable-username/{username}"})
-    public String isUsableUsername(@PathVariable(required = false) @NotEmpty @Email String username,
-                                   HttpServletRequest request) {
-        return String.format("forward:%s/response", request.getRequestURI());
-    }
-
-    /** ID 사용 가능(중복 확인) 요청 시, 실제 응답하는 Handler Method */
-    @GetMapping("/usable-username/{username}/response")
-    @ResponseBody
-    public ResponseEntity<SimpleResult> isUsableUsernameResponse(@PathVariable String username, Locale locale) {
+    public ResponseEntity<SimpleResult> isUsableUsername(@ModelAttribute @Validated Username username, BindingResult bindingResult,
+                                                         HttpServletRequest request, Locale locale) {
         SimpleResult result;
 
-        if (accountService.isDuplicatedUser(username)) {
+        if (bindingResult.hasErrors()) {
+            if (!request.isUserInRole(AccountRole.ROLE_ADMIN.name())) {
+                FieldError fieldError = bindingResult.getFieldError();
+                return ResponseEntity.ok(
+                        SimpleResult.builder()
+                                .request(fieldError.getRejectedValue().toString())
+                                .result(false)
+                                .code(HttpStatus.BAD_REQUEST.value())
+                                .name(fieldError.getField())
+                                .message(fieldError.getDefaultMessage())
+                                .build());
+            }
+        }
+
+        if (accountService.isDuplicatedUser(username.toString())) {
             result = SimpleResult.builder()
-                    .request(username)
+                    .request(username.toString())
                     .result(false)
                     .code(HttpStatus.CONFLICT.value())
                     .name("username")
@@ -53,7 +59,7 @@ public class AccountController {
                     .build();
         } else {
             result = SimpleResult.builder()
-                    .request(username)
+                    .request(username.toString())
                     .result(true)
                     .code(HttpStatus.OK.value())
                     .name("username")
@@ -64,53 +70,15 @@ public class AccountController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/error")
-    @ResponseBody
-    public ResponseEntity<SimpleResult> error(@RequestAttribute Exception exception,
-                                              @RequestAttribute HttpServletRequest request) {
-        ResponseEntity<SimpleResult> response;
+    @Setter
+    protected class Username {
+        @NotEmpty
+        @Email
+        private String username;
 
-        /** Case : ID 사용 가능(중복 확인) 요청 시, 올바른 형식의 Email 주소가 아닌 경우 */
-        if (exception != null && exception.getClass().isAssignableFrom(ConstraintViolationException.class)) {
-            Set<ConstraintViolation<?>> constraintViolations =
-                    ((ConstraintViolationException) exception).getConstraintViolations();
-            ConstraintViolation[] constraintViolations2 =
-                    constraintViolations.toArray(new ConstraintViolation[constraintViolations.size()]);
-            String[] nodes = constraintViolations2[0].getPropertyPath().toString().split("\\.");
-
-            response = ResponseEntity.ok(
-                    SimpleResult.builder()
-                            .request((String) constraintViolations2[0].getInvalidValue())
-                            .result(false)
-                            .code(HttpStatus.BAD_REQUEST.value())
-                            .name(nodes[nodes.length - 1])
-                            .message(constraintViolations2[0].getMessage())
-                            .build());
-        } else {
-            log.warn("Unexpected exception {request_uri : \"{}\"}", request.getRequestURI(), exception);
-            response = ResponseEntity.badRequest().body(
-                    SimpleResult.builder()
-                            .result(false)
-                            .code(HttpStatus.BAD_REQUEST.value())
-                            .build());
+        @Override
+        public String toString() {
+            return username;
         }
-
-
-        return response;
-    }
-
-    @ExceptionHandler
-    public String handleIsUsableUsername(ConstraintViolationException exception,
-                              Principal principal,
-                              HttpServletRequest request, Model model) {
-        if (principal != null &&
-                ((AccountUserDetails) ((Authentication) principal).getPrincipal())
-                        .getAccount().getRoles().contains(AccountRole.ROLE_ADMIN)) {
-            return String.format("forward:%s/response", request.getRequestURI());
-        }
-
-        model.addAttribute("exception", exception);
-        model.addAttribute("request", request);
-        return "forward:/account/error";
     }
 }

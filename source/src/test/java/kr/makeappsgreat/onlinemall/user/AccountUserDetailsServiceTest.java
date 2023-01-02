@@ -1,22 +1,37 @@
 package kr.makeappsgreat.onlinemall.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+@SpringBootTest(classes = AccountUserDetailsService.class)
 class AccountUserDetailsServiceTest {
 
     @Autowired
-    AccountUserDetailsService userDetailsService;
+    private AccountUserDetailsService userDetailsService;
+
+    @MockBean
+    private AccountRepository<Account> accountRepository;
+
+    private Account account = TestAccount.get();
+
+    @BeforeEach
+    void mock() {
+        given(accountRepository.findByUsername(account.getUsername())).willReturn(Optional.of(account));
+    }
 
     @Test
-    public void loadUserByUsername() {
+    void loadUserByUsername() {
         // Given
-        String username = "makeappsgreat@gmail.com";
+        String username = account.getUsername();
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);

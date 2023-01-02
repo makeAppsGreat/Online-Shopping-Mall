@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 public class SimpleResult {
 
-    private String request;
-    private boolean result;
-    private int code;
-    private String name;
-    private String message;
+    private final String request;
+    private final boolean result;
+    private final int code;
+    private final String name;
+    private final String message;
 }

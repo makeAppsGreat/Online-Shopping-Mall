@@ -1,13 +1,11 @@
 package kr.makeappsgreat.onlinemall.user;
 
-import kr.makeappsgreat.onlinemall.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -27,15 +25,13 @@ class AccountRepositoryTest {
     @Autowired
     private AccountRepository<Account> accountRepository;
 
-    private static PasswordEncoder passwordEncoder = new SecurityConfig().passwordEncoder();
-
     @Nested
     class Create {
 
         @Test
         void save() {
             // Given
-            Account account = createTestAccount();
+            Account account = TestAccount.get();
             long count = accountRepository.count();
             LocalDateTime start = LocalDateTime.now();
 
@@ -65,9 +61,8 @@ class AccountRepositoryTest {
         @Test
         void save_duplicatedUsername_throwException() {
             // Given
-            Account account = createTestAccount();
+            Account account = TestAccount.get();
             Account duplicatedAccount = TestAccount.get("김나연", account.getUsername());
-            duplicatedAccount.encodePassword(passwordEncoder);
 
             accountRepository.save(account);
 
@@ -106,7 +101,7 @@ class AccountRepositoryTest {
         @BeforeEach
         void saveTestAccount() {
             // Given
-            Account account = createTestAccount();
+            Account account = TestAccount.get();
             username = account.getUsername();
 
             accountRepository.deleteAll();
@@ -131,12 +126,5 @@ class AccountRepositoryTest {
             // Then
             assertThat(account).isPresent();
         }
-    }
-
-    private Account createTestAccount() {
-        Account account = TestAccount.get();
-        account.encodePassword(passwordEncoder);
-
-        return account;
     }
 }

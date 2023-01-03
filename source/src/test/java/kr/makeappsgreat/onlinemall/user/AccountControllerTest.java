@@ -1,178 +1,119 @@
 package kr.makeappsgreat.onlinemall.user;
 
-import org.junit.jupiter.api.MethodOrderer;
+import kr.makeappsgreat.onlinemall.config.SecurityConfig;
+import kr.makeappsgreat.onlinemall.config.WebConfig;
+import kr.makeappsgreat.onlinemall.main.GlobalInterceptor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Locale;
-import java.util.Map;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.DisplayName.class)
+
+@WebMvcTest(value = AccountController.class,
+        includeFilters = @ComponentScan.Filter(classes = SecurityConfig.class, type = FilterType.ASSIGNABLE_TYPE),
+        excludeFilters = @ComponentScan.Filter(
+                classes = {WebConfig.class, GlobalInterceptor.class},
+                type = FilterType.ASSIGNABLE_TYPE))
 class AccountControllerTest {
 
     @Autowired
-    MessageSource messageSource;
+    private MockMvc mockMvc;
 
     @Autowired
-    ModelMapper modelMapper;
+    private MessageSource messageSource;
 
-    @Autowired
-    MockMvc mockMvc;
+    @MockBean
+    private AccountService<Account> accountService;
 
-    private AccountUserDetails admin = new AccountUserDetails(createAdminAccount());
+    // Given
+    private final String username = "user@domain.com";
+    private final String duplicatedUsername = "duplicatedUser@domain.com";
+    private final String notAWellFormedUsername = "user";
+
+    @BeforeEach
+    void mock() {
+        given(accountService.isDuplicatedUser(username)).willReturn(false);
+        given(accountService.isDuplicatedUser(duplicatedUsername)).willReturn(true);
+    }
 
     @Test
-    public void isUsableUsername_properRequest_200() throws Exception {
-        // Given
-        String username = "makeappsgreat@simple.com";
-
-        // When & Then
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/usable-username/" + username + "/response"))
-                .andReturn();
-
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl()))
+    void isUsableUsername() throws Exception {
+        mockMvc.perform(get("/account/usable-username/" + username))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(true))
-                .andExpect(jsonPath("$.code").value(200));
+                .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(nullValue()));
     }
 
     @Test
-    public void isUsableUsername_notAEmailWithAdmin_200() throws Exception {
-        // Given
-        String username = "makeappsgreat";
-
-        // When & Then
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username)
-                        .with(user(admin)))
+    void isUsableUsername_empty_200ButResultIsFalse() throws Exception {
+        mockMvc.perform(get("/account/usable-username/"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/usable-username/" + username + "/response"))
-                .andReturn();
+                .andExpect(jsonPath("$.result").value(false))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value(
+                        messageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.getDefault())));
+    }
 
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl()))
+    @Test
+    void isUsableUsername_blank_200ButResultIsFalse() throws Exception {
+        mockMvc.perform(get("/account/usable-username/" + " "))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(false))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value(
+                        messageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.getDefault())));
+    }
+
+    @Test
+    void isUsableUsername_duplicatedUsername_200ButResultIsFalse() throws Exception {
+        mockMvc.perform(get("/account/usable-username/" + duplicatedUsername))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(false))
+                .andExpect(jsonPath("$.code").value(HttpStatus.CONFLICT.value()))
+                .andExpect(jsonPath("$.message").value(
+                        messageSource.getMessage("account.username.duplicated", null, Locale.getDefault())));
+    }
+
+    @Test
+    void isUsableUsername_notAWellFormedUsername_200ButResultIsFalse() throws Exception {
+        mockMvc.perform(get("/account/usable-username/" + notAWellFormedUsername))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(false))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value(
+                        messageSource.getMessage("javax.validation.constraints.Email.message", null, Locale.getDefault())));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void isUsableUsername_notAWellFormedUsernameWithAdminAccount_200ButResultIsFalse() throws Exception {
+        mockMvc.perform(get("/account/usable-username/" + notAWellFormedUsername))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(true))
-                .andExpect(jsonPath("$.code").value(200));
-    }
-
-    @Test
-    public void isUsableUsername_duplicatedUsername_200ButResultIsFalse() throws Exception {
-        // Given
-        String username = "makeappsgreat@gmail.com";
-
-        // When & Then
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/usable-username/" + username + "/response"))
-                .andReturn();
-
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result").value(false))
-                .andExpect(jsonPath("$.code").value(409))
-                .andExpect(jsonPath("$.message").value(messageSource.getMessage(
-                        "account.username.duplicated", null, Locale.getDefault())
-                ));
-    }
-
-    @Test
-    public void isUsableUsername_notAEmail_200() throws Exception {
-        // Given
-        String username = "makeappsgreat";
-
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/error"))
-                .andReturn();
-        Map<String, Object> forwardedModel = mvcResult.getModelAndView().getModel();
-
-        // When & Then
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl())
-                        .requestAttr("exception", forwardedModel.get("exception"))
-                        .requestAttr("request", forwardedModel.get("request")))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result").value(false))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("must be a well-formed email address"));
-    }
-
-    @Test
-    public void isUsableUsername_empty_200() throws Exception {
-        // Given
-        String username = "";
-
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/error"))
-                .andReturn();
-        Map<String, Object> forwardedModel = mvcResult.getModelAndView().getModel();
-
-        // When & Then
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl())
-                        .requestAttr("exception", forwardedModel.get("exception"))
-                        .requestAttr("request", forwardedModel.get("request")))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result").value(false))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("must not be empty"));
-    }
-
-    @Test
-    public void isUsableUsername_blank_200() throws Exception {
-        // Given
-        String username = " ";
-
-        MvcResult mvcResult = mockMvc.perform(get("/account/usable-username/" + username))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/account/error"))
-                .andReturn();
-        Map<String, Object> forwardedModel = mvcResult.getModelAndView().getModel();
-
-        // When & Then
-        mockMvc.perform(get(mvcResult.getResponse().getForwardedUrl())
-                        .requestAttr("exception", forwardedModel.get("exception"))
-                        .requestAttr("request", forwardedModel.get("request")))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result").value(false))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("must be a well-formed email address"));
-    }
-
-    private Account createAdminAccount() {
-        AccountRequest request = new AccountRequest();
-        request.setUsername("simpleadmin");
-        request.setPassword("simple");
-
-        Account account = modelMapper.map(request, Account.class);
-        account.addRole(AccountRole.ROLE_ADMIN);
-
-        return account;
+                .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(nullValue()));
     }
 }

@@ -40,7 +40,7 @@ public class AccountController {
                 FieldError fieldError = bindingResult.getFieldError();
                 return ResponseEntity.ok(
                         SimpleResult.builder()
-                                .request(fieldError.getRejectedValue().toString())
+                                .request(fieldError.getRejectedValue() == null ? null : fieldError.getRejectedValue().toString())
                                 .result(false)
                                 .code(HttpStatus.BAD_REQUEST.value())
                                 .name(fieldError.getField())

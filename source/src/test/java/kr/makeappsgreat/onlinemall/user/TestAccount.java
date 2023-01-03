@@ -20,6 +20,7 @@ class TestAccount {
         Account account = modelMapper.map(request, Account.class);
         account.encodePassword(passwordEncoder);
         account.addRole(AccountRole.ROLE_USER);
+        account.addRole(AccountRole.ROLE_ADMIN);
 
         return account;
     }

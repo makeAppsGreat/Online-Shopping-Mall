@@ -69,7 +69,7 @@ class VerifyPasswordValidatorTest {
         assertThat(violations).hasSize(1);
         ConstraintViolation<AccountRequest> violation = violations.iterator().next();
         assertThat(violation.getPropertyPath().toString()).isEqualTo("passwordVerify");
-        assertThat(violation.getMessage()).isEqualTo("{message.password-verify-not-match}");
+        assertThat(violation.getMessageTemplate()).isEqualTo("{message.password-verify-not-match}");
     }
 
     private String password = "simple";

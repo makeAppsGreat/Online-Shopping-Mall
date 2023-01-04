@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.user;
 import kr.makeappsgreat.onlinemall.config.SecurityConfig;
 import kr.makeappsgreat.onlinemall.config.WebConfig;
 import kr.makeappsgreat.onlinemall.main.GlobalInterceptor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 type = FilterType.ASSIGNABLE_TYPE))
 class AccountControllerTest {
 
+    private static ResourceBundleMessageSource validationMessageSource;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -45,6 +49,12 @@ class AccountControllerTest {
     private final String username = "user@domain.com";
     private final String duplicatedUsername = "duplicatedUser@domain.com";
     private final String notAWellFormedUsername = "user";
+
+    @BeforeAll
+    static void init() {
+        validationMessageSource = new ResourceBundleMessageSource();
+        validationMessageSource.setBasename("org.hibernate.validator/ValidationMessages");
+    }
 
     @BeforeEach
     void mock() {
@@ -70,7 +80,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.message").value(
-                        messageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.getDefault())));
+                        validationMessageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.ENGLISH)));
     }
 
     @Test
@@ -81,7 +91,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.message").value(
-                        messageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.getDefault())));
+                        validationMessageSource.getMessage("javax.validation.constraints.Email.message", null, Locale.ENGLISH)));
     }
 
     @Test
@@ -103,7 +113,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.message").value(
-                        messageSource.getMessage("javax.validation.constraints.Email.message", null, Locale.getDefault())));
+                        validationMessageSource.getMessage("javax.validation.constraints.Email.message", null, Locale.ENGLISH)));
     }
 
     @Test

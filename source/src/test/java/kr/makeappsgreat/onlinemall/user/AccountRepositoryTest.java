@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.user;
 
+import kr.makeappsgreat.onlinemall.common.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static kr.makeappsgreat.onlinemall.common.Constants.H2_DUPLICATE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -36,7 +36,6 @@ class AccountRepositoryTest {
             LocalDateTime start = LocalDateTime.now();
 
             // When
-            System.out.println(account.getPassword());
             Account savedAccount = accountRepository.save(account);
 
             // Then
@@ -49,13 +48,17 @@ class AccountRepositoryTest {
         void save_hasNoData_throwException() {
             // Given
             Account account = new Account();
+            boolean noException = true;
 
             // When & Then
             try {
                 accountRepository.save(account);
             } catch (ConstraintViolationException e) {
+                noException = false;
                 assertThat(e.getConstraintViolations()).hasSize(3);
             }
+
+            assertThat(noException).isFalse();
         }
 
         @Test
@@ -69,27 +72,31 @@ class AccountRepositoryTest {
             // When & Then
             assertThatExceptionOfType(DataAccessException.class)
                     .isThrownBy(() -> accountRepository.save(duplicatedAccount))
-                    .withStackTraceContaining(H2_DUPLICATE_KEY);
+                    .withStackTraceContaining(Constants.H2_DUPLICATE_KEY);
         }
 
         @Test
         void save_notEncodedPassword_throwException() throws NoSuchMethodException {
             // Given
-            Account account = TestAccount.get();
+            Account account = TestAccount.getWithNotEncodedPassword();
+            boolean noException = true;
 
             // When & Then
             try {
                 accountRepository.save(account);
             } catch (ConstraintViolationException e) {
+                noException = false;
+
                 Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
                 assertThat(violations).hasSize(1);
 
                 ConstraintViolation<?> violation = violations.iterator().next();
                 assertThat(violation.getPropertyPath().toString()).isEqualTo("password");
                 assertThat(violation.getMessageTemplate()).isEqualTo(
-                        Pattern.class.getMethod("message").getDefaultValue()
-                );
+                        Pattern.class.getMethod("message").getDefaultValue());
             }
+
+            assertThat(noException).isFalse();
         }
     }
 
@@ -115,7 +122,6 @@ class AccountRepositoryTest {
 
             // Then
             assertThat(all).hasSizeGreaterThan(0);
-            assertThat(all).allSatisfy(account -> assertThat(account.getRoles()).containsAnyOf(AccountRole.values()));
         }
 
         @Test

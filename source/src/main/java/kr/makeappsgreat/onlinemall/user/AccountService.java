@@ -18,7 +18,6 @@ public class AccountService<T extends Account> {
 
     public T join(T account) {
         account.encodePassword(passwordEncoder);
-        account.addRole(AccountRole.ROLE_USER);
 
         verifyAccount(account);
         return accountRepository.save(account);

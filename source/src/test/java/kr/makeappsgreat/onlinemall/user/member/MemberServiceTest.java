@@ -1,34 +1,59 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
+import kr.makeappsgreat.onlinemall.user.AccountRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
+@SpringBootTest(classes = MemberService.class)
 class MemberServiceTest {
 
     @Autowired
-    MemberService memberService;
+    private MemberService memberService;
 
-    @Autowired
-    ModelMapper modelMapper;
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
-    @Test
-    void join() {
-        Member member = new TestMember(modelMapper).getMember();
-        memberService.join(member);
+    @MockBean
+    private AccountRepository<Member> accountRepository;
+
+    @MockBean
+    private AgreementRepository agreementRepository;
+
+    @BeforeEach
+    void mock() {
+        given(passwordEncoder.encode(anyString())).will(returnsFirstArg());
+        given(accountRepository.existsByUsername(anyString())).willReturn(false);
+        given(accountRepository.save(any(Member.class))).will(returnsFirstArg());
     }
 
     @Test
-    void join_withNullAgreement_Fail() {
+    void join() {
+        // When
+        Member member = TestMember.getWithNotAdaptToAccount();
+        Member joinedMember = memberService.join(member);
+
+        // Then
+        assertThat(joinedMember).isNotNull();
+    }
+
+    @Test
+    void join_withNullAgreement_throwException() {
         Member member = new Member();
 
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> memberService.join(member))
                 .withNoCause()
-                .withMessage("Unexpected usage");
+                .withMessage("Unexpected usage : Agreement is null.");
     }
 }

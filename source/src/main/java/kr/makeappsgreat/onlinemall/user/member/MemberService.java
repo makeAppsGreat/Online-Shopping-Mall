@@ -22,7 +22,7 @@ public class MemberService extends AccountService<Member> {
     @Override
     public Member join(Member member) {
         Agreement agreement = member.getAgreement();
-        if (agreement == null) throw new NullPointerException("Unexpected usage");
+        if (agreement == null) throw new NullPointerException("Unexpected usage : Agreement is null.");
         member.adaptToAccount(passwordEncoder);
 
         verifyAccount(member);

@@ -10,22 +10,19 @@ class TestAccount {
     private static PasswordEncoder passwordEncoder = new SecurityConfig().passwordEncoder();
     private static ModelMapper modelMapper = new ApplicationConfig().modelMapper();
 
-    public static Account get() { return get("김가연", "account"); }
-    public static Account get(String name, String username) {
+    public static Account getWithNotEncodedPassword() { return get("김가연", "account", false); }
+    public static Account get() { return get("김가연", "account", true); }
+    public static Account get(String name, String username) { return get(name, username, true); }
+
+    private static Account get(String name, String username, boolean encodePassword) {
         AccountRequest request = new AccountRequest();
         request.setName(name);
         request.setUsername(username);
         request.setPassword("simple");
 
         Account account = modelMapper.map(request, Account.class);
-        account.encodePassword(passwordEncoder);
-        account.addRole(AccountRole.ROLE_USER);
-        account.addRole(AccountRole.ROLE_ADMIN);
+        if (encodePassword) account.encodePassword(passwordEncoder);
 
         return account;
-    }
-
-    public static PasswordEncoder getPasswordEncoder() {
-        return passwordEncoder;
     }
 }

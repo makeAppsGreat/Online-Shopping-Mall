@@ -21,10 +21,13 @@ class AccountUserDetailsServiceTest {
     @MockBean
     private AccountRepository<Account> accountRepository;
 
-    private Account account = TestAccount.get();
+    private Account account;
 
     @BeforeEach
     void mock() {
+        account = TestAccount.get();
+        account.addRole(AccountRole.ROLE_USER);
+
         given(accountRepository.findByUsername(account.getUsername())).willReturn(Optional.of(account));
     }
 

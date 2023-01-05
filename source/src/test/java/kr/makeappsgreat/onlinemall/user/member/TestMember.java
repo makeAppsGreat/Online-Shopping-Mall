@@ -1,17 +1,20 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
+import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
+import kr.makeappsgreat.onlinemall.config.SecurityConfig;
 import kr.makeappsgreat.onlinemall.model.Address;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 class TestMember {
 
-    private Member member;
-    private String username;
+    private static PasswordEncoder passwordEncoder = new SecurityConfig().passwordEncoder();
+    private static ModelMapper modelMapper = new ApplicationConfig().modelMapper();
 
-    public TestMember(ModelMapper modelMapper) {
-        new TestMember(modelMapper, "김가연", "simpleuser@email.com");
-    }
-    public TestMember(ModelMapper modelMapper, String name, String username) {
+    public static Member getWithNotAdaptToAccount() { return get("김가연", "user@domain.com", false); }
+    public static Member get() { return get("김가연", "user@domain.com", true); }
+    public static Member get(String name, String username) { return get(name, username, true); }
+    public static Member get(String name, String username, boolean adaptToAccount) {
         AgreementRequest agreementRequest = new AgreementRequest();
         agreementRequest.setTerms1(true);
         agreementRequest.setTerms2(true);
@@ -30,15 +33,11 @@ class TestMember {
         memberRequest.setAddress(address);
         memberRequest.setMobileNumber("010-1234-5678");
 
-        this.member = modelMapper.map(memberRequest, Member.class);
-        this.member.setAgreement(agreement);
-    }
+        Member member = modelMapper.map(memberRequest, Member.class);
+        member.setAgreement(agreement);
+        if (adaptToAccount) member.adaptToAccount(passwordEncoder);
 
-    public String getUsername() {
-        return username;
-    }
 
-    public Member getMember() {
         return member;
     }
 }

@@ -18,4 +18,9 @@ public class NamedEntity {
     protected Long id;
     @NotBlank
     protected String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -23,27 +23,24 @@ import java.util.Locale;
 public class ProductController {
 
     /**
-     * @TODO detail(detail of product and shopping mall notice ( shared details)
+     * @TODO detail(detail of product and shopping mall notice (shared details)
      * @TODO list(manufacturer, category and sorting)
      * @TODO list -> Print no product if selecting manufacturer or category that not saved product and no search result found.
      * @TODO search(with product name, in manufacturer or category)
      */
 
     private final ProductService productService;
-    private final ManufacturerRepository manufacturerRepository;
-    private final CategoryRepository categoryRepository;
     private final ProductSortMethod productSortMethod;
 
 
     @GetMapping("/detail/{id}")
     @Transactional(readOnly = true)
     public String detail(@PathVariable Long id, Model model) {
-        Product product = productService.getProduct(id);
+        Product product = productService.getProduct(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         model.addAttribute("product", product);
-        if (!product.getOptions().isEmpty()) {
-            model.addAttribute("options", product.getOptions());
-        }
+        if (!product.getOptions().isEmpty()) model.addAttribute("options", product.getOptions());
 
         return "/product/detail";
     }
@@ -51,40 +48,32 @@ public class ProductController {
     @GetMapping("/list")
     public String list(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
                        Model model, Locale locale) {
+        productPageRequest.setKeyword(null); // Ignore keyword in this handler method.
         if (bindingResult.hasErrors()) productPageRequest.handleBindingResult(bindingResult);
 
-        productPageRequest.setKeyword(null); // Ignore keyword in this handler method.
         Page<Product> result = productService.getPagedProducts(productPageRequest);
         ServletUriComponentsBuilder currentRequest = ServletUriComponentsBuilder.fromCurrentRequest();
 
-        if (productPageRequest.getManufacturer() != null) {
-            Product product = result.stream().findFirst().orElse(null);
 
-            if (product != null) {
-                model.addAttribute("manufacturer", product.getManufacturer());
-            } else {
+        if (productPageRequest.getManufacturer() != null) {
+            if (result.isEmpty()) {
                 model.addAttribute(
                         "manufacturer",
-                        manufacturerRepository.findById(productPageRequest.getManufacturer())
+                        productService.getManufacturerById(productPageRequest.getManufacturer())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
                 );
-            }
+            } else model.addAttribute("manufacturer", result.stream().findFirst().get().getManufacturer());
         }
 
         if (productPageRequest.getCategory() != null) {
-            Product product = result.stream().findFirst().orElse(null);
-
-            if (product != null) {
-                model.addAttribute("category", product.getCategory());
-            } else {
+            if (result.isEmpty()) {
                 model.addAttribute(
                         "category",
-                        categoryRepository.findById(productPageRequest.getCategory())
+                        productService.getCategoryById(productPageRequest.getCategory())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
                 );
-            }
+            } else model.addAttribute("category", result.stream().findFirst().get().getCategory());
         }
-
 
         model.addAttribute("products", result);
         model.addAttribute("pagination", new Pagination(currentRequest, result));
@@ -97,15 +86,15 @@ public class ProductController {
     public String search(@ModelAttribute @Validated ProductPageRequest productPageRequest, BindingResult bindingResult,
                          Model model, Locale locale) {
         Page<Product> result;
+
+        if (bindingResult.hasErrors()) {
+            productPageRequest.handleBindingResult(bindingResult);
+            if (bindingResult.hasFieldErrors("keyword")) result = Page.empty();
+            else result = productService.getPagedProducts(productPageRequest);
+        } else result = productService.getPagedProducts(productPageRequest);
+
+
         ServletUriComponentsBuilder currentRequest = ServletUriComponentsBuilder.fromCurrentRequest();
-
-        if (bindingResult.hasErrors() && productPageRequest.handleBindingResult(bindingResult)) {
-            result = Page.empty();
-        } else {
-            result = productService.getPagedProducts(productPageRequest);
-        }
-
-
         model.addAttribute("products", result);
         model.addAttribute("pagination", new Pagination(currentRequest, result));
         model.addAttribute("sortMethod", productSortMethod.get(currentRequest.replaceQueryParam("page"), locale));

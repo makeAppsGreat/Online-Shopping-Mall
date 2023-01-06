@@ -41,18 +41,11 @@ public class ProductPageRequest {
     }
 
     /**
-     * @param bindingResult the binding result to be handled
-     * @return {@code ture} if {@code keyword} has error,
-     *         {@code false} otherwise
+     * @param bindingResult to be handled
      */
-    public boolean handleBindingResult(BindingResult bindingResult) {
-        boolean returnValue = false;
-
+    public void handleBindingResult(BindingResult bindingResult) {
         for (FieldError e : bindingResult.getFieldErrors()) {
             switch (e.getField()) {
-                case "keyword":
-                    returnValue = true;
-                    break;
                 case "manufacturer":
                 case "category":
                     if (e.isBindingFailure() && !((String) e.getRejectedValue()).isBlank())
@@ -67,7 +60,5 @@ public class ProductPageRequest {
                     break;
             }
         }
-
-        return returnValue;
     }
 }

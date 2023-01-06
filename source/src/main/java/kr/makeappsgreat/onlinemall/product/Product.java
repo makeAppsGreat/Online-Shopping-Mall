@@ -39,9 +39,4 @@ public class Product extends NamedEntity {
 
     @CreationTimestamp
     private LocalDateTime registeredDate;
-
-    @Override
-    public String toString() {
-        return getName();
-    }
 }

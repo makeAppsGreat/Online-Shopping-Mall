@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,10 +15,12 @@ public class ProductService {
     @Value("${product.list.page_request_size}")
     private int PAGE_SIZE;
 
+    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public Optional<Product> getProduct(Long id) {
+        return productRepository.findById(id);
     }
 
     public Page<Product> getPagedProducts(ProductPageRequest productPageRequest) {
@@ -47,5 +49,13 @@ public class ProductService {
 
 
         return result;
+    }
+
+    public Optional<Manufacturer> getManufacturerById(Long manufacturer) {
+        return manufacturerRepository.findById(manufacturer);
+    }
+
+    public Optional<Category> getCategoryById(Long category) {
+        return categoryRepository.findById(category);
     }
 }

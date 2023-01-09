@@ -21,6 +21,14 @@ public class NamedEntity {
 
     @Override
     public String toString() {
-        return name;
+        return String.format("(%s) %s", this.getClass().getSimpleName(), name);
+    }
+
+    protected boolean canEqual(Object other) {
+        // if (!(other instanceof NamedEntity)) return false;
+        if (!this.getClass().isInstance(other)) return false;
+        if (this.id == null || ((NamedEntity) other).id == null) return false;
+
+        return true;
     }
 }

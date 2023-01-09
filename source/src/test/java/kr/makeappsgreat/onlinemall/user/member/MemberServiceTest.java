@@ -48,7 +48,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void join_withNullAgreement_throwException() {
+    void join_nullAgreement_throwException() {
         Member member = new Member();
 
         assertThatExceptionOfType(NullPointerException.class)

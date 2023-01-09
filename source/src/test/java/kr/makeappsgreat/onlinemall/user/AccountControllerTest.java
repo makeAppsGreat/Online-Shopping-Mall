@@ -27,7 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(value = AccountController.class,
+@WebMvcTest(
+        controllers = AccountController.class,
         includeFilters = @ComponentScan.Filter(classes = SecurityConfig.class, type = FilterType.ASSIGNABLE_TYPE),
         excludeFilters = @ComponentScan.Filter(
                 classes = {WebConfig.class, GlobalInterceptor.class},
@@ -118,7 +119,7 @@ class AccountControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void isUsableUsername_notAWellFormedUsernameWithAdminAccount_200ButResultIsFalse() throws Exception {
+    void isUsableUsername_notAWellFormedUsernameWithAdminAccount_200() throws Exception {
         mockMvc.perform(get("/account/usable-username/" + notAWellFormedUsername))
                 .andDo(print())
                 .andExpect(status().isOk())

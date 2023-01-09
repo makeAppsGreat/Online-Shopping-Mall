@@ -1,50 +1,71 @@
 package kr.makeappsgreat.onlinemall.product;
 
+import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(
+        controllers = ProductController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@MockBeans({ @MockBean(ManufacturerRepository.class), @MockBean(CategoryRepository.class) })
 class ProductControllerTest {
-
-    @Autowired
-    ProductRepository productRepository;
 
     @Autowired
     MockMvc mockMvc;
 
+    @MockBean
+    private ProductService productService;
+
+    @MockBean
+    private ProductSortMethod productSortMethod;
+
+    private ModelMapper modelMapper = new ApplicationConfig().modelMapper();
+
+    // Given
+    private Product product = createProduct();
+
     @Nested
-    @TestMethodOrder(MethodOrderer.DisplayName.class)
     class Detail {
+
+        @BeforeEach
+        void mock() {
+            given(productService.getProduct(product.getId())).willReturn(Optional.of(product));
+        }
 
         @Test
         @DisplayName("Proper request [200]")
         public void detail() throws Exception {
-            /** @TODO : Do save test data first, if run the application with NOT in-memory DB(Test DB). */
-            // Given
-            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
-
             // When & Then
             mockMvc.perform(get("/product/detail/{id}", product.getId()))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(model().attributeExists("product"));
+                    .andExpect(model().attribute("product", product));
         }
 
         @Test
         @DisplayName("No Product Id [404]")
-        public void detail_withNoProductId_404() throws Exception {
+        public void detail_noProductId_404() throws Exception {
             // When & Then
             mockMvc.perform(get("/product/detail/"))
                     .andDo(print())
@@ -71,7 +92,6 @@ class ProductControllerTest {
     }
 
     @Nested
-    @TestMethodOrder(MethodOrderer.DisplayName.class)
     class ListProduct {
 
         @Test
@@ -265,7 +285,6 @@ class ProductControllerTest {
         @DisplayName("Manufacturer [200]")
         public void list_manufacturer_200() throws Exception {
             // Given
-            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
             Manufacturer target = product.getManufacturer();
 
             // When & Then
@@ -322,7 +341,6 @@ class ProductControllerTest {
         @DisplayName("Category [200]")
         public void list_category_200() throws Exception {
             // Given
-            Product product = productRepository.findAll(Pageable.ofSize(1)).stream().findFirst().get();
             Category target = product.getCategory();
 
             // When & Then
@@ -373,5 +391,25 @@ class ProductControllerTest {
                     .andDo(print())
                     .andExpect(status().isNotFound());
         }
+    }
+
+    private Product createProduct() {
+        Map manufacturer = new HashMap();
+        manufacturer.put("id", 200L);
+        manufacturer.put("name", "제조사");
+
+        Map category = new HashMap();
+        category.put("id", 300L);
+        category.put("name", "분류");
+
+
+        Map product = new HashMap();
+        product.put("id", 100L);
+        product.put("name", "제품명");
+        product.put("price", 19_800);
+        product.put("manufacturer", modelMapper.map(manufacturer, Manufacturer.class));
+        product.put("category", modelMapper.map(category, Category.class));
+
+        return modelMapper.map(product, Product.class);
     }
 }

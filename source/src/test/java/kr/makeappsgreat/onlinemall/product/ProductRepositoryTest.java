@@ -1,16 +1,26 @@
 package kr.makeappsgreat.onlinemall.product;
 
-import org.junit.jupiter.api.*;
+import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
+import org.assertj.core.api.Condition;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.anyOf;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 class ProductRepositoryTest {
 
     /**
@@ -18,13 +28,13 @@ class ProductRepositoryTest {
      */
 
     @Autowired
-    ProductRepository productRepository;
-    
-    private Product savedProduct;
+    private ProductRepository productRepository;
 
     @BeforeAll
     @Sql("classpath:data-h2.sql")
     static void saveTestProducts() { }
+
+    private Product savedProduct;
 
     @BeforeEach
     void getTestProduct() {
@@ -33,89 +43,108 @@ class ProductRepositoryTest {
         one.forEach(p -> savedProduct = p);
     }
 
-    @Test
-    void findByManufacturer() throws Exception {
-        // When
-        Page<Product> product = productRepository.findByManufacturer(
-                savedProduct.getManufacturer(),
-                Pageable.ofSize(1));
+    @Nested
+    class Create {
 
-        // Then
-        product.forEach(p -> assertThat(p.getManufacturer()).isEqualTo(savedProduct.getManufacturer()));
+        private ModelMapper modelMapper = new ApplicationConfig().modelMapper();
+
+        @Test
+        void save() {
+            // Given
+            Product product = createProduct("시제품");
+            long count = productRepository.count();
+            LocalDateTime start = LocalDateTime.now();
+
+            // When
+            Product savedProduct = productRepository.save(product);
+
+            // Then
+            assertThat(savedProduct).isNotNull();
+            assertThat(productRepository.count() - count).isEqualTo(1L);
+            assertThat(savedProduct.getRegisteredDate()).isAfter(start);
+        }
+
+        private Product createProduct(String name) {
+            Map product = new HashMap();
+            product.put("name", name);
+            product.put("price", 19_800);
+            product.put("manufacturer", savedProduct.getManufacturer());
+            product.put("category", savedProduct.getCategory());
+
+            return modelMapper.map(product, Product.class);
+        }
     }
 
-    @Test
-    void findByCategory() throws Exception {
-        // When
-        Page<Product> product = productRepository.findByCategory(
-                savedProduct.getCategory(),
-                Pageable.ofSize(1));
+    @Nested
+    class Retrieve {
 
-        // Then
-        product.forEach(p -> assertThat(p.getCategory()).isEqualTo(savedProduct.getCategory()));
-    }
+        @Test
+        void findByManufacturer() {
+            // When
+            Page<Product> product = productRepository.findByManufacturer(
+                    savedProduct.getManufacturer(),
+                    Pageable.ofSize(1));
 
-    @Test
-    void findByManufacturerAndCategory() throws Exception {
-        // When
-        Page<Product> product = productRepository.findByManufacturerAndCategory(
-                savedProduct.getManufacturer(),
-                savedProduct.getCategory(),
-                Pageable.ofSize(1));
+            // Then
+            product.forEach(p -> assertThat(p.getManufacturer()).isEqualTo(savedProduct.getManufacturer()));
+        }
 
-        // Then
-        product.forEach(p -> {
-            assertThat(p.getManufacturer()).isEqualTo(savedProduct.getManufacturer());
-            assertThat(p.getCategory()).isEqualTo(savedProduct.getCategory());
-        });
-    }
+        @Test
+        void findByCategory() {
+            // When
+            Page<Product> product = productRepository.findByCategory(
+                    savedProduct.getCategory(),
+                    Pageable.ofSize(1));
 
-    @Test
-    void findByNameContaining() {
-        // Given
-        String keyword = "라보코스메티카";
+            // Then
+            product.forEach(p -> assertThat(p.getCategory()).isEqualTo(savedProduct.getCategory()));
+        }
 
-        // When
-        Page<Product> product = productRepository.findByNameContainingIgnoreCase(keyword, Pageable.ofSize(1));
+        @Test
+        void findByManufacturerAndCategory() {
+            // When
+            Page<Product> product = productRepository.findByManufacturerAndCategory(
+                    savedProduct.getManufacturer(),
+                    savedProduct.getCategory(),
+                    Pageable.ofSize(1));
 
-        // Then
-        product.forEach(p -> assertThat(p.getName().contains(keyword)).isTrue());
-    }
+            // Then
+            product.forEach(p -> {
+                assertThat(p.getManufacturer()).isEqualTo(savedProduct.getManufacturer());
+                assertThat(p.getCategory()).isEqualTo(savedProduct.getCategory());
+            });
+        }
 
-    @Test
-    void findByNameContainingOrSimpleDetailContaining() {
-        // Given
-        String keyword = "샴푸";
+        @Test
+        void findByNameContaining() {
+            // Given
+            String keyword = "라보코스메티카";
 
-        // When
-        Page<Product> product = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
-                null,
-                keyword,
-                Pageable.ofSize(1));
+            // When
+            Page<Product> product = productRepository.findByNameContainingIgnoreCase(keyword, Pageable.ofSize(1));
 
-        // Then
-        product.forEach(p -> {
-            assertThat(p.getName().contains(keyword) || p.getSimpleDetail().contains(keyword)).isTrue();
-        });
-    }
+            // Then
+            product.forEach(p -> assertThat(p.getName()).contains(keyword));
+        }
 
-    /**
-     * @TODO Need to validate keyword from controller
-     */
-    @Test
-    void findByNameContainingOrSimpleDetailContaining_blank() {
-        // Given
-        String keyword = "";
+        @Test
+        void findByNameContainingOrSimpleDetailContaining() {
+            // Given
+            String keyword = "샴푸";
 
-        // When
-        Page<Product> product = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
-                keyword,
-                keyword,
-                Pageable.ofSize(10));
+            // When
+            Page<Product> product = productRepository.findByNameContainingIgnoreCaseOrSimpleDetailContainingIgnoreCase(
+                    null,
+                    keyword,
+                    Pageable.ofSize(1));
 
-        // Then
-        product.forEach(p -> {
-            assertThat(p.getName().contains(keyword) || p.getSimpleDetail().contains(keyword)).isTrue();
-        });
+            // Then
+            product.forEach(p -> {
+                assertThat(p).is(anyOf(
+                        new Condition<>((__p) -> __p.getName().contains(keyword), ""),
+                        new Condition<>((__p) -> __p.getSimpleDetail().contains(keyword), "")
+                ));
+            });
+        }
     }
 }

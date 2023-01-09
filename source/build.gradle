@@ -39,6 +39,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'com.h2database:h2'
+    // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
+    testCompileOnly 'org.openjdk.jol:jol-core:0.16'
+
 
     annotationProcessor 'org.projectlombok:lombok'
 }

@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
@@ -19,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(
         controllers = ProductController.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@MockBeans({ @MockBean(ManufacturerRepository.class), @MockBean(CategoryRepository.class) })
+@MockBeans({@MockBean(ManufacturerRepository.class), @MockBean(CategoryRepository.class)})
 class ProductControllerTest {
 
     @Autowired
@@ -92,7 +96,12 @@ class ProductControllerTest {
     }
 
     @Nested
-    class ListProduct {
+    class List {
+
+        @BeforeEach
+        void mock() {
+            mockListAndKeyword();
+        }
 
         @Test
         @DisplayName("No condition [200]")
@@ -209,7 +218,7 @@ class ProductControllerTest {
         @Test
         @DisplayName("Sort Method with mot exist [200, Same with default]")
         public void list_notExistedSortMethod_200WithDefaultSortMethod() throws Exception {
-            ProductPageRequest defaultProductPageRequest = new ProductPageRequest();
+            System.out.println(">> " + Integer.MAX_VALUE);
 
             // When & Then
             mockMvc.perform(get("/product/list")
@@ -218,67 +227,17 @@ class ProductControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("sort", is(defaultProductPageRequest.getSort()))
+                            hasProperty("sortMethod", is(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE))
                     ));
 
             mockMvc.perform(get("/product/list")
-                            .param("sortMethod", String.valueOf(1_000_000_000)))
+                            .param("sortMethod", String.valueOf(4_000_000_000L)))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(model().attribute(
                             "productPageRequest",
-                            hasProperty("sort", is(defaultProductPageRequest.getSort()))
+                            hasProperty("sortMethod", is(ProductPageRequest.DEFAULT_SORT_METHOD_VALUE))
                     ));
-        }
-
-        @Test
-        @DisplayName("Keyword [200]")
-        public void list_keyword_200() throws Exception {
-            // Given
-            String keyword = "샴푸";
-
-            // When & Then
-            mockMvc.perform(get("/product/list")
-                            .param("keyword", keyword))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attribute(
-                            "products",
-                            hasProperty(
-                                    "content",
-                                    hasItem(anyOf(
-                                            Matchers.<Product>hasProperty("name", containsString(keyword)),
-                                            Matchers.<Product>hasProperty("simpleDetail", containsString(keyword))))
-                                    )
-
-                    ));
-        }
-
-        @Test
-        @DisplayName("Keyword with blank [200, Same as no conditional request]")
-        public void list_blankKeyword_200() throws Exception {
-            // When & Then
-            mockMvc.perform(get("/product/list")
-                            .header("Referer", "/product/list")
-                            .param("keyword", ""))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeExists("products"));
-        }
-
-        @Test
-        @DisplayName("Keyword with too short [200, with having errors at keyword]")
-        public void list_shortKeyword_200() throws Exception {
-            // Given
-            String keyword = "마";
-
-            // When & Then
-            mockMvc.perform(get("/product/list")
-                            .header("Referer", "/product/list")
-                            .param("keyword", keyword))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(model().attributeHasFieldErrors("productPageRequest", "keyword"));
         }
 
         @Test
@@ -393,6 +352,62 @@ class ProductControllerTest {
         }
     }
 
+    @Nested
+    class Keyword {
+
+        @BeforeEach
+        void mock() {
+            mockListAndKeyword();
+        }
+
+        @Test
+        @DisplayName("Keyword [200]")
+        public void list_keyword_200() throws Exception {
+            // Given
+            String keyword = "샴푸";
+
+            // When & Then
+            mockMvc.perform(get("/product/search")
+                            .param("keyword", keyword))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute(
+                            "products",
+                            hasProperty(
+                                    "content",
+                                    hasItem(anyOf(
+                                            Matchers.<Product>hasProperty("name", containsString(keyword)),
+                                            Matchers.<Product>hasProperty("simpleDetail", containsString(keyword))))
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("Keyword with blank [200, Same as no conditional request]")
+        public void list_blankKeyword_200() throws Exception {
+            // When & Then
+            mockMvc.perform(get("/product/search")
+                            .param("keyword", ""))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeExists("products"));
+        }
+
+        @Test
+        @DisplayName("Keyword with too short [200, with having errors at keyword]")
+        public void list_shortKeyword_200() throws Exception {
+            // Given
+            String keyword = "마";
+
+            // When & Then
+            mockMvc.perform(get("/product/search")
+                            .param("keyword", keyword))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(model().attributeHasFieldErrors("productPageRequest", "keyword"));
+        }
+    }
+
     private Product createProduct() {
         Map manufacturer = new HashMap();
         manufacturer.put("id", 200L);
@@ -409,7 +424,26 @@ class ProductControllerTest {
         product.put("price", 19_800);
         product.put("manufacturer", modelMapper.map(manufacturer, Manufacturer.class));
         product.put("category", modelMapper.map(category, Category.class));
+        product.put("simpleDetail", "샴푸");
 
         return modelMapper.map(product, Product.class);
+    }
+
+    private void mockListAndKeyword() {
+        given(productService.getPagedProducts(any(ProductPageRequest.class)))
+                .willReturn(new PageImpl<>(java.util.List.of(product)));
+        given(productService.getPagedProducts(argThat(argument -> {
+            if (argument != null) {
+                if (argument.getManufacturer() != null && argument.getManufacturer() < 0L) return true;
+                if (argument.getCategory() != null && argument.getCategory() < 0L) return true;
+            }
+
+            return false;
+        })))
+                .willReturn(Page.empty());
+        given(productService.getManufacturerById(product.getManufacturer().getId()))
+                .willReturn(Optional.of(product.getManufacturer()));
+        given(productService.getCategoryById(product.getCategory().getId()))
+                .willReturn(Optional.of(product.getCategory()));
     }
 }

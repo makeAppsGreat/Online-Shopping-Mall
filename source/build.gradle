@@ -33,12 +33,12 @@ dependencies {
 
 
     compileOnly 'org.projectlombok:lombok'
-    // runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
     testImplementation 'org.springframework.security:spring-security-test'
-    implementation 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
     // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
     testCompileOnly 'org.openjdk.jol:jol-core:0.16'
 

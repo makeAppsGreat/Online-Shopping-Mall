@@ -2,7 +2,6 @@ package kr.makeappsgreat.onlinemall.product;
 
 import kr.makeappsgreat.onlinemall.config.ApplicationConfig;
 import org.assertj.core.api.Condition;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class ProductRepositoryTest {
 
     /**
@@ -29,10 +29,6 @@ class ProductRepositoryTest {
 
     @Autowired
     private ProductRepository productRepository;
-
-    @BeforeAll
-    @Sql("classpath:data-h2.sql")
-    static void saveTestProducts() { }
 
     private Product savedProduct;
 

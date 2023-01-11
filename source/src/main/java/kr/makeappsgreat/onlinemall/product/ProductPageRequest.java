@@ -14,8 +14,8 @@ import javax.validation.constraints.Size;
 @Getter @Setter
 public class ProductPageRequest {
 
-    public static final int DEFAULT_SORT_METHOD_VALUE = 0;
     public static final int DEFAULT_PAGE_VALUE = 1;
+    public static final int DEFAULT_SORT_METHOD_VALUE = 0;
 
     private static final ProductPageRequest EMPTY = new ProductPageRequest();
 

@@ -1,13 +1,16 @@
 package kr.makeappsgreat.onlinemall.config;
 
 import kr.makeappsgreat.onlinemall.common.Pagination;
-import kr.makeappsgreat.onlinemall.main.GlobalInterceptor;
+import kr.makeappsgreat.onlinemall.config.interceptor.GlobalInterceptor;
+import kr.makeappsgreat.onlinemall.config.interceptor.MemberInterceptor;
+import kr.makeappsgreat.onlinemall.product.CategoryRepository;
+import kr.makeappsgreat.onlinemall.product.ManufacturerRepository;
 import lombok.RequiredArgsConstructor;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import nz.net.ultraq.thymeleaf.layoutdialect.decorators.strategies.GroupingStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -20,8 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${common.pagination_size}")
     private int PAGINATION_SIZE;
 
-    @Autowired
-    private final GlobalInterceptor globalInterceptor;
+    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryRepository categoryRepository;
+    private final MessageSource messageSource;
 
     @Bean
     public ApplicationRunner initApplication() {
@@ -42,6 +46,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(globalInterceptor);
+        registry.addInterceptor(new GlobalInterceptor(manufacturerRepository, categoryRepository));
+        registry.addInterceptor(new MemberInterceptor(messageSource)).addPathPatterns("/member/**");
     }
 }

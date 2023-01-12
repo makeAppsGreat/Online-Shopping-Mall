@@ -2,7 +2,6 @@ package kr.makeappsgreat.onlinemall.user;
 
 import kr.makeappsgreat.onlinemall.config.SecurityConfig;
 import kr.makeappsgreat.onlinemall.config.WebConfig;
-import kr.makeappsgreat.onlinemall.main.GlobalInterceptor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(
         controllers = AccountController.class,
         includeFilters = @ComponentScan.Filter(classes = SecurityConfig.class, type = FilterType.ASSIGNABLE_TYPE),
-        excludeFilters = @ComponentScan.Filter(
-                classes = {WebConfig.class, GlobalInterceptor.class},
-                type = FilterType.ASSIGNABLE_TYPE))
+        excludeFilters = @ComponentScan.Filter(classes = WebConfig.class, type = FilterType.ASSIGNABLE_TYPE))
 class AccountControllerTest {
 
     private static ResourceBundleMessageSource validationMessageSource;

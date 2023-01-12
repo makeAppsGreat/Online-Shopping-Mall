@@ -2,7 +2,6 @@ package kr.makeappsgreat.onlinemall.user.member;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,8 +19,6 @@ public class MemberJoinController {
     private final MemberService memberService;
 
     private final ModelMapper modelMapper;
-    private final MessageSource messageSource;
-
 
     // Unnecessary handling
     /* @InitBinder("memberRequest")

@@ -6,6 +6,7 @@ ul.crumbs li { display : inline; }
 ul.crumbs li+li:before { content : " > "; }
 /* End of style breadcrumb */
 
+.gray { color : gray }
 .red { color : red }
 .green { color : green }
 .blue { color : blue }

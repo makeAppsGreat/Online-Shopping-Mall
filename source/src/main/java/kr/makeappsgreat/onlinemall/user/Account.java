@@ -46,6 +46,11 @@ public class Account extends NamedEntity {
         password = passwordEncoder.encode(password);
     }
 
+    public void changePassword(PasswordEncoder passwordEncoder, String passwordToChange) {
+        password = passwordToChange;
+        encodePassword(passwordEncoder);
+    }
+
     public void addRole(AccountRole role) {
         roles.add(role);
     }

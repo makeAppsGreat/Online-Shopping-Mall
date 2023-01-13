@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>내 정보</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li>내 정보</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <ul>
+        <li><a class="gray">주문확인</a></li>
+        <li><a class="gray">쿠폰/포인트</a></li>
+        <li><a th:href="@{/member/profile}">정보수정</a></li>
+        <li><a th:href="@{/member/password}">비밀번호 변경</a></li>
+    </ul>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

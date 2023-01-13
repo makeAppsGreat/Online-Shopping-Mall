@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title th:text="${result.title}">Title</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li th:each="breadcrumb : ${result.breadcrumb}">
+        <a th:if="${breadcrumb.link}" th:href="${breadcrumb.link}" th:text="${breadcrumb.name}">Breadcrumb name</a>
+        <span th:unless="${breadcrumb.link}" th:text="${breadcrumb.name}">Breadcrumb name</span>
+    </li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <h2 th:text=${result.subTitle}>Sub Title</h2>
+    <p th:text=${result.message}>Message</p>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

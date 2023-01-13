@@ -17,6 +17,10 @@ public @interface VerifyPassword {
 
     String message() default "{message.password-verify-not-match}";
 
+    String passwordPropertyName() default "password";
+
+    String passwordVerifyPropertyName() default "passwordVerify";
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};

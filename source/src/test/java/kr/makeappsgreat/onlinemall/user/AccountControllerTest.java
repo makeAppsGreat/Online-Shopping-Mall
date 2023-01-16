@@ -77,8 +77,13 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value(
-                        validationMessageSource.getMessage("javax.validation.constraints.NotEmpty.message", null, Locale.ENGLISH)));
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                validationMessageSource.getMessage(
+                                        "javax.validation.constraints.NotEmpty.message",
+                                        null,
+                                        Locale.ENGLISH))
+                );
     }
 
     @Test
@@ -88,8 +93,13 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value(
-                        validationMessageSource.getMessage("javax.validation.constraints.Email.message", null, Locale.ENGLISH)));
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                validationMessageSource.getMessage(
+                                        "javax.validation.constraints.Email.message",
+                                        null,
+                                        Locale.ENGLISH))
+                );
     }
 
     @Test

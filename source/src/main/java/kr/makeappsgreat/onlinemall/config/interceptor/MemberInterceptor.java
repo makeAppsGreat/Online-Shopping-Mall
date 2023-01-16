@@ -34,8 +34,10 @@ public class MemberInterceptor implements HandlerInterceptor {
                         WebAttributes.AUTHENTICATION_EXCEPTION,
                         new AuthenticationCredentialsNotFoundException(
                                 messageSource.getMessage(
-                                        "account.authentication-credentials-not-found", null, LocaleContextHolder.getLocale()))
-                );
+                                        "account.authentication-credentials-not-found",
+                                        null,
+                                        LocaleContextHolder.getLocale())
+                        ));
 
                 response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
                 response.setHeader("Location", "/login?error");

@@ -14,10 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @SessionAttributes("agreement")
 @RequiredArgsConstructor
 public class MemberJoinController {
-    /** @TODO Block access of authenticated user */
 
     private final MemberService memberService;
-
     private final ModelMapper modelMapper;
 
     // Unnecessary handling

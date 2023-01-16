@@ -26,12 +26,14 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer customizer() {
         if (isH2ConsoleEnabled == true) {
-            return (web) -> web.ignoring().requestMatchers(
-                    PathRequest.toStaticResources().atCommonLocations(),
-                    PathRequest.toH2Console());
+            return (web) -> web.ignoring()
+                    .requestMatchers(
+                            PathRequest.toStaticResources().atCommonLocations(),
+                            PathRequest.toH2Console()
+                    );
         } else {
-            return (web) -> web.ignoring().requestMatchers(
-                    PathRequest.toStaticResources().atCommonLocations());
+            return (web) -> web.ignoring()
+                    .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
         }
     }
 

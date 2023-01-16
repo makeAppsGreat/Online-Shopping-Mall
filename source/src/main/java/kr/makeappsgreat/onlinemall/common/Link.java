@@ -22,9 +22,9 @@ public class Link {
         MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
 
         if (!queryParams.isEmpty()) {
-            this.link = "?" + queryParams.entrySet().stream().map(
-                    e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse("")
-                    ).collect(Collectors.joining("&"));
+            this.link = "?" + queryParams.entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue().stream().findFirst().orElse(""))
+                    .collect(Collectors.joining("&"));
         }
     }
 }

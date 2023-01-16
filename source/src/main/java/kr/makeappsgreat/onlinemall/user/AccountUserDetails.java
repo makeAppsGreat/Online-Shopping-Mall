@@ -14,8 +14,7 @@ public class AccountUserDetails extends User {
                 account.getPassword(),
                 account.getRoles()
                         .stream().map(accountRole -> new SimpleGrantedAuthority(accountRole.name()))
-                        .collect(Collectors.toSet())
-        );
+                        .collect(Collectors.toSet()));
 
         this.account = account;
     }

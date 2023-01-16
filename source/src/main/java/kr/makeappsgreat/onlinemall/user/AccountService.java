@@ -30,7 +30,11 @@ public class AccountService<T extends Account> {
         T entity = accountRepository.findById(account.getId()).get();
 
         if (!passwordEncoder.matches(oldPassword, entity.getPassword())) {
-            throw new RuntimeException(messageSource.getMessage("account.password-not-match", null, LocaleContextHolder.getLocale()));
+            throw new RuntimeException(
+                    messageSource.getMessage(
+                            "account.password-not-match",
+                            null,
+                            LocaleContextHolder.getLocale()));
         }
 
         entity.changePassword(passwordEncoder, passwordToChange);

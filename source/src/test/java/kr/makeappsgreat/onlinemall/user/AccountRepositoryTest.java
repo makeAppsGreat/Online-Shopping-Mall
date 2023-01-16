@@ -92,8 +92,8 @@ class AccountRepositoryTest {
 
                 ConstraintViolation<?> violation = violations.iterator().next();
                 assertThat(violation.getPropertyPath().toString()).isEqualTo("password");
-                assertThat(violation.getMessageTemplate()).isEqualTo(
-                        Pattern.class.getMethod("message").getDefaultValue());
+                assertThat(violation.getMessageTemplate())
+                        .isEqualTo(Pattern.class.getMethod("message").getDefaultValue());
             }
 
             assertThat(noException).isFalse();

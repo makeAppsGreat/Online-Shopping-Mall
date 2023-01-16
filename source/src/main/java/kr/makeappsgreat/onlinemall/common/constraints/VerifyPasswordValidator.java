@@ -22,9 +22,11 @@ public class VerifyPasswordValidator implements ConstraintValidator<VerifyPasswo
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
-        Assert.isTrue(wrapper.isReadableProperty(passwordPropertyName),
+        Assert.isTrue(
+                wrapper.isReadableProperty(passwordPropertyName),
                 String.format("'%s' is not readable property. (password)", passwordPropertyName));
-        Assert.isTrue(wrapper.isReadableProperty(passwordVerifyPropertyName),
+        Assert.isTrue(
+                wrapper.isReadableProperty(passwordVerifyPropertyName),
                 String.format("'%s' is not readable property. (passwordVerify)", passwordVerifyPropertyName));
 
         Object password = wrapper.getPropertyValue(passwordPropertyName);

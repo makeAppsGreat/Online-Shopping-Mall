@@ -15,7 +15,9 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <form th:action="@{''}" th:object="${memberRequest}" onsubmit="return validateForm()" method="post">
+    <form th:action="@{''}" th:object="${memberRequest}" method="post"
+          onsubmit="return onSubmit()" onkeydown="return event.key != 'Enter';">
+        <input type="hidden" th:field="*{username}" />
         <p>
             <label th:for="email">아이디</label>
             <span th:utext="#{account.rules.username}" class="hint">(아이디 규칙)</span><br>
@@ -73,6 +75,7 @@
     </form>
     <script th:inline="javascript">
         let username = document.getElementById("email");
+        let checkDupUsernameBtn = document.getElementById("checkDupUsernameBtn");
         let usernameChkResult = username.parentElement.querySelector(".hasErrors");
         if (usernameChkResult === null) {
             usernameChkResult = document.createElement("span");
@@ -88,8 +91,13 @@
             }
         });
 
+        /** Input onkeydown event */
+        username.addEventListener("keydown", (event) => {
+            if (event.code === "Enter") checkDupUsernameBtn.click();
+        });
+
         /** Button onclick event */
-        document.getElementById("checkDupUsernameBtn").addEventListener("click", (event) => {
+        checkDupUsernameBtn.addEventListener("click", (event) => {
             event.currentTarget.disabled = true;
 
             get([[@{/account/usable-username/}]] + username.value, (response) => {
@@ -102,8 +110,7 @@
             });
         });
 
-        /** Validate form function */
-        function validateForm() {
+        function onSubmit() {
             if (usernameChkResult.classList.contains("hasErrors")) {
                 alert([[#{account.username.need-to-check-duplication}]]);
                 username.focus();
@@ -111,6 +118,8 @@
 
                 return false;
             }
+
+            document.getElementById("username").value = username.value;
         }
 
         function usernameChkResultIsGood() {

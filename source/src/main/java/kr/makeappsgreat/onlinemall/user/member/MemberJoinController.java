@@ -1,7 +1,10 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
+import kr.makeappsgreat.onlinemall.common.Link;
+import kr.makeappsgreat.onlinemall.common.ResultAttribute;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,19 +13,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 @Controller @RequestMapping("/member/join")
 @SessionAttributes("agreement")
 @RequiredArgsConstructor
 public class MemberJoinController {
 
-    private final MemberService memberService;
-    private final ModelMapper modelMapper;
+    private static Map<Locale, ResultAttribute> welcomeResult = new HashMap<>();
 
-    // Unnecessary handling
-    /* @InitBinder("memberRequest")
-    public void initBinder(WebDataBinder binder) {
-        binder.setDisallowedFields("username");
-    } */
+    private final MemberService memberService;
+    private final MessageSource messageSource;
+    private final ModelMapper modelMapper;
 
     @GetMapping("/")
     public String join() {
@@ -55,11 +59,8 @@ public class MemberJoinController {
     @PostMapping("/step2")
     public String step2Submit(@ModelAttribute @Validated MemberRequest memberRequest, BindingResult bindingResult,
                               @SessionAttribute Agreement agreement,
-                              RedirectAttributes attributes, SessionStatus status) {
-        if (bindingResult.hasErrors() && bindingResult.getFieldErrors().size() > 1) {
-            // Field 'username' must have field error.
-            return "/member/join/step2";
-        }
+                              RedirectAttributes redirectAttributes, Locale locale, SessionStatus status) {
+        if (bindingResult.hasErrors()) return "/member/join/step2";
         status.setComplete();
 
         Member member = modelMapper.map(memberRequest, Member.class);
@@ -67,12 +68,28 @@ public class MemberJoinController {
         Member savedMember = memberService.join(member);
 
 
-        attributes.addFlashAttribute("name", savedMember.getName());
+        ResultAttribute result = welcomeResult.get(locale);
+        if (result == null) {
+            System.out.println(">> new locale(welcomeResult) " + locale);
+            result = ResultAttribute.builder()
+                    .title(messageSource.getMessage("account.join", null, locale))
+                    .subTitle("Welcome!")
+                    .message(String.format(
+                            "<span style='font-size:x-large'>%s</span>%s",
+                            savedMember.getName(),
+                            messageSource.getMessage("account.join-welcome", null, locale)))
+                    .build();
+
+            result.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.join", null, locale)));
+
+            welcomeResult.put(locale, result);
+        }
+        redirectAttributes.addFlashAttribute("result", result);
         return "redirect:/member/join/welcome";
     }
 
     @GetMapping("/welcome")
-    public String welcome(@ModelAttribute String name) {
-        return "/member/join/welcome";
+    public String welcome() {
+        return "/result";
     }
 }

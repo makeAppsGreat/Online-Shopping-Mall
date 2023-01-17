@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <head>
-    <title th:text="${result.title}">Title</title>
+    <title th:utext="${result.title}">Title</title>
 </head>
 <body>
 <!--/* Breadcrumb */-->
@@ -18,8 +18,8 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <h2 th:text=${result.subTitle}>Sub Title</h2>
-    <p th:text=${result.message}>Message</p>
+    <h2 th:utext=${result.subTitle}>Sub Title</h2>
+    <p th:utext=${result.message}>Message</p>
 </div>
 <!--/* End of Content */-->
 </body>

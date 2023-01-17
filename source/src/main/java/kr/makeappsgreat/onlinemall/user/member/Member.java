@@ -45,8 +45,6 @@ public class Member extends Account {
     }
 
     public void adaptToAccount(PasswordEncoder passwordEncoder) {
-        if (getUsername() != null) throw new RuntimeException("Unexpected usage : Already password encoded.");
-
         setUsername(this.email);
         encodePassword(passwordEncoder);
         addRole(AccountRole.ROLE_USER);

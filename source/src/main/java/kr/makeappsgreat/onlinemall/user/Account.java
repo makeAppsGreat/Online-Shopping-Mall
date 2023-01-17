@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 public class Account extends NamedEntity {
 
-    @Getter(AccessLevel.NONE) private final String PASSWORD_PREFIX = "{bcrypt}";
+    @Getter(AccessLevel.NONE) public static final String PASSWORD_PREFIX = "{bcrypt}";
     @Getter(AccessLevel.NONE) public static final String PASSWORD_REGEXP = "\\{bcrypt\\}.+";
 
     @Column(unique = true)

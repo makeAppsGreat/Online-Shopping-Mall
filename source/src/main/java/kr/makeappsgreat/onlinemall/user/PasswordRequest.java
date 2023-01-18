@@ -6,13 +6,13 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@VerifyPassword
+@VerifyPassword(passwordPropertyName = "newPassword")
 @Getter @Setter
 public class PasswordRequest {
 
     @NotEmpty
     private String oldPassword;
     @NotEmpty
-    private String password;
+    private String newPassword;
     private String passwordVerify;
 }

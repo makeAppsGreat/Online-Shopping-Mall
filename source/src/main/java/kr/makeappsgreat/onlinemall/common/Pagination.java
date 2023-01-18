@@ -16,7 +16,7 @@ public class Pagination {
 
     public static void init(int paginationSize) {
         Pagination.PAGINATION_SIZE = paginationSize;
-        log.info("Set PAGINATION_SIZE to \"{}\".", paginationSize);
+        log.info("Set PAGINATION_SIZE to {}.", paginationSize);
     }
 
     private Link first = new Link("|<");

@@ -19,4 +19,9 @@ public class ResultAttribute {
     public void addLinkToBreadcrumb(Link link) {
         breadcrumb.add(link);
     }
+
+    @Override
+    public String toString() {
+        return String.format("(ResultAttribute)'%s' : '%s'", title, message);
+    }
 }

@@ -2,6 +2,7 @@ package kr.makeappsgreat.onlinemall.user.member;
 
 import kr.makeappsgreat.onlinemall.common.Link;
 import kr.makeappsgreat.onlinemall.common.ResultAttribute;
+import kr.makeappsgreat.onlinemall.main.IndexController;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
@@ -59,7 +60,7 @@ public class MemberJoinController {
     @PostMapping("/step2")
     public String step2Submit(@ModelAttribute @Validated MemberRequest memberRequest, BindingResult bindingResult,
                               @SessionAttribute Agreement agreement,
-                              RedirectAttributes redirectAttributes, Locale locale, SessionStatus status) {
+                              RedirectAttributes attributes, Locale locale, SessionStatus status) {
         if (bindingResult.hasErrors()) return "/member/join/step2";
         status.setComplete();
 
@@ -68,10 +69,9 @@ public class MemberJoinController {
         Member savedMember = memberService.join(member);
 
 
-        ResultAttribute result = welcomeResult.get(locale);
-        if (result == null) {
-            System.out.println(">> new locale(welcomeResult) " + locale);
-            result = ResultAttribute.builder()
+        ResultAttribute resultAttribute = welcomeResult.get(locale);
+        if (resultAttribute == null) {
+            resultAttribute = ResultAttribute.builder()
                     .title(messageSource.getMessage("account.join", null, locale))
                     .subTitle("Welcome!")
                     .message(String.format(
@@ -80,16 +80,16 @@ public class MemberJoinController {
                             messageSource.getMessage("account.join-welcome", null, locale)))
                     .build();
 
-            result.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.join", null, locale)));
+            resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.join", null, locale)));
 
-            welcomeResult.put(locale, result);
+            welcomeResult.put(locale, resultAttribute);
         }
-        redirectAttributes.addFlashAttribute("result", result);
+        attributes.addFlashAttribute("result", resultAttribute);
         return "redirect:/member/join/welcome";
     }
 
     @GetMapping("/welcome")
-    public String welcome() {
-        return "/result";
+    public String welcome(@ModelAttribute ResultAttribute resultAttribute) {
+        return IndexController.result(resultAttribute);
     }
 }

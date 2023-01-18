@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class AccountService<T extends Account> {
         T entity = accountRepository.findById(account.getId()).get();
 
         if (!passwordEncoder.matches(oldPassword, entity.getPassword())) {
-            throw new RuntimeException(
+            throw new BadCredentialsException(
                     messageSource.getMessage(
                             "account.password-not-match",
                             null,
@@ -48,6 +49,6 @@ public class AccountService<T extends Account> {
         String username = account.getUsername();
 
         if (isDuplicatedUser(username))
-            throw new DuplicateKeyException(String.format("Duplicated username { username : \"%s\" }", username));
+            throw new DuplicateKeyException(String.format("Duplicated username { username : '%s' }", username));
     }
 }

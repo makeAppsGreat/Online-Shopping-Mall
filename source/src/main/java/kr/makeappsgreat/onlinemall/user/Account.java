@@ -41,7 +41,7 @@ public class Account extends NamedEntity {
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         if (password.startsWith(PASSWORD_PREFIX))
-            throw new IllegalArgumentException(String.format("Already encoded password { username : \"%s\" }", username));
+            throw new IllegalArgumentException(String.format("Already encoded password { username : '%s' }", username));
 
         password = passwordEncoder.encode(password);
     }

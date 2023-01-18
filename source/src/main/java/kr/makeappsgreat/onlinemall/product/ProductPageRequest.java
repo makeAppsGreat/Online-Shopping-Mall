@@ -50,7 +50,7 @@ public class ProductPageRequest {
                 case "category":
                     if (e.isBindingFailure() && !((String) e.getRejectedValue()).isBlank())
                         // Case : Type mismatched.
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IsBindingFailure is true.");
                     break;
                 case "page":
                     page = ProductPageRequest.DEFAULT_PAGE_VALUE;

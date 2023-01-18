@@ -37,7 +37,7 @@ public class ProductController {
     @Transactional(readOnly = true)
     public String detail(@PathVariable Long id, Model model) {
         Product product = productService.getProduct(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A requested product is not found."));
 
         model.addAttribute("product", product);
         if (!product.getOptions().isEmpty()) model.addAttribute("options", product.getOptions());
@@ -60,7 +60,7 @@ public class ProductController {
                 model.addAttribute(
                         "manufacturer",
                         productService.getManufacturerById(productPageRequest.getManufacturer())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A requested manufacturer is not found."))
                 );
             } else model.addAttribute("manufacturer", result.stream().findFirst().get().getManufacturer());
         }
@@ -70,7 +70,7 @@ public class ProductController {
                 model.addAttribute(
                         "category",
                         productService.getCategoryById(productPageRequest.getCategory())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A requested category is not found."))
                 );
             } else model.addAttribute("category", result.stream().findFirst().get().getCategory());
         }

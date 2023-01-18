@@ -29,7 +29,7 @@ public class MemberInterceptor implements HandlerInterceptor {
             }
         } else {
             if (!requestURI.startsWith("/member/join")) {
-                // org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter
+                /** {@link org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter} */
                 request.getSession().setAttribute(
                         WebAttributes.AUTHENTICATION_EXCEPTION,
                         new AuthenticationCredentialsNotFoundException(

@@ -9,13 +9,20 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class IndexController {
 
-    public static String result(ResultAttribute resultAttribute) {
+    /**
+     * @param resultAttribute the ResultAttribute to pass on to the view
+     * @param viewname the view name to redirect, if bad request
+     * @return
+     */
+    public static String result(ResultAttribute resultAttribute, String viewname) {
         if (resultAttribute == null || resultAttribute.getTitle() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ResultAttribute or resultAttribute.title is null.");
+            if (viewname != null) return "redirect:" + viewname;
+            else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ResultAttribute or resultAttribute.title is null.");
         }
 
         return "/result";
     }
+    public static String result(ResultAttribute resultAttribute) { return result(resultAttribute, null); }
 
     @GetMapping("/")
     public String index() {

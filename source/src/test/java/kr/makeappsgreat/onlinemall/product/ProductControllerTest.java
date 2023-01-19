@@ -218,8 +218,6 @@ class ProductControllerTest {
         @Test
         @DisplayName("Sort Method with mot exist [200, Same with default]")
         public void list_notExistedSortMethod_200WithDefaultSortMethod() throws Exception {
-            System.out.println(">> " + Integer.MAX_VALUE);
-
             // When & Then
             mockMvc.perform(get("/product/list")
                             .param("sortMethod", "-1"))

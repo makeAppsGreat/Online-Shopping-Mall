@@ -4,5 +4,5 @@ import org.h2.api.ErrorCode;
 
 public class Constants {
 
-    public static String H2_DUPLICATE_KEY = String.format("[%d-%d]", ErrorCode.DUPLICATE_KEY_1, org.h2.engine.Constants.BUILD_ID);
+    public static final String H2_DUPLICATE_KEY = String.format("[%d-%d]", ErrorCode.DUPLICATE_KEY_1, org.h2.engine.Constants.BUILD_ID);
 }

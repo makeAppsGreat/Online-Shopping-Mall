@@ -14,7 +14,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProductSortMethod {
 
-    private static Map<Locale, List<Link>> cache = new HashMap<>();
+    private static final Map<Locale, List<Link>> cache = new HashMap<>();
     private final MessageSource messageSource;
 
     public List<Link> get(UriComponentsBuilder currentRequest, Locale locale) {
@@ -52,7 +52,7 @@ public class ProductSortMethod {
                 "product.sort-method.newProduct",
                 Sort.by("registeredDate").descending());
 
-        public static Map<Integer, Sort> SORT = new HashMap<>();
+        public static final Map<Integer, Sort> SORT = new HashMap<>();
         private final String code;
         private final Sort sort;
 

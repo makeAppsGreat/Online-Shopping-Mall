@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@VerifyPassword(passwordPropertyName = "newPassword")
+@VerifyPassword(passwordPropertyName = "newPassword", passwordVerifyPropertyName = "newPasswordVerify")
 @Getter @Setter
 public class PasswordRequest {
 
@@ -14,5 +14,5 @@ public class PasswordRequest {
     private String oldPassword;
     @NotEmpty
     private String newPassword;
-    private String passwordVerify;
+    private String newPasswordVerify;
 }

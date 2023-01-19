@@ -23,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberJoinController {
 
-    private static Map<Locale, ResultAttribute> welcomeResult = new HashMap<>();
+    private static final Map<Locale, ResultAttribute> welcomeResult = new HashMap<>();
 
     private final MemberService memberService;
     private final MessageSource messageSource;
@@ -90,6 +90,6 @@ public class MemberJoinController {
 
     @GetMapping("/welcome")
     public String welcome(@ModelAttribute ResultAttribute resultAttribute) {
-        return IndexController.result(resultAttribute);
+        return IndexController.result(resultAttribute, "/member/join/");
     }
 }

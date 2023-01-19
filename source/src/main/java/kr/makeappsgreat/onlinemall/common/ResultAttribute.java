@@ -22,6 +22,6 @@ public class ResultAttribute {
 
     @Override
     public String toString() {
-        return String.format("(ResultAttribute)'%s' : '%s'", title, message);
+        return String.format("(ResultAttribute) '%s' : '%s'", title, message);
     }
 }

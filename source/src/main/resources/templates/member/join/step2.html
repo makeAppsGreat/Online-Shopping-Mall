@@ -32,7 +32,7 @@
             <span th:utext="#{account.rules.password}" class="hint">(비밀번호 규칙)</span><br>
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="red">Incorrect Data</span>
             <br th:if="${#fields.hasErrors('password')}">
-            <input type="password" th:field="*{passwordVerify}"/>
+            <input type="password" th:field="*{passwordVerify}" />
             <span th:utext="#{account.password-verify}" class="hint">(비밀번호 확인)</span>
             <br>
             <span th:if="${#fields.hasErrors('passwordVerify')}" th:errors="*{passwordVerify}" class="red">Incorrect Data</span>
@@ -52,7 +52,7 @@
         <p>
             <label th:for="phoneNumber">연락처2</label><br>
             <input type="text" th:field="*{phoneNumber}" />
-            <span th:utext="#{account.option}" class="hint">선택</span><br>
+            <span th:utext="#{account.option}" class="hint">선택</span>
             <br>
             <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="red">Incorrect Data</span>
         </p>

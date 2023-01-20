@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.user.member;
 
+import kr.makeappsgreat.onlinemall.common.constraints.EditProfileGroup;
 import kr.makeappsgreat.onlinemall.model.Address;
 import kr.makeappsgreat.onlinemall.user.AccountRequest;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class MemberRequest extends AccountRequest {
     private String email;
     @Valid
     private Address address;
-    @NotBlank
+    @NotBlank(groups = EditProfileGroup.class)
     private String mobileNumber;
     private String phoneNumber;
 }

@@ -11,10 +11,24 @@ public class ApplicationConfig {
 
     @Bean
     public ModelMapper modelMapper() {
+        return baseModelMapper();
+    }
+
+    @Bean
+    public ModelMapper deepModelMapper() {
+        // 'deepModelMapper()' has same address as 'modelMapper()' if using 'modelMapper()'
+        ModelMapper modelMapper = baseModelMapper();
+        modelMapper.getConfiguration().setDeepCopyEnabled(true);
+
+        return modelMapper;
+    }
+
+    private ModelMapper baseModelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
                 .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
+                .setSkipNullEnabled(true);
 
         return modelMapper;
     }

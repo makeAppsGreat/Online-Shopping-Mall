@@ -2,6 +2,7 @@ package kr.makeappsgreat.onlinemall.user.member;
 
 import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import kr.makeappsgreat.onlinemall.user.AccountService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +17,9 @@ public class MemberService extends AccountService<Member> {
     public MemberService(AccountRepository<Member> accountRepository,
                          PasswordEncoder passwordEncoder,
                          MessageSource messageSource,
+                         ModelMapper modelMapper,
                          AgreementRepository agreementRepository) {
-        super(accountRepository, passwordEncoder, messageSource);
+        super(accountRepository, passwordEncoder, messageSource, modelMapper);
         this.agreementRepository = agreementRepository;
     }
 

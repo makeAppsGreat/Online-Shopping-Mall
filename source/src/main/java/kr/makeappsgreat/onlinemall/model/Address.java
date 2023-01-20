@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.model;
 
+import kr.makeappsgreat.onlinemall.common.constraints.EditProfileGroup;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +13,10 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 public class Address {
 
-    @NotNull @Pattern(regexp = "\\d{5}", message = "{message.invalid-pattern}")
+    @NotNull(groups = EditProfileGroup.class)
+    @Pattern(regexp = "\\d{5}", message = "{message.invalid-pattern}", groups = EditProfileGroup.class)
     private String zipcode;
-    @NotBlank
+    @NotBlank(groups = EditProfileGroup.class)
     private String address;
     private String address2;
 }

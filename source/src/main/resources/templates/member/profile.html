@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>내 정보 수정</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li><a th:href="@{/member/}">내 정보</a></li>
+    <li>내 정보 수정</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <form th:action="@{''}" th:object="${memberRequest}" method="post"
+          onsubmit="return onSubmit()" onkeydown="return event.key != 'Enter';">
+        <p>
+            <label th:for="name">이름</label><br>
+            <input type="text" th:field="*{name}" disabled />
+        </p>
+        <p>
+            <label th:for="mobileNumber">연락처1</label><br>
+            <input type="text" th:field="*{mobileNumber}" />
+            <br>
+            <span th:if="${#fields.hasErrors('mobileNumber')}" th:errors="*{mobileNumber}" class="red">Incorrect Data</span>
+        </p>
+        <p>
+            <label th:for="phoneNumber">연락처2</label><br>
+            <input type="text" th:field="*{phoneNumber}" />
+            <span th:utext="#{account.option}" class="hint">선택</span>
+            <br>
+            <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="red">Incorrect Data</span>
+        </p>
+        <p>
+            기본 주소<br>
+            <input type="text" th:field="*{address.zipcode}" />
+            <label th:for="address.zipcode" class="hint">우편번호</label><br>
+            <span th:if="${#fields.hasErrors('address.zipcode')}" th:errors="*{address.zipcode}" class="red">Incorrect Data</span>
+            <br th:if="${#fields.hasErrors('address.zipcode')}">
+
+            <input type="text" th:field="*{address.address}" />
+            <label th:for="address.address" class="hint">도로명건물번호</label><br>
+            <span th:if="${#fields.hasErrors('address.address')}" th:errors="*{address.address}" class="red">Incorrect Data</span>
+            <br th:if="${#fields.hasErrors('address.address')}">
+
+            <input type="text" th:field="*{address.address2}" />
+            <label th:for="address.address2" class="hint">상세주소</label>
+        </p>
+        <input type="submit" value="저장" />
+        <button type="button" th:onclick="'location.href=\'' + @{/member/profile} + '\';'">취소</button>
+    </form>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

@@ -1,6 +1,7 @@
 package kr.makeappsgreat.onlinemall.user;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DuplicateKeyException;
@@ -15,6 +16,7 @@ public class AccountService<T extends Account> {
     protected final AccountRepository<T> accountRepository;
     protected final PasswordEncoder passwordEncoder;
     private final MessageSource messageSource;
+    private final ModelMapper modelMapper;
 
     public boolean isDuplicatedUser(String username) {
         return accountRepository.existsByUsername(username);
@@ -27,7 +29,7 @@ public class AccountService<T extends Account> {
         return accountRepository.save(account);
     }
 
-    public void changePassword(Account account, String oldPassword, String passwordToChange) {
+    public T changePassword(T account, String oldPassword, String passwordToChange) {
         T entity = accountRepository.findById(account.getId()).get();
 
         if (!passwordEncoder.matches(oldPassword, entity.getPassword())) {
@@ -39,7 +41,16 @@ public class AccountService<T extends Account> {
         }
 
         entity.changePassword(passwordEncoder, passwordToChange);
-        accountRepository.save(entity);
+
+
+        return accountRepository.save(entity);
+    }
+
+    public <S extends AccountRequest> T updateProfile(Long id, S request) {
+        T entity = accountRepository.findById(id).get();
+        modelMapper.map(request, entity);
+
+        return accountRepository.save(entity);
     }
 
     /**

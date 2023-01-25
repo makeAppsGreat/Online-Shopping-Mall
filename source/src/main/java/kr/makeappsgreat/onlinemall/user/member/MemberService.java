@@ -16,10 +16,10 @@ public class MemberService extends AccountService<Member> {
     @Autowired
     public MemberService(AccountRepository<Member> accountRepository,
                          PasswordEncoder passwordEncoder,
-                         MessageSource messageSource,
                          ModelMapper modelMapper,
+                         MessageSource messageSource,
                          AgreementRepository agreementRepository) {
-        super(accountRepository, passwordEncoder, messageSource, modelMapper);
+        super(accountRepository, passwordEncoder, modelMapper, messageSource);
         this.agreementRepository = agreementRepository;
     }
 
@@ -33,5 +33,12 @@ public class MemberService extends AccountService<Member> {
 
         agreementRepository.save(agreement);
         return accountRepository.save(member);
+    }
+
+    public Agreement updateMarketing(Member member, MarketingRequest marketingRequest) {
+        Agreement foundAgreement = agreementRepository.findById(member.getAgreement().getId()).get();
+        foundAgreement.updateMarketing(modelMapper.map(marketingRequest, Marketing.class));
+
+        return agreementRepository.save(foundAgreement);
     }
 }

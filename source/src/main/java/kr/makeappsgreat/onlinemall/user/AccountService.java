@@ -15,8 +15,12 @@ public class AccountService<T extends Account> {
 
     protected final AccountRepository<T> accountRepository;
     protected final PasswordEncoder passwordEncoder;
+    protected final ModelMapper modelMapper;
     private final MessageSource messageSource;
-    private final ModelMapper modelMapper;
+
+    public T retrieve(T account) {
+        return accountRepository.findById(account.getId()).get();
+    }
 
     public boolean isDuplicatedUser(String username) {
         return accountRepository.existsByUsername(username);
@@ -30,7 +34,7 @@ public class AccountService<T extends Account> {
     }
 
     public T changePassword(T account, String oldPassword, String passwordToChange) {
-        T entity = accountRepository.findById(account.getId()).get();
+        T entity = this.retrieve(account);
 
         if (!passwordEncoder.matches(oldPassword, entity.getPassword())) {
             throw new BadCredentialsException(
@@ -46,8 +50,8 @@ public class AccountService<T extends Account> {
         return accountRepository.save(entity);
     }
 
-    public <S extends AccountRequest> T updateProfile(Long id, S request) {
-        T entity = accountRepository.findById(id).get();
+    public <S extends AccountRequest> T updateProfile(T account, S request) {
+        T entity = this.retrieve(account);
         modelMapper.map(request, entity);
 
         return accountRepository.save(entity);

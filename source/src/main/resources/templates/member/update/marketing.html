@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>마케팅 수신 동의</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li><a th:href="@{/member/}">내 정보</a></li>
+    <li>마케팅 수신 동의</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <form th:action="@{''}" th:object="${marketing}" method="post">
+        <p>
+            <input type="checkbox" th:field="*{acceptance}" th:value="*{acceptance}"/>
+            <label th:for="${#ids.prev('acceptance')}">마케팅 수신 동의(선택)</label>
+        </p>
+        <p th:if="${marketing.acceptance}" class="gray">수신 동의 일자 : <span th:utext="${{updateDate}}"></span></p>
+        <input type="submit" value="저장"/>
+    </form>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

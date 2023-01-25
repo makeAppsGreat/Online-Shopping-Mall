@@ -3,9 +3,11 @@ package kr.makeappsgreat.onlinemall.user.member;
 import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +31,9 @@ class MemberServiceTest {
 
     @MockBean
     private AgreementRepository agreementRepository;
+
+    @SpyBean
+    private ModelMapper modelMapper;
 
     @BeforeEach
     void mock() {

@@ -40,8 +40,8 @@
                       th:errors="*{terms3}" class="red">Incorrect Data</span>
             </li>
             <li>
-                <input type="checkbox" th:field="*{marketing}" />
-                <label th:for="${#ids.prev('marketing')}">마케팅 수신 동의(선택)</label>
+                <input type="checkbox" th:field="*{marketing.acceptance}" />
+                <label th:for="${#ids.prev('marketing.acceptance')}">마케팅 수신 동의(선택)</label>
             </li>
         </ul>
         <input type="submit" value="회원가입" />

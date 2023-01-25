@@ -89,7 +89,7 @@ public class MemberJoinController {
     }
 
     @GetMapping("/welcome")
-    public String welcome(@ModelAttribute ResultAttribute resultAttribute) {
-        return IndexController.result(resultAttribute, "/member/join/");
+    public String welcome(@ModelAttribute("result") ResultAttribute resultAttribute) {
+        return IndexController.result(resultAttribute, "/");
     }
 }

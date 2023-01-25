@@ -4,7 +4,6 @@ import kr.makeappsgreat.onlinemall.common.Link;
 import kr.makeappsgreat.onlinemall.common.ResultAttribute;
 import kr.makeappsgreat.onlinemall.common.constraints.EditProfileGroup;
 import kr.makeappsgreat.onlinemall.main.IndexController;
-import kr.makeappsgreat.onlinemall.user.Account;
 import kr.makeappsgreat.onlinemall.user.AccountUserDetails;
 import kr.makeappsgreat.onlinemall.user.PasswordRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +33,7 @@ public class MemberController {
 
     private static final Map<Locale, ResultAttribute> passwordResult = new HashMap<>();
     private static final Map<Locale, ResultAttribute> profileResult = new HashMap<>();
+    private static final Map<Locale, ResultAttribute> marketingResult = new HashMap<>();
     private static final Set<String> disallowedFields = Set.of("name", "username", "password", "email");
     private static final FieldError oldPasswordNotMatch = new FieldError(
             "passwordRequest", "oldPassword", null, false, new String[]{"account.password-not-match"}, null, "Password not match"
@@ -48,6 +48,11 @@ public class MemberController {
         binder.setDisallowedFields(disallowedFields.toArray(String[]::new));
     }
 
+    @ModelAttribute
+    public void addAttributes(Authentication authentication, Model model) {
+        model.addAttribute("user", ((AccountUserDetails) authentication.getPrincipal()).getAccount());
+    }
+
     @GetMapping("/")
     public String root() {
         return "redirect:/member/my-info";
@@ -58,87 +63,126 @@ public class MemberController {
         return "/member/my-info";
     }
 
-    @GetMapping("/password")
+    @GetMapping("/update/password")
     public String changePassword(@ModelAttribute PasswordRequest passwordRequest) {
-        return "/member/password";
+        return "/member/update/password";
     }
 
-    @PostMapping("/password")
+    @PostMapping("/update/password")
     public String changePasswordSubmit(@ModelAttribute @Validated PasswordRequest passwordRequest, BindingResult bindingResult,
-                                       Authentication authentication,
+                                       @ModelAttribute("user") Member user,
                                        RedirectAttributes attributes, Locale locale) {
-        if (bindingResult.hasErrors()) return "/member/password";
+        if (bindingResult.hasErrors()) return "/member/update/password";
 
         try {
-            Account account = ((AccountUserDetails) authentication.getPrincipal()).getAccount();
-            memberService.changePassword((Member) account, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
+            Member member = memberService.retrieve(user);
+            memberService.changePassword(member, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
         } catch (BadCredentialsException e) {
             bindingResult.addError(oldPasswordNotMatch);
-            return "/member/password";
+            return "/member/update/password";
         }
 
 
         ResultAttribute resultAttribute = passwordResult.get(locale);
         if (resultAttribute == null) {
+            String job = messageSource.getMessage("account.update.change-password", null, locale);
             resultAttribute = ResultAttribute.builder()
-                    .title(messageSource.getMessage("account.change-password", null, locale))
-                    .subTitle(messageSource.getMessage("account.change-password", null, locale))
-                    .message(messageSource.getMessage("account.change-password-success", null, locale))
+                    .title(job)
+                    .subTitle(job)
+                    .message(messageSource.getMessage("account.update.change-password-success", null, locale))
                     .build();
 
             resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.my-info", null, locale)));
-            resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.change-password", null, locale)));
+            resultAttribute.addLinkToBreadcrumb(new Link(job));
             resultAttribute.getBreadcrumb().get(0).setLink("/member/my-info");
 
             passwordResult.put(locale, resultAttribute);
         }
         attributes.addFlashAttribute("result", resultAttribute);
-        return "redirect:/member/password/success";
+        return "redirect:/member/update/password/success";
     }
 
-    @GetMapping("/profile")
-    public String updateProfile(Authentication authentication, Model model) {
-        Account account = ((AccountUserDetails) authentication.getPrincipal()).getAccount();
-        MemberRequest memberRequest = deepModelMapper.map(account, MemberRequest.class);
-        model.addAttribute("memberRequest", memberRequest);
+    @GetMapping("/update/profile")
+    public String updateProfile(@ModelAttribute("user") Member user, Model model) {
+        Member member = memberService.retrieve(user);
+        model.addAttribute("memberRequest", deepModelMapper.map(member, MemberRequest.class));
 
-        return "/member/profile";
+        return "/member/update/profile";
     }
 
-    @PostMapping("/profile")
+    @PostMapping("/update/profile")
     public String updateProfileSubmit(@ModelAttribute @Validated(EditProfileGroup.class) MemberRequest memberRequest, BindingResult bindingResult,
-                                      Authentication authentication,
+                                      @ModelAttribute("user") Member user,
                                       RedirectAttributes attributes, Locale locale) {
-        AccountUserDetails userDetails = (AccountUserDetails) authentication.getPrincipal();
-        Account account = userDetails.getAccount();
+        Member member = memberService.retrieve(user);
 
         if (bindingResult.hasErrors()) {
-            deepModelMapper.map(account, memberRequest);
-            return "/member/profile";
+            deepModelMapper.map(member, memberRequest);
+            return "/member/update/profile";
         }
 
-        userDetails.updateAccount(memberService.updateProfile(account.getId(), memberRequest));
+        memberService.updateProfile(member, memberRequest);
 
 
         ResultAttribute resultAttribute = profileResult.get(locale);
         if (resultAttribute == null) {
+            String job = messageSource.getMessage("account.update.profile", null, locale);
             resultAttribute = ResultAttribute.builder()
-                    .title(messageSource.getMessage("account.profile", null, locale))
-                    .subTitle(messageSource.getMessage("account.profile", null, locale))
-                    .message(messageSource.getMessage("account.profile-success", null, locale))
+                    .title(job)
+                    .subTitle(job)
+                    .message(messageSource.getMessage("account.update.profile-success", null, locale))
                     .build();
 
             resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.my-info", null, locale)));
-            resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.profile", null, locale)));
+            resultAttribute.addLinkToBreadcrumb(new Link(job));
             resultAttribute.getBreadcrumb().get(0).setLink("/member/my-info");
 
             profileResult.put(locale, resultAttribute);
         }
         attributes.addFlashAttribute("result", resultAttribute);
-        return "redirect:/member/profile/success";
+        return "redirect:/member/update/profile/success";
     }
 
-    @GetMapping({"/profile/success", "/password/success"})
+    @GetMapping("/update/marketing")
+    public String updateMarketing(@ModelAttribute("user") Member user, Model model) {
+        Agreement agreement = memberService.retrieve(user).getAgreement();
+
+        model.addAttribute(
+                "marketing",
+                deepModelMapper.map(agreement.getMarketing(), MarketingRequest.class));
+        model.addAttribute("updateDate", agreement.getUpdateDate());
+
+        return "/member/update/marketing";
+    }
+
+    @PostMapping("/update/marketing")
+    public String updateMarketingSubmit(@ModelAttribute("marketing") MarketingRequest marketingRequest,
+                                        @ModelAttribute("user") Member user,
+                                        RedirectAttributes attributes, Locale locale) {
+        Member member = memberService.retrieve(user);
+        memberService.updateMarketing(member, marketingRequest);
+
+
+        ResultAttribute resultAttribute = marketingResult.get(locale);
+        if (resultAttribute == null) {
+            String job = messageSource.getMessage("account.update.marketing", null, locale);
+            resultAttribute = ResultAttribute.builder()
+                    .title(job)
+                    .subTitle(job)
+                    .message(messageSource.getMessage("account.update.marketing-success", null, locale))
+                    .build();
+
+            resultAttribute.addLinkToBreadcrumb(new Link(messageSource.getMessage("account.my-info", null, locale)));
+            resultAttribute.addLinkToBreadcrumb(new Link(job));
+            resultAttribute.getBreadcrumb().get(0).setLink("/member/my-info");
+
+            marketingResult.put(locale, resultAttribute);
+        }
+        attributes.addFlashAttribute("result", resultAttribute);
+        return "redirect:/member/update/marketing/success";
+    }
+
+    @GetMapping({"/update/profile/success", "/update/password/success", "/update/marketing/success"})
     public String success(@ModelAttribute("result") ResultAttribute resultAttribute) {
         return IndexController.result(resultAttribute, "/member/");
     }

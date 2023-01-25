@@ -16,10 +16,13 @@ class TestMember {
     public static Member get(String name, String username) { return get(name, username, true); }
     public static Member get(String name, String username, boolean adaptToAccount) {
         AgreementRequest agreementRequest = new AgreementRequest();
+        MarketingRequest marketingRequest = new MarketingRequest();
+        marketingRequest.setAcceptance(false);
+
         agreementRequest.setTerms1(true);
         agreementRequest.setTerms2(true);
         agreementRequest.setTerms3(true);
-        agreementRequest.setMarketing(false);
+        agreementRequest.setMarketing(marketingRequest);
         Agreement agreement = modelMapper.map(agreementRequest, Agreement.class);
 
         Address address = new Address();

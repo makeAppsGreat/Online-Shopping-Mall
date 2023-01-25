@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -31,16 +32,15 @@ public class Agreement {
     private LocalDateTime acceptanceDate = LocalDateTime.now();
 
     // 선택
-    @NotNull
-    private Boolean marketing;
+    @Embedded
+    @Valid
+    private Marketing marketing;
     private LocalDateTime updateDate = acceptanceDate;
 
-    public LocalDateTime updateMarketingAgreement(boolean marketing) {
-        if (this.marketing != marketing) {
+    public void updateMarketing(Marketing marketing) {
+        if (!this.marketing.equals(marketing)) {
             this.marketing = marketing;
             updateDate = LocalDateTime.now();
         }
-
-        return updateDate;
     }
 }

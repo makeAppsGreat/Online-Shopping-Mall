@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.user.member;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
@@ -15,6 +16,6 @@ public class AgreementRequest {
     private Boolean terms2;
     @NotNull @AssertTrue
     private Boolean terms3;
-    @NotNull
-    private Boolean marketing;
+    @Valid
+    private MarketingRequest marketing;
 }

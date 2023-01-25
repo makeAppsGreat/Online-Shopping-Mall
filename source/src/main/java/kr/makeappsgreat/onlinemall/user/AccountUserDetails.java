@@ -22,8 +22,4 @@ public class AccountUserDetails extends User {
     public Account getAccount() {
         return account;
     }
-
-    public void updateAccount(Account account) {
-        this.account = account;
-    }
 }

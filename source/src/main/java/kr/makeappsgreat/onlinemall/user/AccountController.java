@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import java.util.Locale;
 
 @Controller @RequestMapping("/account")
@@ -30,9 +30,10 @@ public class AccountController {
     public ResponseEntity<SimpleResult> isUsableUsername(@ModelAttribute @Validated Username username, BindingResult bindingResult,
                                                          HttpServletRequest request, Locale locale) {
         if (bindingResult.hasErrors()) {
-            if (!request.isUserInRole(AccountRole.ROLE_ADMIN.name())) {
-                FieldError fieldError = bindingResult.getFieldError();
+            FieldError fieldError = bindingResult.getFieldError();
 
+            if (!request.isUserInRole(AccountRole.ROLE_ADMIN.name())
+                    || fieldError.getCode().equals(NotBlank.class.getSimpleName())) {
                 return ResponseEntity.ok(
                         SimpleResult.builder()
                                 .request(fieldError.getRejectedValue() == null ? null : fieldError.getRejectedValue().toString())
@@ -65,13 +66,11 @@ public class AccountController {
 
     @Setter
     protected class Username {
-        @NotEmpty
-        @Email
+
+        @NotBlank @Email
         private String username;
 
         @Override
-        public String toString() {
-            return username;
-        }
+        public String toString() { return username; }
     }
 }

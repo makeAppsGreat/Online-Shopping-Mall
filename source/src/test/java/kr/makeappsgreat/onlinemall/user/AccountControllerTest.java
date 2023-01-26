@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Locale;
 
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -80,7 +80,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value(
                                 validationMessageSource.getMessage(
-                                        "javax.validation.constraints.NotEmpty.message",
+                                        "javax.validation.constraints.NotBlank.message",
                                         null,
                                         Locale.ENGLISH))
                 );
@@ -93,13 +93,18 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(false))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message")
-                        .value(
+                .andExpect(jsonPath("$.message").value(anyOf(
+                        is(
+                                validationMessageSource.getMessage(
+                                        "javax.validation.constraints.NotBlank.message",
+                                        null,
+                                        Locale.ENGLISH)),
+                        is(
                                 validationMessageSource.getMessage(
                                         "javax.validation.constraints.Email.message",
                                         null,
                                         Locale.ENGLISH))
-                );
+                )));
     }
 
     @Test

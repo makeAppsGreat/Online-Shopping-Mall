@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,7 +27,7 @@ public class Product extends NamedEntity {
 
     @OneToMany
     @JoinTable(inverseJoinColumns = @JoinColumn(name = "option_id"))
-    private Set<Product> options = new HashSet<>();
+    private Set<Product> options;
 
     /* @OneToMany
     private Set<Product> relatedProducts = new HashSet<>(); // 관련상품 */

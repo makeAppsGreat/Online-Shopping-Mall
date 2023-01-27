@@ -34,7 +34,7 @@ public class Account extends NamedEntity {
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private Set<AccountRole> roles = new HashSet<>();
+    private Set<AccountRole> roles;
 
     @CreationTimestamp
     private LocalDateTime registeredDate;
@@ -52,6 +52,7 @@ public class Account extends NamedEntity {
     }
 
     public void addRole(AccountRole role) {
+        if (roles == null) roles = new HashSet<>();
         roles.add(role);
     }
 }

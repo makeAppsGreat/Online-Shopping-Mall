@@ -35,8 +35,8 @@ public class ProductSortMethod {
         return list;
     }
 
-    @Getter
     @RequiredArgsConstructor
+    @Getter
     public enum SortMethod {
 
         NAME(

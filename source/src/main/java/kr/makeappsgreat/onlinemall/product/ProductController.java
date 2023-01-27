@@ -40,7 +40,9 @@ public class ProductController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A requested product is not found."));
 
         model.addAttribute("product", product);
-        if (!product.getOptions().isEmpty()) model.addAttribute("options", product.getOptions());
+        if (product.getOptions() != null && !product.getOptions().isEmpty()) {
+            model.addAttribute("options", product.getOptions());
+        }
 
         return "/product/detail";
     }

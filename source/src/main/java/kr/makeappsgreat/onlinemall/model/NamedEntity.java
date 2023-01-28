@@ -4,12 +4,13 @@ import lombok.Getter;
 
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @MappedSuperclass
 @Getter
 public class NamedEntity extends BaseEntity {
 
-    @NotBlank
+    @NotNull @NotBlank
     protected String name;
 
     @Override

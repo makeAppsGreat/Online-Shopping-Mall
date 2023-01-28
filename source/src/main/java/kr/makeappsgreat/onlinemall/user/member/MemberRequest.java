@@ -10,15 +10,18 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 @Getter @Setter
 public class MemberRequest extends AccountRequest {
 
-    @NotEmpty @Email
+    @NotNull @NotEmpty
+    @Email
     private String email;
     @Valid
     private Address address;
-    @NotBlank(groups = EditProfileGroup.class)
+    @NotNull @NotBlank(groups = {Default.class, EditProfileGroup.class})
     private String mobileNumber;
     private String phoneNumber;
 }

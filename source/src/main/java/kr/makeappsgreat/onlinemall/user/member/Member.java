@@ -6,10 +6,7 @@ import kr.makeappsgreat.onlinemall.user.AccountRole;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,7 +18,8 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class Member extends Account {
 
-    @NotEmpty @Email
+    @NotNull @NotEmpty
+    @Email
     private String email; // Do set email to username.
 
     @OneToOne(mappedBy = "member", optional = false)
@@ -29,10 +27,14 @@ public class Member extends Account {
     private Agreement agreement;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "zipcode", column = @Column(nullable = false)),
+            @AttributeOverride(name = "address", column = @Column(nullable = false))
+    })
     @Valid
     private Address address;
 
-    @NotBlank
+    @NotNull @NotBlank
     private String mobileNumber;
 
     private String phoneNumber;

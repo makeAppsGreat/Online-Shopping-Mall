@@ -29,12 +29,14 @@ public class Agreement {
     private Boolean terms2; // 개인정보 수집 이용에 관한 동의
     @NotNull @AssertTrue
     private Boolean terms3; // 개인정보 제3자 제공에 관한 동의
+    @NotNull
     private LocalDateTime acceptanceDate = LocalDateTime.now();
 
     // 선택
     @Embedded
     @Valid
     private Marketing marketing;
+    @NotNull
     private LocalDateTime updateDate = acceptanceDate;
 
     public void updateMarketing(Marketing marketing) {

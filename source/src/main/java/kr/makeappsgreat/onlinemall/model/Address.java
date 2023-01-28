@@ -8,15 +8,16 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.groups.Default;
 
 @Embeddable
 @Getter @Setter
 public class Address {
 
-    @NotNull(groups = EditProfileGroup.class)
-    @Pattern(regexp = "\\d{5}", message = "{message.invalid-pattern}", groups = EditProfileGroup.class)
+    @NotNull(groups = {Default.class, EditProfileGroup.class})
+    @Pattern(regexp = "\\d{5}", message = "{message.invalid-pattern}", groups = {Default.class, EditProfileGroup.class})
     private String zipcode;
-    @NotBlank(groups = EditProfileGroup.class)
+    @NotBlank(groups = {Default.class, EditProfileGroup.class})
     private String address;
     private String address2;
 }

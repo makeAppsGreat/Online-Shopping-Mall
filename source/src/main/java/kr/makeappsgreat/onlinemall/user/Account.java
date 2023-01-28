@@ -24,7 +24,7 @@ public class Account extends NamedEntity {
     @Getter(AccessLevel.NONE) public static final String PASSWORD_REGEXP = "\\{bcrypt\\}.+";
 
     @Column(unique = true)
-    @NotBlank
+    @NotNull @NotBlank
     @Setter(AccessLevel.PROTECTED)
     private String username;
 
@@ -37,6 +37,7 @@ public class Account extends NamedEntity {
     private Set<AccountRole> roles;
 
     @CreationTimestamp
+    @NotNull
     private LocalDateTime registeredDate;
 
     public void encodePassword(PasswordEncoder passwordEncoder) {

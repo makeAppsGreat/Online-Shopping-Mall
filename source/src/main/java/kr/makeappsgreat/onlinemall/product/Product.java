@@ -37,5 +37,6 @@ public class Product extends NamedEntity {
     private String detail;
 
     @CreationTimestamp
+    @NotNull
     private LocalDateTime registeredDate;
 }

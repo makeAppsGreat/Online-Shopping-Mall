@@ -16,7 +16,7 @@ public class Agreement {
     @Id
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @MapsId
     @Setter

@@ -34,10 +34,11 @@ public class Account extends NamedEntity {
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Set<AccountRole> roles;
 
     @CreationTimestamp
-    @NotNull
+    @Column(nullable = false)
     private LocalDateTime registeredDate;
 
     public void encodePassword(PasswordEncoder passwordEncoder) {

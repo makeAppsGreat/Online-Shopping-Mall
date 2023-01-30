@@ -10,8 +10,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,27 +27,28 @@ public class Order extends BaseEntity {
 
     // private OrderDetail orderDetail;
 
-    @OneToMany
+    @OneToMany(mappedBy = "order")
     private List<Transaction> transactions;
 
     @PositiveOrZero
     private int grandTotal;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private OrderStatus status;
 
-    @NotBlank
+    @NotNull @NotBlank
     private String receiver;
 
-    @NotBlank
+    @NotNull @NotBlank
     private String contact;
 
     private String contact2;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "zipcode", column = @Column(name = "dst_zipcode")),
-            @AttributeOverride(name = "address", column = @Column(name = "dst_address")),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "dst_zipcode", nullable = false)),
+            @AttributeOverride(name = "address", column = @Column(name = "dst_address", nullable = false)),
             @AttributeOverride(name = "address2", column = @Column(name = "dst_address2"))
     })
     @Valid
@@ -54,5 +57,11 @@ public class Order extends BaseEntity {
     private String memo;
 
     @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime orderDate;
+
+    public void addTransaction(Transaction transaction) {
+        if (transactions == null) transactions = new ArrayList<>();
+        transactions.add(transaction);
+    }
 }

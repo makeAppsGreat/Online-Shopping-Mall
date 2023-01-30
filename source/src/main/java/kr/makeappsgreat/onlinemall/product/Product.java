@@ -5,8 +5,8 @@ import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 public class Product extends NamedEntity {
 
-    @Min(0)
+    @PositiveOrZero
     private int price;
 
     @ManyToOne
@@ -37,6 +37,6 @@ public class Product extends NamedEntity {
     private String detail;
 
     @CreationTimestamp
-    @NotNull
+    @Column(nullable = false)
     private LocalDateTime registeredDate;
 }

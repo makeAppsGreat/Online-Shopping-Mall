@@ -55,7 +55,7 @@ class AccountRepositoryTest {
                 accountRepository.save(account);
             } catch (ConstraintViolationException e) {
                 noException = false;
-                assertThat(e.getConstraintViolations()).hasSize(3);
+                assertThat(e.getConstraintViolations()).hasSize(5);
             }
 
             assertThat(noException).isFalse();

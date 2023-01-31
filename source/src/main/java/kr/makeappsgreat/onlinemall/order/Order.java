@@ -25,7 +25,8 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "orderer_id")
     private Member orderer;
 
-    // private OrderDetail orderDetail;
+    @OneToMany(mappedBy = "order")
+    private List<OrderDetail> items;
 
     @OneToMany(mappedBy = "order")
     private List<Transaction> transactions;
@@ -59,6 +60,11 @@ public class Order extends BaseEntity {
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime orderDate;
+
+    public void addItem(OrderDetail item) {
+        if (items == null) items = new ArrayList<>();
+        items.add(item);
+    }
 
     public void addTransaction(Transaction transaction) {
         if (transactions == null) transactions = new ArrayList<>();

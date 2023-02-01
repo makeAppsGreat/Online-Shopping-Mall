@@ -20,7 +20,7 @@ public class Transaction extends BaseEntity {
     private Order order;
     private String orderDesc;
 
-    @OneToOne(mappedBy = "transaction", optional = false)
+    @OneToOne(mappedBy = "transaction")
     @NotNull
     private TransactionDetail transactionDetail;
 

@@ -3,6 +3,7 @@ package kr.makeappsgreat.onlinemall.order;
 import kr.makeappsgreat.onlinemall.model.BaseEntity;
 import kr.makeappsgreat.onlinemall.product.Product;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ public class Item<T extends Item> extends BaseEntity {
 
     @OneToOne
     @NotNull
+    @Setter
     protected Product product;
 
     @Positive

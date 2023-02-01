@@ -29,6 +29,7 @@ class OrderRepositoryTest {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private TransactionDetailRepository<Card> transactionDetailRepository;
     @Autowired private OrderDetailRepository orderDetailRepository;
+    @Autowired private ShippingInfoRepository shippingInfoRepository;
     @Autowired private ProductRepository productRepository;
 
     private List<Product> products;
@@ -43,11 +44,6 @@ class OrderRepositoryTest {
         assertThat(products).hasSizeGreaterThan(1);
     }
 
-    @Test
-    void contextLoads() {
-
-    }
-
     @Nested
     class Create {
 
@@ -56,6 +52,7 @@ class OrderRepositoryTest {
         private Card transactionDetail;
         private OrderDetail orderDetail;
         private OrderDetail orderDetail2;
+        private ShippingInfo shippingInfo;
 
         @Test
         void save() {
@@ -66,14 +63,10 @@ class OrderRepositoryTest {
 
             // When
             Order savedOrder = orderRepository.save(order);
+            shippingInfoRepository.save(shippingInfo);
             transactionDetailRepository.save(transactionDetail);
             transactionRepository.save(transaction);
-            orderDetailRepository.saveAll(savedOrder.getItems());
-
-
-            transactionRepository.flush();
-            transactionDetailRepository.flush();
-            orderDetailRepository.flush();
+            orderDetailRepository.saveAll(Set.of(orderDetail, orderDetail2));
 
             // Then
             assertThat(savedOrder).isNotNull();
@@ -83,29 +76,39 @@ class OrderRepositoryTest {
 
         private Order createOrder() {
             Map<String, Object> orderMap = new HashMap<>();
-            Map<String, Object> destinationMap = new HashMap<>();
             Map<String, Object> transactionMap = new HashMap<>();
             Map<String, Object> transactionDetailMap = new HashMap<>();
             Map<String, Object> orderDetailMap = new HashMap<>();
             Map<String, Object> orderDetail2Map = new HashMap<>();
+            Map<String, Object> shippingInfoMap = new HashMap<>();
+            Map<String, Object> destinationMap = new HashMap<>();
             int subTotal;
             int grandTotal;
 
-            orderDetailMap.put("product", products.get(0));
-            orderDetailMap.put("quantity", 1);
-            orderDetailMap.put("total", products.get(0).getPrice());
+            destinationMap.put("zipcode", "42700");
+            destinationMap.put("address", "대구광역시 달서구");
+
+            shippingInfoMap.put("receiver", "김가연");
+            shippingInfoMap.put("contact", "010-1234-5678");
+            shippingInfoMap.put("destination", destinationMap);
+            shippingInfoMap.put("shippingCompany", "**택배");
+            shippingInfoMap.put("trackingNo", "000000000000");
+            shippingInfo = modelMapper.map(shippingInfoMap, ShippingInfo.class);
 
             orderDetail2Map.put("product", products.get(1));
             orderDetail2Map.put("quantity", 1);
             orderDetail2Map.put("total", products.get(1).getPrice());
-
-            orderDetail = modelMapper.map(orderDetailMap, OrderDetail.class);
             orderDetail2 = modelMapper.map(orderDetail2Map, OrderDetail.class);
+
+            orderDetailMap.put("product", products.get(0));
+            orderDetailMap.put("quantity", 1);
+            orderDetailMap.put("total", products.get(0).getPrice());
+            orderDetail = modelMapper.map(orderDetailMap, OrderDetail.class);
             orderDetail.addOption(orderDetail2);
+
             subTotal = orderDetail.getTotal() + orderDetail2.getTotal();
             grandTotal = subTotal + deliveryFee;
 
-            //transactionDetailMap.put("transaction", transaction);
             transactionDetailMap.put("amount", grandTotal);
             transactionDetailMap.put("tax", grandTotal);
             transactionDetailMap.put("serviceFee", 0);
@@ -118,33 +121,24 @@ class OrderRepositoryTest {
             transactionDetailMap.put("cardNo", "9425-****-****-****");
             transactionDetailMap.put("cardAuthNo", "12345678");
             transactionDetailMap.put("cardInstCount", "0");
+            transactionDetail = modelMapper.map(transactionDetailMap, Card.class);
 
-            //transactionMap.put("order", orderMap);
             transactionMap.put("orderDesc", products.get(0).getName());
-            //transactionMap.put("transactionDetail", transactionDetail);
             transactionMap.put("subTotal", subTotal);
             transactionMap.put("deliveryFee", deliveryFee);
-
-            destinationMap.put("zipcode", "42700");
-            destinationMap.put("address", "대구광역시 달서구");
-
             transaction = modelMapper.map(transactionMap, Transaction.class);
-            transactionDetail = modelMapper.map(transactionDetailMap, Card.class);
             transaction.setTransactionDetail(transactionDetail);
 
-
-            orderMap.put("items", List.of(orderDetail, orderDetail2));
+            orderMap.put("items", List.of(orderDetail));
             orderMap.put("transactions", List.of(transaction));
             orderMap.put("grandTotal", grandTotal);
             orderMap.put("status", OrderStatus.PAYMENT_DONE);
-            orderMap.put("receiver", "김가연");
-            orderMap.put("contact", "010-1234-5678");
-            orderMap.put("destination", destinationMap);
             orderMap.put("orderDate", LocalDateTime.now());
 
             Order order = modelMapper.map(orderMap, Order.class);
-            transaction.setOrder(order);
-            orderDetail.setOrder(order);
+            order.addItem(orderDetail);
+            order.addTransaction(transaction);
+            order.setShippingInfo(shippingInfo);
 
 
             return order;

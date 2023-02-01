@@ -22,7 +22,7 @@ public class Member extends Account {
     @Email
     private String email; // Do set email to username.
 
-    @OneToOne(mappedBy = "member", optional = false, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     @NotNull
     private Agreement agreement;
 

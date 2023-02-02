@@ -3,14 +3,17 @@ package kr.makeappsgreat.onlinemall.user.member;
 import kr.makeappsgreat.onlinemall.user.Account;
 import kr.makeappsgreat.onlinemall.user.AccountRepository;
 import kr.makeappsgreat.onlinemall.user.AccountRole;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(properties = "spring.jpa.properties.hibernate.format_sql=true")
 class MemberRepositoryTest {
 
     @Autowired
@@ -18,6 +21,11 @@ class MemberRepositoryTest {
 
     @Autowired
     private AgreementRepository agreementRepository;
+
+    @BeforeEach
+    void init() {
+        memberRepository.deleteAll();
+    }
 
     @Nested
     class Create {
@@ -40,6 +48,30 @@ class MemberRepositoryTest {
             assertThat(savedMember.getUsername()).isNotNull();
             assertThat(savedMember.getPassword()).containsPattern(Account.PASSWORD_REGEXP);
             assertThat(savedMember.getRoles()).contains(AccountRole.ROLE_USER);
+        }
+    }
+
+    @Nested
+    class Retrieve {
+
+        private Member savedMember;
+
+        @BeforeEach
+        void saveTestMember() {
+            // Given
+            Member member = TestMember.get();
+
+            agreementRepository.save(member.getAgreement());
+            savedMember = memberRepository.save(member);
+        }
+
+        @Test
+        void findByUsername() {
+            // When
+            Optional<Member> member = memberRepository.findByUsername(savedMember.getUsername());
+
+            // Then
+            assertThat(member).isPresent();
         }
     }
 }

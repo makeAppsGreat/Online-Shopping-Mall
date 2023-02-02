@@ -42,3 +42,14 @@ INSERT INTO product_options (product_id, option_id) VALUES
     (@P0, @P1),
     (@P2, @P3),
     (@P4, @P5);
+
+
+INSERT INTO account (name, username, password, registered_date) VALUES ('User', 'user', '', CURRENT_TIMESTAMP);
+SET @A0 = SELECT id FROM account WHERE username = 'user';
+
+INSERT INTO account_roles (account_id, role) VALUES
+    (@A0, 'ROLE_USER');
+INSERT INTO member (account_id, email, mobile_number, zipcode, address) VALUES
+    (@A0, 'user@domain.com', '010-1200-3400', '42700', '대구광역시 달서구');
+INSERT INTO agreement (member_id, terms1, terms2, terms3, acceptance_date, acceptance, update_date) VALUES
+    (@A0, true, true, true, CURRENT_TIMESTAMP, true, CURRENT_TIMESTAMP)

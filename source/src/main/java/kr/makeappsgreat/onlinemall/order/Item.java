@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,14 +17,11 @@ public class Item<T extends Item> extends BaseEntity {
 
     @OneToOne
     @NotNull
-    @Setter
     protected Product product;
 
     @Positive
+    @Setter
     protected int quantity;
-
-    @PositiveOrZero
-    protected int total;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     protected List<T> options;

@@ -5,6 +5,7 @@ import kr.makeappsgreat.onlinemall.order.Order;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -20,7 +21,7 @@ public class Transaction extends BaseEntity {
     private Order order;
     private String orderDesc;
 
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.REMOVE)
     @NotNull
     private TransactionDetail transactionDetail;
 

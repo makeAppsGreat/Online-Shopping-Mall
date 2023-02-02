@@ -39,4 +39,11 @@ public class Product extends NamedEntity {
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime registeredDate;
+
+    public static Product of(Long id) {
+        Product product = new Product();
+        product.id = id;
+
+        return product;
+    }
 }

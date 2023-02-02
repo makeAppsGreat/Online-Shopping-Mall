@@ -5,12 +5,13 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
-public class TransactionDetail {
+public class TransactionDetail implements Serializable {
 
     @Id
     protected Long id;

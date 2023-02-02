@@ -7,11 +7,12 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-public class Agreement {
+public class Agreement implements Serializable {
 
     @Id
     private Long id;

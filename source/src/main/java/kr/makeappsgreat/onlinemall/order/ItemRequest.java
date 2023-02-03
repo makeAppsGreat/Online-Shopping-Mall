@@ -9,13 +9,13 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Getter @Setter
-public class ItemRequest {
+public class ItemRequest<T extends ItemRequest> {
 
     @NotNull
     protected Product product;
     @Positive
     protected int quantity;
-    protected List<ItemRequest> options;
+    protected List<T> options;
 
     public void setProduct(Long product) {
         this.product = Product.of(product);

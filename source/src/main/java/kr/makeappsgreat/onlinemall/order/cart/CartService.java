@@ -1,9 +1,9 @@
 package kr.makeappsgreat.onlinemall.order.cart;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 
 @Service
@@ -11,19 +11,16 @@ import java.util.Optional;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final EntityManager entityManager;
+    private final ModelMapper modelMapper;
 
     public void addToCart(Cart cart) {
-        System.out.println(">> 100 " + cartRepository.count());
         Optional<Cart> optionalCart = cartRepository.findByMemberAndProduct(cart.getMember(), cart.getProduct());
 
         if (optionalCart.isPresent()) {
             Cart savedCart = optionalCart.get();
-            System.out.println(">> isContains : " + entityManager.contains(savedCart));
-        } else {
-            cartRepository.save(cart);
-        }
+            savedCart.include(cart);
 
-        System.out.println(">> 200 " + cartRepository.count());
+            cartRepository.save(savedCart);
+        } else cartRepository.save(cart);
     }
 }

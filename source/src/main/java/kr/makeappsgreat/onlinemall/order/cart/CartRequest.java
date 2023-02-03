@@ -4,5 +4,5 @@ import kr.makeappsgreat.onlinemall.order.ItemRequest;
 import lombok.ToString;
 
 @ToString
-public class CartRequest extends ItemRequest {
+public class CartRequest extends ItemRequest<CartRequest> {
 }

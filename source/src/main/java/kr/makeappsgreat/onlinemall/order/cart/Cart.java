@@ -6,18 +6,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "product_id"}))
 @Getter
 public class Cart extends Item<Cart> {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    @NotNull
     @Setter
     private Member member;
 

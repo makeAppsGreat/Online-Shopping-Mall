@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thmeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>장바구니</title>
+</head>
+<body>
+<!--/* Breadcrumb */-->
+<ul layout:fragment="breadcrumb">
+    <li><a th:href="@{/}">홈</a></li>
+    <li>장바구니</li>
+</ul>
+<!--/* End of Breadcrumb */-->
+<!--/* Content */-->
+<div layout:fragment="content">
+    <hr>
+    <h2>Do Simple</h2>
+    <p>Welcome!</p>
+</div>
+<!--/* End of Content */-->
+</body>
+</html>

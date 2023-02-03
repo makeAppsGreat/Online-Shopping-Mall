@@ -15,6 +15,7 @@ public class NamedEntity extends BaseEntity {
 
     @Override
     public String toString() {
-        return String.format("(%s) %s", this.getClass().getSimpleName(), name);
+        if (name != null) return String.format("(%s) %s", this.getClass().getSimpleName(), name);
+        else return String.format("(%s) [%d]", this.getClass().getSimpleName(), id);
     }
 }

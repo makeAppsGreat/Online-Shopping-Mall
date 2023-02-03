@@ -1,5 +1,6 @@
 package kr.makeappsgreat.onlinemall.order.cart;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.makeappsgreat.onlinemall.product.Product;
 import kr.makeappsgreat.onlinemall.product.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +13,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -30,10 +30,13 @@ class CartControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ProductRepository productRepository;
 
+    private ObjectMapper objectMapper;
     private List<Product> products;
 
     @BeforeEach
     void beforeEach() {
+        objectMapper = new ObjectMapper();
+
         products = new ArrayList<>();
         productRepository.findByNameContainingIgnoreCase("프리머스", Pageable.unpaged())
                 .stream().sorted(Comparator.comparingInt(Product::getPrice))
@@ -44,13 +47,25 @@ class CartControllerTest {
     @Test
     @WithUserDetails
     void addToCart() throws Exception {
+        // Given
+        Map<String, Object> body = new HashMap<>();
+        Map<String, Object> option = new HashMap<>();
+
+        option.put("product", products.get(1).getId());
+        option.put("quantity", 1);
+
+        body.put("product", products.get(0).getId());
+        body.put("quantity", 2);
+        body.put("options", List.of(option));
+
+        // When & Then
         mockMvc.perform(post("/cart/add")
-                        .param("product", products.get(0).getId().toString())
-                        .param("quantity", "2")
-                        .with(csrf())
-                )
+                        .header("Content-Type", "application/json")
+                        .content(objectMapper.writeValueAsString(body))
+                        .with(csrf().asHeader()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(true));
     }
 
 }

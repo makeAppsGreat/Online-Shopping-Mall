@@ -13,10 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller @RequestMapping("/cart")
 @RequiredArgsConstructor
@@ -36,7 +33,8 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<SimpleResult> addToCart(@ModelAttribute @Validated CartRequest cartRequest, BindingResult bindingResult,
+    @ResponseBody
+    public ResponseEntity<SimpleResult> addToCart(@RequestBody @Validated CartRequest cartRequest, BindingResult bindingResult,
                                                   @ModelAttribute("user") Member user) {
         if (bindingResult.hasErrors()) {
             FieldError error = bindingResult.getFieldErrors().get(0);

@@ -4,6 +4,8 @@
       layout:decorate="~{layouts/main}">
 <head>
     <title th:text="${product.name}">Detail</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <!--/* Breadcrumb */-->
@@ -46,8 +48,7 @@
             <option th:each="option : ${options}"
                     th:value="${option.id} + ',' + ${option.price}"
                     th:label="${option.name} + ' - ' + ${#numbers.formatInteger(option.price, 3, 'COMMA')} + ' 원'"
-                    th:text="${option.name}"
-            >(상품 이름) - (상품 가격)</option>
+                    th:text="${option.name}">(상품 이름) - (상품 가격)</option>
         </select>
     </div>
 
@@ -56,11 +57,11 @@
         <table id="order_list">
             <tbody>
                 <tr>
-                    <td><input name = "product_id" type="hidden" th:value="${product.id}" /></td>
+                    <td><input name="product_id" type="hidden" th:value="${product.id}" /></td>
                     <td th:text="${product.name}">(Product Name)</td>
-                    <td><input name = "product_qty" onchange="onQtyChanged(this)" type="number" value="1" /></td>
+                    <td><input name="product_qty" onchange="onQtyChanged(this)" type="number" value="1" /></td>
                     <td style="text-align:end">
-                        <input name = "product_price" type="hidden" th:value="${product.price}" />
+                        <input name="product_price" type="hidden" th:value="${product.price}" />
                         <b th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(상품 가격)</b> 원
                     </td>
                     <td></td>
@@ -73,9 +74,11 @@
             <b id="total_price" style="font-size:x-large" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}">(Total Price)</b>
             원( <span id="total_qty" th:text="1">(Total Quantity)</span> 개)
         </p>
+        <button onclick="addToCart()">장바구니</button>
+        <button>구매하기</button>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         let tbody = document.getElementById("order_list").getElementsByTagName("tbody")[0];
 
         function onQtyChanged( target ) {
@@ -102,6 +105,33 @@
 
             document.getElementById("total_price").textContent = new Intl.NumberFormat().format(t_price);
             document.getElementById("total_qty").textContent = t_qty;
+        }
+
+        function addToCart() {
+            let rows = tbody.getElementsByTagName("tr");
+            let json = {
+                product : Number(rows[0].cells[0].children.product_id.value),
+                quantity : Number(rows[0].cells[2].children.product_qty.value),
+                options : []
+            };
+
+            if (rows.length > 1) {
+                for (let i = 1; i < rows.length; i++) {
+                    json.options.push({
+                        product : Number(rows[i].cells[0].children.product_id.value),
+                        quantity : Number(rows[i].cells[2].children.product_qty.value)
+                    });
+                }
+            }
+
+            fetchJson([[@{/cart/add}]], json, (response) => {
+                if (response.result === undefined) {
+                    alert([[#{message.error-occurred} + '\n' + #{message.reload-page}]]);
+                    location.reload();
+                }
+
+                console.log(response);
+            });
         }
     </script>
     <script th:unless="${#sets.isEmpty(product.options)}" th:inline="javascript">

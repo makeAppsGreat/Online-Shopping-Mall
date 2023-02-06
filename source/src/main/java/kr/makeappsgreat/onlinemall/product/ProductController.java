@@ -29,6 +29,8 @@ public class ProductController {
      * @TODO search(with product name, in manufacturer or category)
      */
 
+    public static final String PRODUCT_DETAIL_PREFIX = "/product/detail/";
+
     private final ProductService productService;
     private final ProductSortMethod productSortMethod;
 

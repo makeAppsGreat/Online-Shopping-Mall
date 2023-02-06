@@ -17,6 +17,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +35,7 @@ class CartControllerTest {
     private List<Product> products;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Exception {
         objectMapper = new ObjectMapper();
 
         products = new ArrayList<>();
@@ -42,11 +43,7 @@ class CartControllerTest {
                 .stream().sorted(Comparator.comparingInt(Product::getPrice))
                 .iterator().forEachRemaining(products::add);
         assertThat(products).hasSizeGreaterThan(1);
-    }
 
-    @Test
-    @WithUserDetails
-    void addToCart() throws Exception {
         // Given
         Map<String, Object> body = new HashMap<>();
         Map<String, Object> option = new HashMap<>();
@@ -67,5 +64,21 @@ class CartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(true));
     }
+
+    @Test
+    @WithUserDetails
+    void addToCart() { }
+
+    /**
+     * Test rendering of thymeleaf.
+     */
+    @Test
+    @WithUserDetails
+    void index() throws Exception {
+        mockMvc.perform(get("/cart"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
 
 }

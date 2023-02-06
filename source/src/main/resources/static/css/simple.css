@@ -11,3 +11,12 @@ ul.crumbs li+li:before { content : " > "; }
 .green { color : green }
 .blue { color : blue }
 .hint { font-size : smaller; color : gray }
+
+.b-darkgray { background-color : darkgray }
+.b-lightgray { background-color : lightgray }
+
+.tab { padding-left : 2em }
+.border { border : 1px solid }
+.right { text-align : right }
+.center { text-align : center }
+.v-center { vertical-align : middle }

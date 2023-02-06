@@ -5,6 +5,7 @@ import kr.makeappsgreat.onlinemall.user.AccountUserDetails;
 import kr.makeappsgreat.onlinemall.user.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,11 +16,15 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Locale;
+
 @Controller @RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
+    private final MessageSource messageSource;
     private final ModelMapper modelMapper;
 
     @ModelAttribute
@@ -28,14 +33,20 @@ public class CartController {
     }
 
     @GetMapping
-    public String index() {
+    // @Transactional(readOnly = true)
+    public String index(@ModelAttribute("user") Member user, Model model) {
+        List<Cart> cart = cartService.listCart(user);
+
+        model.addAttribute("cart", cart);
+        model.addAttribute("total", null);
+
         return "/order/cart";
     }
 
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<SimpleResult> addToCart(@RequestBody @Validated CartRequest cartRequest, BindingResult bindingResult,
-                                                  @ModelAttribute("user") Member user) {
+                                                  @ModelAttribute("user") Member user, Locale locale) {
         if (bindingResult.hasErrors()) {
             FieldError error = bindingResult.getFieldErrors().get(0);
 
@@ -50,7 +61,7 @@ public class CartController {
 
         Cart cart = modelMapper.map(cartRequest, Cart.class);
         cart.setMember(user);
-        cartService.addToCart(cart);
+        Object[] args = { cartService.addToCart(cart) };
 
 
         return ResponseEntity.ok(
@@ -58,7 +69,9 @@ public class CartController {
                         .result(true)
                         .code(HttpStatus.OK.value())
                         .name(null)
-                        .message(null)
+                        .message(String.format("%s\n%s",
+                                messageSource.getMessage("message.cart-added", args, locale),
+                                messageSource.getMessage("message.move-to-cart", null, locale)))
                         .build());
     }
 }

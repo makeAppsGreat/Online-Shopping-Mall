@@ -15,9 +15,9 @@
         <p sec:authorize="isAuthenticated()">
             <a th:href="@{/member/}">
                 <i class="fa-regular fa-user"></i>
-                <b sec:authentication="principal.account.name">(Login user name)</b> 님</a>
-            |
-            <a th:href="@{/logout}">로그아웃</a>
+                <b sec:authentication="principal.account.name">(Login user name)</b> 님</a> |
+            <a th:href="@{/logout}">로그아웃</a> |
+            <a th:href="@{/cart}">장바구니</a>
         </p>
         <p sec:authorize="!isAuthenticated()">
             <a th:href="@{/login}">로그인</a> |

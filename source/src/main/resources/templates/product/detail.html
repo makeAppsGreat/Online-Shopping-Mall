@@ -125,12 +125,12 @@
             }
 
             fetchJson([[@{/cart/add}]], json, (response) => {
-                if (response.result === undefined) {
+                if (response.result === undefined || response.result === false) {
                     alert([[#{message.error-occurred} + '\n' + #{message.reload-page}]]);
                     location.reload();
                 }
 
-                console.log(response);
+                if (confirm(response.message)) location.href = [[@{/cart}]];
             });
         }
     </script>

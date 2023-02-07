@@ -5,6 +5,7 @@ import kr.makeappsgreat.onlinemall.user.AccountUserDetails;
 import kr.makeappsgreat.onlinemall.user.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Locale;
 
 @Controller @RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
+
+    @Value("${common.delivery-fee}")
+    private int DELIVERY_FEE;
 
     private final CartService cartService;
     private final MessageSource messageSource;
@@ -29,22 +32,31 @@ public class CartController {
 
     @ModelAttribute
     public void addAttributes(Authentication authentication, Model model) {
-        model.addAttribute("user", ((AccountUserDetails) authentication.getPrincipal()).getAccount());
+        if (authentication != null) {
+            model.addAttribute("user", ((AccountUserDetails) authentication.getPrincipal()).getAccount());
+        }
     }
 
     @GetMapping
-    // @Transactional(readOnly = true)
     public String index(@ModelAttribute("user") Member user, Model model) {
-        List<Cart> cart = cartService.listCart(user);
+        if (user == null || user.getId() == null) return "redirect:/login";
 
-        model.addAttribute("cart", cart);
-        model.addAttribute("total", null);
+        CartRequestWrapper wrapper = new CartRequestWrapper();
+        for (Cart item : cartService.listCart(user)) wrapper.add(modelMapper.map(item, CartRequest.class));
+
+        model.addAttribute("wrapper", wrapper);
+        model.addAttribute("deliveryFee", DELIVERY_FEE);
+
 
         return "/order/cart";
     }
 
+    @PostMapping
+    public ResponseEntity index(@ModelAttribute("wrapper") CartRequestWrapper wrapper) {
+        return ResponseEntity.ok(wrapper);
+    }
+
     @PostMapping("/add")
-    @ResponseBody
     public ResponseEntity<SimpleResult> addToCart(@RequestBody @Validated CartRequest cartRequest, BindingResult bindingResult,
                                                   @ModelAttribute("user") Member user, Locale locale) {
         if (bindingResult.hasErrors()) {

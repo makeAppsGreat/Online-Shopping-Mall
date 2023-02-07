@@ -5,7 +5,7 @@
 <head>
     <title th:text="${product.name}">Detail</title>
     <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
 <!--/* Breadcrumb */-->
@@ -110,7 +110,7 @@
         function addToCart() {
             let rows = tbody.getElementsByTagName("tr");
             let json = {
-                product : Number(rows[0].cells[0].children.product_id.value),
+                productId : Number(rows[0].cells[0].children.product_id.value),
                 quantity : Number(rows[0].cells[2].children.product_qty.value),
                 options : []
             };
@@ -118,7 +118,7 @@
             if (rows.length > 1) {
                 for (let i = 1; i < rows.length; i++) {
                     json.options.push({
-                        product : Number(rows[i].cells[0].children.product_id.value),
+                        productId : Number(rows[i].cells[0].children.product_id.value),
                         quantity : Number(rows[i].cells[2].children.product_qty.value)
                     });
                 }
@@ -128,9 +128,9 @@
                 if (response.result === undefined || response.result === false) {
                     alert([[#{message.error-occurred} + '\n' + #{message.reload-page}]]);
                     location.reload();
+                } else {
+                    if (confirm(response.message)) location.href = [[@{/cart}]];
                 }
-
-                if (confirm(response.message)) location.href = [[@{/cart}]];
             });
         }
     </script>

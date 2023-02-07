@@ -15,39 +15,55 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <form>
-        <table>
-            <thead><tr class="b-lightgray"><th>선택</th><th>상품명/옵션</th><th>제품가격</th><th>수량</th><th>주문금액</th><th></th></tr></thead>
+    <form th:action="@{''}" th:object="${wrapper}" method="post">
+        <table class="table">
+            <thead>
+                <tr class="b-lightgray">
+                    <th><input type="checkbox" checked /></th>
+                    <th>상품명/옵션</th><th>상품가격</th><th>수량</th><th>금액</th><th></th>
+                </tr>
+            </thead>
             <tbody>
-                <th:block th:each="item,iterStat : ${cart}">
-                <tr th:class="${iterStat.even} ? 'b-lightgray'">
-                    <td th:rowspan="${item.options} ? ${#lists.size(item.options) + 1}"><input type="checkbox" /></td>
+                <th:block th:each="item, status : *{list}">
+                <tr th:class="${status.even} ? 'b-lightgray'">
+                    <td th:rowspan="${item.options} ? ${#lists.size(item.options) + 1}">
+                        <input type="checkbox" th:field="*{list[__${status.index}__].select}" />
+                    </td>
                     <td>
+                        <input type="hidden" th:field="*{list[__${status.index}__].productId}" />
                         <a th:href="@{${item.link}}">
-                            <img th:unless="${item.product.imageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" class="v-center border" style="height:80px">
-                            <img th:if="${item.product.imageLink}" th:src="${item.product.imageLink}" th:title="${item.product.name}" th:alt="${item.product.name}" class="v-center border" style="height:80px">
-                            [[${item.product.name}]]
+                            <img th:unless="${item.productImageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" class="v-center border" style="height:80px">
+                            <img th:if="${item.productImageLink}" th:src="${item.productImageLink}" th:title="${item.productName}" th:alt="${item.productName}" class="v-center border" style="height:80px">
+                            [[${item.productName}]]
                         </a>
                     </td>
-                    <td class="right"><span th:text="${#numbers.formatInteger(item.product.price, 3, 'COMMA')}">(Price)</span> 원</td>
+                    <td class="right">
+                        <input type="hidden" th:field="*{list[__${status.index}__].productPrice}" />
+                        <span th:text="${#numbers.formatInteger(item.productPrice, 3, 'COMMA')}">(Price)</span> 원
+                    </td>
                     <td class="center">
-                        <input type="number" th:value="${item.quantity}" class="center" style="width:40px" /><br>
+                        <input type="number" th:field="*{list[__${status.index}__].quantity}" class="center" style="width:40px" /><br>
                         <button>변경</button>
                     </td>
-                    <td class="right"><span th:text="${#numbers.formatInteger(item.total, 3, 'COMMA')}">(Price)</span> 원</td>
+                    <td class="right"><span th:text="${#numbers.formatInteger(item.total, 3, 'COMMA')}">(Total)</span> 원</td>
                     <td th:rowspan="${item.options} ? ${#lists.size(item.options) + 1}"><button>X</button></td>
                 </tr>
-                <tr th:if="${item.options}" th:each="option : ${item.options}" th:class="${iterStat.even} ? 'b-lightgray'">
+                <tr th:if="${item.options}" th:each="option, innerStatus : ${item.options}" th:class="${status.even} ? 'b-lightgray'">
                     <td>
+                        <input type="hidden" th:field="*{list[__${status.index}__].options[__${innerStatus.index}__].productId}" />
                         <a th:href="@{${option.link}}" class="tab">
-                            <img th:unless="${option.product.imageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" class="v-center border" style="height:80px">
-                            <img th:if="${option.product.imageLink}" th:src="${option.product.imageLink}" th:title="${option.product.name}" th:alt="${option.product.name}" class="v-center border" style="height:80px">
-                            [[${item.product.name}]]
+                            <img th:unless="${option.productImageLink}" th:src="@{/images/magnifying-glass-solid.svg}" title="not found" alt="not found" class="v-center border" style="height:80px">
+                            <img th:if="${option.productImageLink}" th:src="${option.productImageLink}" th:title="${option.productName}" th:alt="${option.productName}" class="v-center border" style="height:80px">
+                            [[${option.productName}]]
                         </a>
                     </td>
-                    <td class="right"><span th:text="${#numbers.formatInteger(option.product.price, 3, 'COMMA')}">(Price)</span> 원</td>
+                    <td class="right">
+                        <input type="hidden" th:field="*{list[__${status.index}__].options[__${innerStatus.index}__].productPrice}" />
+                        <span th:text="${#numbers.formatInteger(option.productPrice, 3, 'COMMA')}">(Price)</span> 원
+                    </td>
                     <td class="center">
-                        <input type="number" th:value="${option.quantity}" class="center" style="width:40px" /><br>
+                        <input type="number" th:field="*{list[__${status.index}__].options[__${innerStatus.index}__].quantity}" class="center" style="width:40px" /><br>
+                        <input type="number" th:value="${option.quantity}" min="1" class="center" style="width:40px" /><br>
                         <button>변경</button>
                     </td>
                     <td class="right"><span th:text="${#numbers.formatInteger(option.total, 3, 'COMMA')}">(Price)</span> 원</td>
@@ -55,8 +71,31 @@
                 </th:block>
             </tbody>
         </table>
+        <button>선택 삭제</button>
     </form>
+    <hr>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>주문 금액</th>
+                <td class="right" style="min-width:120px"><span></span> 원</td>
+            </tr>
+            <tr>
+                <th>배 송 비</th>
+                <td class="right"><span th:text="${#numbers.formatInteger(deliveryFee, 3, 'COMMA')}">(Delivery Fee)</span> 원</td>
+            </tr>
+            <tr>
+                <th>결제 금액</th>
+                <td class="right"><span></span> 원</td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="submit" value="선택 주문하기" />
+    <input type="submit" value="전체 주문하기" />
 </div>
+<script>
+
+</script>
 <!--/* End of Content */-->
 </body>
 </html>

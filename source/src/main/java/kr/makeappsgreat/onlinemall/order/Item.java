@@ -39,7 +39,7 @@ public class Item<T extends Item> extends BaseEntity {
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         for (S request : options) {
             T item = (T) this.getClass().getDeclaredConstructor().newInstance();
-            item.product = request.getProduct();
+            item.product = Product.of(request.getProductId());
             item.quantity = request.getQuantity();
 
             this.addOption(item);
@@ -47,24 +47,30 @@ public class Item<T extends Item> extends BaseEntity {
     }
 
     public void include(T item) {
-        if (item == null || item.getProduct() == null) {
+        if (item == null || item.product == null) {
             throw new NullPointerException("Unexpected usage : Item or Product in item is null.");
-        } else if (!item.getProduct().equals(this.product)) throw new RuntimeException("Unexpected usage : Product is not equal.");
+        } else if (!item.product.equals(this.product)) throw new RuntimeException("Unexpected usage : Product is not equal.");
 
-        List<T> srcOptions = item.getOptions();
-        for (T source : srcOptions) {
-            boolean flag = true;
+        List<T> srcOptions = item.options;
+        if (srcOptions != null) {
+            if (this.options == null || this.options.isEmpty()) {
+                for (T source : srcOptions) this.addOption(source);
+            } else {
+                for (T source : srcOptions) {
+                    boolean flag = false;
 
-            for (T option : options) {
-                if (source.getProduct().equals(option.product)) {
-                    option.quantity += source.getQuantity();
+                    for (T option : this.options) {
+                        if (source.product.equals(option.product)) {
+                            option.quantity += source.quantity;
 
-                    flag = false;
-                    break;
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (!flag) this.addOption(source);
                 }
             }
-
-            if (flag) this.addOption(source);
         }
         quantity += item.getQuantity();
     }

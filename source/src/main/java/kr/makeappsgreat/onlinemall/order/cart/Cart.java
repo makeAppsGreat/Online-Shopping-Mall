@@ -52,9 +52,4 @@ public class Cart extends Item<Cart> {
             }
         }
     }
-
-    public String getLink() {
-        System.out.println(">> " + this);
-        return link;
-    }
 }

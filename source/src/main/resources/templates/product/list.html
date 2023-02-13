@@ -34,7 +34,7 @@
         <hr>
         <p><label th:for="sortMethod">정렬방식 : </label>
             <select th:field=*{productPageRequest.sortMethod} onchange="location.href=this[this.selectedIndex].text;">
-                <option th:each="method,status : ${sortMethod}"
+                <option th:each="method, status : ${sortMethod}"
                         th:value="${status.index}"
                         th:label="${method.name}"
                         th:text="${method.link}">(정렬 방식)

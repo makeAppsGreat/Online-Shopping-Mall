@@ -16,8 +16,7 @@
 <!--/* Content */-->
 <div layout:fragment="content">
     <hr>
-    <form th:action="@{''}" th:object="${memberRequest}" method="post"
-          onsubmit="return onSubmit()" onkeydown="return event.key != 'Enter';">
+    <form th:action="@{''}" th:object="${memberRequest}" method="post" onsubmit="return onSubmit()">
         <p>
             <label th:for="name">이름</label><br>
             <input type="text" th:field="*{name}" disabled />

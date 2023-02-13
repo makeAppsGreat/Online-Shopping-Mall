@@ -12,8 +12,11 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
@@ -32,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(
         controllers = ProductController.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@Import({CsrfFilter.class, HttpSessionCsrfTokenRepository.class})
 @MockBeans({@MockBean(ManufacturerRepository.class), @MockBean(CategoryRepository.class)})
 class ProductControllerTest {
 
